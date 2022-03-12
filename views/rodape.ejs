@@ -1,0 +1,23 @@
+<div class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">	
+                <div class="copy-right">
+                    <p>&#169Copyright 2014 All Rights Reserved  Template <a href="http://w3layouts.com/">  w3layouts.com</a></p>	
+                </div>	
+            </div>
+        </div>
+    </div>
+</div>
+<!-- scroll_top_btn -->
+<script type="text/javascript" src="js/move-top.js"></script>
+<script type="text/javascript" src="js/easing.js"></script>
+<script type="text/javascript">
+    jQuery(document).ready(function($) {
+        $(".scroll").click(function(event){		
+            event.preventDefault();
+            $('html,body').animate({scrollTop:$(this.hash).offset().top},1200);
+        });
+    });
+</script>
+ <a href="#" id="toTop" style="display: block;"><span id="toTopHover" style="opacity: 1;"></span></a>
