@@ -49,10 +49,9 @@ app.get('/', (request, response) => {
 })
 
 app.get('/setup', (request, response) => {
-  // TO-DO configurar a criação das tabelas
   const query = `
-  DROP TABLE IF EXISTS vagas;
   DROP TABLE IF EXISTS unidades;
+  DROP TABLE IF EXISTS vagas;
   
   CREATE TABLE vagas (
     codigo CHAR(5) PRIMARY KEY,
