@@ -50,6 +50,60 @@ app.get('/', (request, response) => {
 
 app.get('/setup', (request, response) => {
   // TO-DO configurar a criação das tabelas
+  const query = `
+  DROP TABLE IF EXISTS vagas;
+  DROP TABLE IF EXISTS unidades;
+  
+  CREATE TABLE vagas (
+    codigo CHAR(5) PRIMARY KEY,
+    bloqueada BOOLEAN
+  );
+  
+  CREATE TABLE unidades (
+    unidade CHAR(5) PRIMARY KEY,
+    pne BOOLEAN,
+    presente BOOLEAN,
+    adimplente BOOLEAN,
+    vaga_sorteada CHAR(5) REFERENCES Vagas (codigo),
+    vagas_escolhidas JSONB
+  );
+  
+  INSERT INTO vagas (codigo, bloqueada) VALUES ('T1G01', false);
+  INSERT INTO vagas (codigo, bloqueada) VALUES ('T1G02', false);
+  INSERT INTO vagas (codigo, bloqueada) VALUES ('T1G03', false);
+  INSERT INTO vagas (codigo, bloqueada) VALUES ('T1G04', false);
+  INSERT INTO vagas (codigo, bloqueada) VALUES ('T1G05', false);
+  INSERT INTO vagas (codigo, bloqueada) VALUES ('T1G06', true);
+  INSERT INTO vagas (codigo, bloqueada) VALUES ('T1G07', false);
+  INSERT INTO vagas (codigo, bloqueada) VALUES ('T1G08', false);
+  
+  INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas)
+  VALUES ('T1041', false, true, true, NULL, '[{"vaga": "T1G01"},{"vaga": "T1G02"}]');
+  INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas)
+  VALUES ('T1042', false, true, true, NULL, NULL);
+  INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas)
+  VALUES ('T1043', false, true, false, NULL, '[{"vaga": "T1G01"},{"vaga": "T1G03"}]');
+  INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas)
+  VALUES ('T1044', false, true, true, NULL, '[{"vaga": "T1G04"},{"vaga": "T1G05"}]');
+  INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas)
+  VALUES ('T1051', false, false, true, NULL, '[{"vaga": "T1G04"},{"vaga": "T1G05"}]');
+  INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas)
+  VALUES ('T1052', false, false, true, NULL, '[{"vaga": "T1G03"},{"vaga": "T1G04"},{"vaga": "T1G05"}]');
+  INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas)
+  VALUES ('T1053', true, true, true, NULL, '[{"vaga": "T1G01"},{"vaga": "T1G08"},{"vaga": "T1G04"}]');
+  INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas)
+  VALUES ('T1054', true, true, true, NULL, '[{"vaga": "T1G01"},{"vaga": "T1G08"},{"vaga": "T1G04"}]');
+  INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas)
+  VALUES ('T1061', true, true, true, NULL, NULL);
+  `
+
+  pool.query(query, (error, results) => {
+    if (error) {
+      response.status(503).json({ status: 'error', message: error.message })
+    } else {
+      response.send('Setup finalizado com sucesso.')
+    }
+  })
 })
 
 function sorteia_vagas(vagas_disponiveis, query) {
@@ -58,40 +112,40 @@ function sorteia_vagas(vagas_disponiveis, query) {
       response.status(503).json({ status: 'error', message: error.message })
     }
     var aptos = results.rows
-    // sorteia aleatoriamente a lista de apartamentos
+    // sorteia aleatoriamente a lista de unidades
     aptos.sort(function(a, b){return 0.5 - Math.random()})
-    aptos.forEach(apartamentos_element => {
-      var vagas_escolhidas = apartamentos_element.vagas_escolhidas 
+    aptos.forEach(unidades_element => {
+      var vagas_escolhidas = unidades_element.vagas_escolhidas 
       //console.log('vagas_escolhidas')           
       //console.log(vagas_escolhidas)
       if (vagas_escolhidas != null) {
         vagas_escolhidas.forEach(vagas_element => {
-          if (apartamentos_element.vaga_sorteada === null) { 
+          if (unidades_element.vaga_sorteada === null) { 
             //console.log('vagas_element.vaga '+vagas_element.vaga)           
             var indice_lista_vagas_disponiveis = vagas_disponiveis.indexOf(vagas_element.vaga)
             //console.log('indice_lista_vagas_disponiveis')
             //console.log(indice_lista_vagas_disponiveis)              
             if (indice_lista_vagas_disponiveis > -1) {
               //console.log('vagas_disponiveis[indice_lista_vagas_disponiveis] '+vagas_disponiveis[indice_lista_vagas_disponiveis])
-              apartamentos_element.vaga_sorteada = vagas_disponiveis[indice_lista_vagas_disponiveis]
+              unidades_element.vaga_sorteada = vagas_disponiveis[indice_lista_vagas_disponiveis]
               vagas_disponiveis.splice(indice_lista_vagas_disponiveis, 1);
               //console.log('vagas_disponiveis '+vagas_disponiveis)                
             }
           }
         })
         // se ao final todas as vagas escolhidas foram sorteadas, o apartamento recebe a primeira vaga disponivel
-        if (apartamentos_element.vaga_sorteada === null) {
-          apartamentos_element.vaga_sorteada = vagas_disponiveis[0]
+        if (unidades_element.vaga_sorteada === null) {
+          unidades_element.vaga_sorteada = vagas_disponiveis[0]
           vagas_disponiveis.splice(0, 1);  
         }
       } else {
         // se o apartamento sorteado não escolheu nenhuma vaga ele deverá pegar a primeira disponível
-        apartamentos_element.vaga_sorteada = vagas_disponiveis[0]
+        unidades_element.vaga_sorteada = vagas_disponiveis[0]
         vagas_disponiveis.splice(0, 1);
         //console.log('vagas_disponiveis '+vagas_disponiveis)                
       }
-      console.log('apartamentos_element')
-      console.log(apartamentos_element)
+      console.log('unidades_element')
+      console.log(unidades_element)
     })
     console.log('vagas_disponiveis')
     console.log(vagas_disponiveis)  
@@ -99,7 +153,7 @@ function sorteia_vagas(vagas_disponiveis, query) {
   return vagas_disponiveis
 }
 
-app.post('/sorteio', (request, response) => {
+app.get('/sorteio', (request, response) => {
   pool.query('SELECT codigo FROM vagas WHERE bloqueada = false', (error, results) => {
     if (error) {
       response.status(503).json({ status: 'error', message: 'Não há vagas disponíveis' })
@@ -116,26 +170,27 @@ app.post('/sorteio', (request, response) => {
       if (qtd_de_vagas_disponiveis < 1) {
         response.status(503).json({ status: 'error', message: 'Não há vagas disponíveis' })
       } else {
-        // sorteio apartamentos com portadores de necessidade especiais
-        console.log('sorteio apartamentos com portadores de necessidade especiais')
+        // sorteio unidades com portadores de necessidade especiais
+        console.log('sorteio unidades com portadores de necessidade especiais')
         vagas_disponiveis = sorteia_vagas(vagas_disponiveis, 
-          'SELECT unidade, vaga_sorteada, vagas_escolhidas FROM apartamentos WHERE pne = true AND presente = true')
+          'SELECT unidade, vaga_sorteada, vagas_escolhidas FROM unidades WHERE pne = true AND presente = true')
         
-        // sorteio apartamentos sem portadores de necessidade especiais
-        console.log('sorteio apartamentos sem portadores de necessidade especiais')
+        // sorteio unidades sem portadores de necessidade especiais
+        console.log('sorteio unidades sem portadores de necessidade especiais')
         vagas_disponiveis = sorteia_vagas(vagas_disponiveis, 
-          'SELECT unidade, vaga_sorteada, vagas_escolhidas FROM apartamentos WHERE adimplente = true AND pne = false AND presente = true')  
+          'SELECT unidade, vaga_sorteada, vagas_escolhidas FROM unidades WHERE adimplente = true AND pne = false AND presente = true')  
 
-        // sorteio apartamentos sem portadores de necessidade especiais e inadimplentes
-        console.log('sorteio apartamentos sem portadores de necessidade especiais e inadimplentes')
+        // sorteio unidades sem portadores de necessidade especiais e inadimplentes
+        console.log('sorteio unidades sem portadores de necessidade especiais e inadimplentes')
         vagas_disponiveis = sorteia_vagas(vagas_disponiveis, 
-          'SELECT unidade, vaga_sorteada, vagas_escolhidas FROM apartamentos WHERE adimplente = false AND pne = false AND presente = true')  
+          'SELECT unidade, vaga_sorteada, vagas_escolhidas FROM unidades WHERE adimplente = false AND pne = false AND presente = true')  
 
-        // sorteio apartamentos sem portadores de necessidade especiais e ausentes
-        console.log('sorteio apartamentos sem portadores de necessidade especiais e ausentes')
+        // sorteio unidades sem portadores de necessidade especiais e ausentes
+        console.log('sorteio unidades sem portadores de necessidade especiais e ausentes')
         vagas_disponiveis = sorteia_vagas(vagas_disponiveis, 
-          'SELECT unidade, vaga_sorteada, vagas_escolhidas FROM apartamentos WHERE pne = false AND presente = false')  
-      
+          'SELECT unidade, vaga_sorteada, vagas_escolhidas FROM unidades WHERE pne = false AND presente = false')  
+
+        response.status(200).json({ status: 'success', message: 'Sorteio realizado com sucesso.' })
       }
     }
   })
