@@ -31,7 +31,7 @@ const postLimiter = rateLimit({
 })
 
 app.use(limiter, (request, response, next) => {
-  if (request.url != '/') {
+  if (request.url != '/' && request.url != '/sorteio') {
     if (
       !request.header('apiKey') ||
       request.header('apiKey') !== process.env.API_KEY
@@ -109,7 +109,7 @@ app.get('/setup', (request, response) => {
 function sorteia_vagas(vagas_disponiveis, query) {
   pool.query(query, (error, results) => {
     if (error) {
-      response.status(503).json({ status: 'error', message: error.message })
+      response.status(503).json({ status: 'warning', message: error.message })
     }
     var aptos = results.rows
     // sorteia aleatoriamente a lista de unidades
