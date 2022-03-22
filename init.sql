@@ -29,6 +29,8 @@ INSERT INTO vagas (codigo, bloqueada) VALUES ('T1G05', false);
 INSERT INTO vagas (codigo, bloqueada) VALUES ('T1G06', true);
 INSERT INTO vagas (codigo, bloqueada) VALUES ('T1G07', false);
 INSERT INTO vagas (codigo, bloqueada) VALUES ('T1G08', false);
+INSERT INTO vagas (codigo, bloqueada) VALUES ('T1G09', false);
+INSERT INTO vagas (codigo, bloqueada) VALUES ('T1G10', false);
 
 
 INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas)
