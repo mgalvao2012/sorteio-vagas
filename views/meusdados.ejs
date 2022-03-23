@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Sorteio de vagas de estacionamento do Condomínio Grandlife Ipiranga</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'cross-origin'">
+-->
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link href="./css/style.css" rel='stylesheet' type='text/css' />
+<style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    
+    th, td {
+      text-align: left;
+      padding: 8px;
+    }
+    
+    tr:nth-child(even) {background-color: #f2f2f2;}
+    </style>
+</head>
+<body>
+
+<!-- Navbar (sit on top) -->
+<div class="w3-top">
+  <div class="w3-bar w3-white w3-card" id="myNavbar">
+    <a href="/" class="w3-bar-item w3-button w3-wide">SVE</a>
+    <!-- Right-sided navbar links -->
+    <div class="w3-right w3-hide-small">
+      <a href="/#about" class="w3-bar-item w3-button"> ABOUT</a>
+      <a href="/#contact" class="w3-bar-item w3-button"><i class="fa fa-envelope"></i> CONTACT</a>
+      <% if (email) { %>
+        <div class="dropdown">
+          <button class="dropbtn"><%= name %> 
+            <i class="fa fa-caret-down"></i>
+          </button>
+          <div class="dropdown-content">
+            <a href="/meusdados">Meus dados</a>
+            <a href="/logout">Logout</a>
+          </div>
+        </div> 
+      <% } else { %>
+        <a href="/login" onclick="w3_close()" class="w3-bar-item w3-button">Login</a>
+      <% } %>
+      <!--
+      <a href="#team" class="w3-bar-item w3-button"><i class="fa fa-user"></i> TEAM</a>
+      <a href="#work" class="w3-bar-item w3-button"><i class="fa fa-th"></i> WORK</a>
+      <a href="#pricing" class="w3-bar-item w3-button"><i class="fa fa-usd"></i> PRICING</a>
+      -->
+    </div>
+    <!-- Hide right-floated links on small screens and replace them with a menu icon -->
+
+    <a href="javascript:void(0)" class="w3-bar-item w3-button w3-right w3-hide-large w3-hide-medium" onclick="w3_open()">
+      <i class="fa fa-bars"></i>
+    </a>
+  </div>
+</div>
+
+<!-- Sidebar on small screens when clicking the menu icon -->
+<nav class="w3-sidebar w3-bar-block w3-black w3-card w3-animate-left w3-hide-medium w3-hide-large" style="display:none" id="mySidebar">
+  <a href="javascript:void(0)" onclick="w3_close()" class="w3-bar-item w3-button w3-large w3-padding-16">Close ×</a>
+  <a href="#about" onclick="w3_close()" class="w3-bar-item w3-button">ABOUT</a>
+  <a href="#contact" onclick="w3_close()" class="w3-bar-item w3-button">CONTACT</a>
+  <% if (email) { %>
+    <div class="w3-dropdown-hover w3-mobile">
+      <button class="w3-button"><%= name %><i class="fa fa-caret-down"></i></button>
+      <div class="w3-dropdown-content w3-bar-block w3-dark-grey">
+        <a href="/meusdados" class="w3-bar-item w3-button">Meus dados</a>
+        <a href="/logout" class="w3-bar-item w3-button">Logout</a>
+      </div>
+    </div>
+  <% } else { %>
+    <a href="/login" onclick="w3_close()" class="w3-bar-item w3-button">Login</a>
+  <% } %>
+<!--
+  <a href="#team" onclick="w3_close()" class="w3-bar-item w3-button">TEAM</a>
+  <a href="#work" onclick="w3_close()" class="w3-bar-item w3-button">WORK</a>
+  <a href="#pricing" onclick="w3_close()" class="w3-bar-item w3-button">PRICING</a>
+-->  
+</nav>
+
+<!-- Header with full-height image
+<header class="bgimg-interna-1 w3-display-container w3-grayscale-min" id="home">
+  <div class="w3-display-left w3-text-white" style="padding:48px">
+    <span class="w3-jumbo w3-hide-small titulo-principal">Sorteio de vagas de estacionamento do Condomínio Grandlife Ipiranga</span><br>
+    <span class="w3-xxlarge w3-hide-large w3-hide-medium titulo-principal">Sorteio de vagas de estacionamento do Condomínio Grandlife Ipiranga</span><br>
+    <span class="w3-large titulo-principal">O jeito mais fácil e rápido de conseguir as melhores vagas</span>
+    <p><a href="#about" class="w3-button w3-white w3-padding-large w3-large w3-margin-top w3-opacity w3-hover-opacity-off">Veja mais detalhes</a></p>
+  </div> 
+</header>
+ -->
+
+<!-- Contact Section -->
+<div class="w3-container w3-light-grey" style="padding:128px 16px;" id="contact">
+    <div style="padding: 20px; box-shadow: 0 3px 18px 8px rgb(38 24 24 / 25%);">
+      <h3 class="w3-center">Meus dados</h3>
+      <p class="w3-center w3-medium">Atualize suas informações para participar do sorteio.</p>
+      <div style="margin-top:48px; width: 70%; margin: auto;">
+        <div>
+            <form action="/meusdados" method="POST">
+              <p><label class="w3-label">Nome</label>
+              <input class="w3-input w3-border" type="text" required name="name" value="<%= name %>"></p>
+              <p><label class="w3-label">Email</label>
+              <input class="w3-input w3-border" type="text" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" required name="email" value="<%= email %>"></p>
+              <p><label class="w3-label">Unidade: exemplo <span>T1041</span>, T + (torre 1 ou 2) + (número do apartamento)</label>
+              <input class="w3-input w3-border" type="text" pattern="T[1-2][0-1][0-9][1-4]" required name="unidade" value="<%= unidade %>" oninput="apagaMensagem()"></p>
+              <p id="mensagem"><label class="w3-label"><%= mensagem %></label></p>
+              <p>
+                <input type="text" id="unidades_escolhidas" name="unidades_escolhidas" style="display: none;">
+                <button class="w3-button w3-black" type="submit">
+                    <i class="fa fa-paper-plane"></i> ENVIAR
+                </button>
+              </p>
+              <p>
+                <div style="overflow-x: auto;">
+                    <table>
+                      <tr>
+                        <th>Vaga</th>
+                        <th>Vaga</th>
+                        <th>Vaga</th>
+                        <th>Vaga</th>
+                        <th>Vaga</th>
+                        <th>Vaga</th>
+                        <th>Vaga</th>
+                        <th>Vaga</th>
+                        <th>Vaga</th>
+                        <th>Vaga</th>
+                      </tr>
+                      <tr>
+                        <td id="T1G01" onclick="unidadeClicada('T1G01')">T1G01</td>
+                        <td id="T1G02" onclick="unidadeClicada('T1G02')">T1G02</td>
+                        <td>50</td>
+                        <td>50</td>
+                        <td>50</td>
+                        <td>50</td>
+                        <td>50</td>
+                        <td>50</td>
+                        <td>50</td>
+                        <td>50</td>
+                      </tr>
+                      <tr>
+                        <td>Eve</td>
+                        <td>Jackson</td>
+                        <td>94</td>
+                        <td>94</td>
+                        <td>94</td>
+                        <td>94</td>
+                        <td>94</td>
+                        <td>94</td>
+                        <td>94</td>
+                        <td>94</td>
+                      </tr>
+                      <tr>
+                        <td>Adam</td>
+                        <td>Johnson</td>
+                        <td>67</td>
+                        <td>67</td>
+                        <td>67</td>
+                        <td>67</td>
+                        <td>67</td>
+                        <td>67</td>
+                        <td>67</td>
+                        <td>67</td>
+                      </tr>
+                    </table>
+                  </div>                  
+              </p>
+            </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Footer -->
+  <footer class="w3-center w3-black w3-padding-64">
+    <a href="#home" class="w3-button w3-light-grey"><i class="fa fa-arrow-up w3-margin-right"></i>To the top</a>
+    <div class="w3-xlarge w3-section">
+      <i class="fa fa-facebook-official w3-hover-opacity"></i>
+      <i class="fa fa-instagram w3-hover-opacity"></i>
+      <i class="fa fa-snapchat w3-hover-opacity"></i>
+      <i class="fa fa-pinterest-p w3-hover-opacity"></i>
+      <i class="fa fa-twitter w3-hover-opacity"></i>
+      <i class="fa fa-linkedin w3-hover-opacity"></i>
+    </div>
+    <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank" class="w3-hover-text-green">w3.css</a></p>
+  </footer>
+   
+  <script>
+  var lista = []
+
+  function apagaMensagem() {
+    document.getElementById("mensagem").innerHTML = '';  
+  }
+
+  function unidadeClicada(valor) {
+      var celula = document.getElementById(valor).style.backgroundColor;
+      if (celula.valueOf() == 'yellow') {
+        document.getElementById(valor).style.backgroundColor = "";
+        lista.pop(valor);
+      } else {
+        document.getElementById(valor).style.backgroundColor = "yellow";
+        lista.push(valor);
+      }
+      var lista_unidades = document.getElementById("unidades_escolhidas");      
+      lista_unidades.value = lista;
+    }
+
+  // Toggle between showing and hiding the sidebar when clicking the menu icon
+  var mySidebar = document.getElementById("mySidebar");
+  
+  function w3_open() {
+    if (mySidebar.style.display === 'block') {
+      mySidebar.style.display = 'none';
+    } else {
+      mySidebar.style.display = 'block';
+    }
+  }
+  
+  // Close the sidebar with the close button
+  function w3_close() {
+      mySidebar.style.display = "none";
+  }
+  </script>
+  
+  </body>
+  </html>
+  

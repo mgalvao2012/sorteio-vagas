@@ -1,38 +1,46 @@
+<!DOCTYPE html>
 <html>
 <head>
 <title>Sorteio de vagas de estacionamento do Condomínio Grandlife Ipiranga</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'cross-origin'">
+-->
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<link href="./public/css/style.css" rel='stylesheet' type='text/css' />
+<link href="./css/style.css" rel='stylesheet' type='text/css' />
+
 </head>
 <body>
 
 <!-- Navbar (sit on top) -->
 <div class="w3-top">
   <div class="w3-bar w3-white w3-card" id="myNavbar">
-    <a href="#home" class="w3-bar-item w3-button w3-wide">LOGO</a>
+    <a href="#home" class="w3-bar-item w3-button w3-wide">SVE</a>
     <!-- Right-sided navbar links -->
     <div class="w3-right w3-hide-small">
-      <a href="#about" class="w3-bar-item w3-button">ABOUT</a>
-      <div class="dropdown">
-        <button class="dropbtn">Dropdown 
-          <i class="fa fa-caret-down"></i>
-        </button>
-        <div class="dropdown-content">
-          <a href="#">Link 1</a>
-          <a href="#">Link 2</a>
-          <a href="#">Link 3</a>
-        </div>
-      </div> 
+      <a href="#about" class="w3-bar-item w3-button"> ABOUT</a>
+      <a href="#contact" class="w3-bar-item w3-button"><i class="fa fa-envelope"></i> CONTACT</a>
+      <% if (email) { %>
+        <div class="dropdown">
+          <button class="dropbtn"><%= name %> 
+            <i class="fa fa-caret-down"></i>
+          </button>
+          <div class="dropdown-content">
+            <a href="/meusdados">Meus dados</a>
+            <a href="/logout">Logout</a>
+          </div>
+        </div> 
+      <% } else { %>
+        <a href="/login" onclick="w3_close()" class="w3-bar-item w3-button">Login</a>
+      <% } %>
       <!--
       <a href="#team" class="w3-bar-item w3-button"><i class="fa fa-user"></i> TEAM</a>
       <a href="#work" class="w3-bar-item w3-button"><i class="fa fa-th"></i> WORK</a>
-      -->
       <a href="#pricing" class="w3-bar-item w3-button"><i class="fa fa-usd"></i> PRICING</a>
-      <a href="#contact" class="w3-bar-item w3-button"><i class="fa fa-envelope"></i> CONTACT</a>
+      -->
     </div>
     <!-- Hide right-floated links on small screens and replace them with a menu icon -->
 
@@ -46,19 +54,23 @@
 <nav class="w3-sidebar w3-bar-block w3-black w3-card w3-animate-left w3-hide-medium w3-hide-large" style="display:none" id="mySidebar">
   <a href="javascript:void(0)" onclick="w3_close()" class="w3-bar-item w3-button w3-large w3-padding-16">Close ×</a>
   <a href="#about" onclick="w3_close()" class="w3-bar-item w3-button">ABOUT</a>
-  <div class="w3-dropdown-hover w3-mobile">
-    <button class="w3-button">Dropdown <i class="fa fa-caret-down"></i></button>
-    <div class="w3-dropdown-content w3-bar-block w3-dark-grey">
-      <a href="#" class="w3-bar-item w3-button">Link 1</a>
-      <a href="#" class="w3-bar-item w3-button">Link 2</a>
-      <a href="#" class="w3-bar-item w3-button">Link 3</a>
+  <a href="#contact" onclick="w3_close()" class="w3-bar-item w3-button">CONTACT</a>
+  <% if (email) { %>
+    <div class="w3-dropdown-hover w3-mobile">
+      <button class="w3-button"><%= name %><i class="fa fa-caret-down"></i></button>
+      <div class="w3-dropdown-content w3-bar-block w3-dark-grey">
+        <a href="/meusdados" class="w3-bar-item w3-button">Meus dados</a>
+        <a href="/logout" class="w3-bar-item w3-button">Logout</a>
+      </div>
     </div>
-  </div>
-
+  <% } else { %>
+    <a href="/login" onclick="w3_close()" class="w3-bar-item w3-button">Login</a>
+  <% } %>
+<!--
   <a href="#team" onclick="w3_close()" class="w3-bar-item w3-button">TEAM</a>
   <a href="#work" onclick="w3_close()" class="w3-bar-item w3-button">WORK</a>
   <a href="#pricing" onclick="w3_close()" class="w3-bar-item w3-button">PRICING</a>
-  <a href="#contact" onclick="w3_close()" class="w3-bar-item w3-button">CONTACT</a>
+-->  
 </nav>
 
 <!-- Header with full-height image -->

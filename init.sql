@@ -18,6 +18,7 @@ CREATE TABLE unidades (
   presente BOOLEAN,
   adimplente BOOLEAN,
   vaga_sorteada CHAR(5) REFERENCES Vagas (codigo),
+  user_id CHAR(80),
   vagas_escolhidas JSONB
 );
 
