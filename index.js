@@ -175,91 +175,22 @@ app.post('/meusdados', requiresAuth(), (request, response) => {
 })
 
 app.get('/setup', requiresAuth(), (request, response) => {
-  const query = `
-  DROP TABLE IF EXISTS unidades;
-  DROP TABLE IF EXISTS vagas;
-  
-  CREATE TABLE vagas (
-    codigo CHAR(5) PRIMARY KEY,
-    bloqueada BOOLEAN
-  );
-  
-  CREATE TABLE unidades (
-    unidade CHAR(5) PRIMARY KEY,
-    pne BOOLEAN,
-    presente BOOLEAN,
-    adimplente BOOLEAN,
-    vaga_sorteada CHAR(5) REFERENCES Vagas (codigo),
-    user_id CHAR(80),
-    vagas_escolhidas JSONB
-  );
-  
-  INSERT INTO vagas (codigo, bloqueada) VALUES ('T1G01', false);
-  INSERT INTO vagas (codigo, bloqueada) VALUES ('T1G02', false);
-  INSERT INTO vagas (codigo, bloqueada) VALUES ('T1G03', false);
-  INSERT INTO vagas (codigo, bloqueada) VALUES ('T1G04', false);
-  INSERT INTO vagas (codigo, bloqueada) VALUES ('T1G05', false);
-  INSERT INTO vagas (codigo, bloqueada) VALUES ('T1G06', false);
-  INSERT INTO vagas (codigo, bloqueada) VALUES ('T1G07', false);
-  INSERT INTO vagas (codigo, bloqueada) VALUES ('T1G08', false);
-  INSERT INTO vagas (codigo, bloqueada) VALUES ('T1G09', false);
-  INSERT INTO vagas (codigo, bloqueada) VALUES ('T1G10', false);
-  INSERT INTO vagas (codigo, bloqueada) VALUES ('T1G11', false);
-  INSERT INTO vagas (codigo, bloqueada) VALUES ('T1G12', false);
-  INSERT INTO vagas (codigo, bloqueada) VALUES ('T1G13', false);
-  INSERT INTO vagas (codigo, bloqueada) VALUES ('T1G14', false);
-  INSERT INTO vagas (codigo, bloqueada) VALUES ('T1G15', false);
-  INSERT INTO vagas (codigo, bloqueada) VALUES ('T1G16', false);
-  INSERT INTO vagas (codigo, bloqueada) VALUES ('T1G17', false);
-  INSERT INTO vagas (codigo, bloqueada) VALUES ('T1G18', false);
-  INSERT INTO vagas (codigo, bloqueada) VALUES ('T1G19', false);
-  INSERT INTO vagas (codigo, bloqueada) VALUES ('T1G20', false);
-
-  INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas)
-  VALUES ('T1041', false, true, true, NULL, '[{"vaga": "T1G01"},{"vaga": "T1G02"}]');
-  INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas)
-  VALUES ('T1042', false, true, true, NULL, NULL);
-  INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas)
-  VALUES ('T1043', false, true, false, NULL, '[{"vaga": "T1G01"},{"vaga": "T1G03"}]');
-  INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas)
-  VALUES ('T1044', false, true, true, NULL, '[{"vaga": "T1G04"},{"vaga": "T1G05"}]');
-  INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas)
-  VALUES ('T1051', false, false, true, NULL, '[{"vaga": "T1G04"},{"vaga": "T1G05"}]');
-  INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas)
-  VALUES ('T1052', false, false, true, NULL, '[{"vaga": "T1G03"},{"vaga": "T1G04"},{"vaga": "T1G05"}]');
-  INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas)
-  VALUES ('T1053', true, true, true, NULL, '[{"vaga": "T1G01"},{"vaga": "T1G08"},{"vaga": "T1G04"}]');
-  INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas)
-  VALUES ('T1054', true, true, true, NULL, '[{"vaga": "T1G01"},{"vaga": "T1G08"},{"vaga": "T1G04"}]');
-  INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas)
-  VALUES ('T1061', true, true, true, NULL, NULL);
-  INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas)
-  VALUES ('T2041', false, true, true, NULL, '[{"vaga": "T2G01"},{"vaga": "T2G02"}]');
-  INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas)
-  VALUES ('T2042', false, true, true, NULL, NULL);
-  INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas)
-  VALUES ('T2043', false, true, false, NULL, '[{"vaga": "T1G01"},{"vaga": "T1G03"}]');
-  INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas)
-  VALUES ('T2044', false, true, true, NULL, '[{"vaga": "T1G04"},{"vaga": "T1G05"}]');
-  INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas)
-  VALUES ('T2051', false, false, true, NULL, '[{"vaga": "T1G04"},{"vaga": "T1G05"}]');
-  INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas)
-  VALUES ('T2052', false, false, true, NULL, '[{"vaga": "T1G03"},{"vaga": "T1G04"},{"vaga": "T1G05"}]');
-  INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas)
-  VALUES ('T2053', true, true, true, NULL, '[{"vaga": "T1G01"},{"vaga": "T1G08"},{"vaga": "T1G04"}]');
-  INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas)
-  VALUES ('T2054', true, true, true, NULL, '[{"vaga": "T1G01"},{"vaga": "T1G08"},{"vaga": "T1G04"}]');
-  INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas)
-  VALUES ('T2061', true, true, true, NULL, NULL);
-  `
-
-  pool.query(query, (error, results) => {
+  var fs = require('fs');
+  fs.readFile('init.sql', 'utf8', function(error, data) {
     if (error) {
       response.status(500).json({ status: 'error', message: error.message })
     } else {
-      response.send('Setup finalizado com sucesso.')
+      const query = data
+      pool.query(query, (error, results) => {
+        if (error) {
+          response.status(500).json({ status: 'error', message: error.message })
+        } else {
+          response.send('Setup finalizado com sucesso.')
+        }
+      })    
     }
   })
+
 })
 
 function sorteia_vagas(objetivo, vagas_disponiveis, query) {
