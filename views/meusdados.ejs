@@ -103,29 +103,50 @@
     }
 
     .imagem-subsolo1 {
-      background: url(../images/subsolo1.jpg) no-repeat center center fixed;
+      background: url(../images/subsolo1.jpg) no-repeat center top;
       background-size: auto auto;
       background-size: 100% auto;
       margin: 0;
       padding: 0;
-      height:300px;
+      min-height: 300px;
       width:100%;
     }
     .imagem-subsolo2 {
-      background: url(../images/subsolo2.jpg) no-repeat center center fixed;
+      background: url(../images/subsolo2.jpg) no-repeat center top;
       background-size: auto auto;
       background-size: 100% auto;
       margin: 0;
       padding: 0;
-      height:300px;
+      min-height:300px;
       width:100%;
     }
-    @media screen and (max-width:800px) {
-      .imagem-subsolo1 .imagem-subsolo2 {
-        background-size: cover;
-        background-attachment:fixed;
+    /*
+    @media screen and (max-width:1400px) {
+      .imagem-subsolo1, .imagem-subsolo2 {
+        min-height:900px;
+      }
+    }    
+    @media screen and (max-width:1200px) {
+      .imagem-subsolo1, .imagem-subsolo2 {
+        min-height:750px;
+      }
+    }    
+    @media screen and (max-width: 800px) {
+      .imagem-subsolo1, .imagem-subsolo2 {
+        min-height:650px;
       }
     }
+    @media screen and (max-width: 600px) {
+      .imagem-subsolo1, .imagem-subsolo2 {
+        min-height:450px;
+      }
+    }
+    @media screen and (max-width: 600px) {
+      .imagem-subsolo1, .imagem-subsolo2 {
+        min-height:300px;
+      }
+    }
+    */
 </style>
 </head>
 <body>
@@ -216,8 +237,8 @@
                     <div class="w3-bar" >
                         <input id="S1b" type="button" class="aba-subsolo" onclick="abreSubsolo('S1')" value="Sub-solo 1">
                         <input id="S2b" type="button" onclick="abreSubsolo('S2')" value="Sub-solo 2">
-                        <input id="S3b" type="button" onclick="abreSubsolo('S3')" value="Mapa Sub-solo 1">
-                        <input id="S4b" type="button" onclick="abreSubsolo('S4')" value="Mapa Sub-solo 2">
+                        <input id="S3b" type="button" onclick="abreSubsolo('S3')" value="Mapa S1">
+                        <input id="S4b" type="button" onclick="abreSubsolo('S4')" value="Mapa S2">
                     </div> 
                     <div id="S1" class="cards subsolo w3-border">  
                         <% lista_vagas.forEach(function(row) { %>
@@ -245,10 +266,10 @@
                           <% } %>
                       <% }) %>
                     </div>
-                    <div id="S3" class="subsolo w3-border" style="display:none"> 
+                    <div id="S3" class="subsolo" style="display:none"> 
                       <div class="imagem-subsolo1"></div>
                     </div>
-                    <div id="S4" class="subsolo w3-border" style="display:none"> 
+                    <div id="S4" class="subsolo" style="display:none"> 
                       <div class="imagem-subsolo2"></div>
                     </div>
                 </div>                  
