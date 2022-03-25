@@ -62,6 +62,45 @@
         text-align: center;
         color: #000;  
       }
+
+    /* The Modal (background) */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1; /* Sit on top */
+        padding-top: 100px; /* Location of the box */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+    
+    /* Modal Content */
+    .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+    }
+    
+    /* The Close Button */
+    .close {
+        color: #aaaaaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+    
+    .close:hover,
+    .close:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+    }
 </style>
 </head>
 <body>
@@ -124,25 +163,21 @@
 -->  
 </nav>
 
-<!-- Header with full-height image
-<header class="bgimg-interna-1 w3-display-container w3-grayscale-min" id="home">
-  <div class="w3-display-left w3-text-white" style="padding:48px">
-    <span class="w3-jumbo w3-hide-small titulo-principal">Sorteio de vagas de estacionamento do Condomínio Grandlife Ipiranga</span><br>
-    <span class="w3-xxlarge w3-hide-large w3-hide-medium titulo-principal">Sorteio de vagas de estacionamento do Condomínio Grandlife Ipiranga</span><br>
-    <span class="w3-large titulo-principal">O jeito mais fácil e rápido de conseguir as melhores vagas</span>
-    <p><a href="#about" class="w3-button w3-white w3-padding-large w3-large w3-margin-top w3-opacity w3-hover-opacity-off">Veja mais detalhes</a></p>
-  </div> 
-</header>
- -->
+<!-- The Modal Message -->
+<div id="myModal" class="modal">
+    <!-- Modal content -->
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <p><%= mensagem %></p>
+    </div>  
+</div> 
 
-<!-- Contact Section -->
-<div class="w3-container w3-light-grey" style="padding:128px 16px;" id="contact">
-    <div style="padding: 20px; box-shadow: 0 3px 18px 8px rgb(38 24 24 / 25%);">
-
-        
+<!-- Form Section -->
+<div class="w3-container w3-light-grey" style="padding:78px 16px;" id="meusdados">
+    <div style="padding: 10px; box-shadow: 0 3px 18px 8px rgb(38 24 24 / 25%);">
       <h3 class="w3-center">Meus dados</h3>
       <p class="w3-center w3-medium">Atualize suas informações para participar do sorteio.</p>
-      <div style="margin-top:48px; width: 90%; margin: auto;">
+      <div style="margin-top:28px; width: 90%; margin: auto;">
         <div>
             <form action="/meusdados" method="POST">
               <p><label class="w3-label">Nome</label>
@@ -151,126 +186,42 @@
               <input class="w3-input w3-border" type="text" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" required name="email" value="<%= email %>"></p>
               <p><label class="w3-label">Unidade: exemplo <span>T1041</span>, T + (torre 1 ou 2) + (número do apartamento)</label>
               <input class="w3-input w3-border" type="text" pattern="T[1-2][0-1][0-9][1-4]" required name="unidade" value="<%= unidade %>" oninput="apagaMensagem()"></p>
-              <p id="mensagem"><label class="w3-label"><%= mensagem %></label></p>
-              <p>                  
+              <p>
                 <div>
                     <div class="w3-bar" >
                         <input id="S1b" type="button" class="aba-subsolo" onclick="abreSubsolo('S1')" value="Sub-solo 1">
                         <input id="S2b" type="button" class="botaoSubsolo" onclick="abreSubsolo('S2')" value="Sub-solo 2">
                     </div> 
-                    <div id="S1" class="cards subsolo w3-border">                     
-                        <div class="card" onclick="unidadeClicada('S1G01')">
-                            <div id="S1G01c" class="res-circle">
-                                <div id="S1G01t" class="circle-txt">01</div>
-                            </div>
-                        </div>
-                        <div class="card" onclick="unidadeClicada('S1G02')">
-                            <div id="S1G02c" class="res-circle">
-                                <div id="S1G02t" class="circle-txt">02</div>
-                            </div>
-                        </div>
-                        <div class="card" onclick="unidadeClicada('S1G03')">
-                            <div id="S1G03c" class="res-circle">
-                                <div id="S1G03t" class="circle-txt">03</div>
-                            </div>
-                        </div>
-                        <div class="card" onclick="unidadeClicada('S1G04')">
-                            <div id="S1G04c" class="res-circle">
-                                <div id="S1G04t" class="circle-txt">04</div>
-                            </div>
-                        </div>
-                        <div class="card" onclick="unidadeClicada('S1G05')">
-                            <div id="S1G05c" class="res-circle">
-                                <div id="S1G05t" class="circle-txt">05</div>
-                            </div>
-                        </div>
-                        <div class="card" onclick="unidadeClicada('S1G06')">
-                            <div id="S1G06c" class="res-circle">
-                                <div id="S1G06t" class="circle-txt">06</div>
-                            </div>
-                        </div>
-                        <div class="card" onclick="unidadeClicada('S1G07')">
-                            <div id="S1G07c" class="res-circle">
-                                <div id="S1G07t" class="circle-txt">07</div>
-                            </div>
-                        </div>
-                        <div class="card" onclick="unidadeClicada('S1G08')">
-                            <div id="S1G08c" class="res-circle">
-                                <div id="S1G08t" class="circle-txt">08</div>
-                            </div>
-                        </div>
-                        <div class="card" onclick="unidadeClicada('S1G09')">
-                            <div id="S1G09c" class="res-circle">
-                                <div id="S1G09t" class="circle-txt">09</div>
-                            </div>
-                        </div>
-                        <div class="card" onclick="unidadeClicada('S1G10')">
-                            <div id="S1G10c" class="res-circle">
-                                <div id="S1G10t" class="circle-txt">10</div>
-                            </div>
-                        </div>
+                    <div id="S1" class="cards subsolo w3-border">  
+                        <% lista_vagas.forEach(function(row) { %>
+                            <% if (row.codigo.substring(0,2) == 'S1' ) { %>
+                                <div class="card" onclick="unidadeClicada('<%- row.codigo %>')">
+                                    <div id="<%- row.codigo %>c" class="res-circle">
+                                        <div id="<%- row.codigo %>t" class="circle-txt">
+                                            <%- row.codigo.substring(3) %>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% } %>
+                        <% }) %>
                     </div>
                     <div id="S2" class="cards subsolo w3-border" style="display:none">                     
-                        <div class="card" onclick="unidadeClicada('S2G01')">
-                            <div id="S2G01c" class="res-circle">
-                                <div id="S2G01t" class="circle-txt">01</div>
-                            </div>
-                        </div>
-                        <div class="card" onclick="unidadeClicada('S2G02')">
-                            <div id="S2G02c" class="res-circle">
-                                <div id="S2G02t" class="circle-txt">02</div>
-                            </div>
-                        </div>
-                        <div class="card" onclick="unidadeClicada('S2G03')">
-                            <div id="S2G03c" class="res-circle">
-                                <div id="S2G03t" class="circle-txt">03</div>
-                            </div>
-                        </div>
-                        <div class="card" onclick="unidadeClicada('S2G04')">
-                            <div id="S2G04c" class="res-circle">
-                                <div id="S2G04t" class="circle-txt">04</div>
-                            </div>
-                        </div>
-                        <div class="card" onclick="unidadeClicada('S2G05')">
-                            <div id="S2G05c" class="res-circle">
-                                <div id="S2G05t" class="circle-txt">05</div>
-                            </div>
-                        </div>
-                        <div class="card" onclick="unidadeClicada('S2G06')">
-                            <div id="S2G06c" class="res-circle">
-                                <div id="S2G06t" class="circle-txt">06</div>
-                            </div>
-                        </div>
-                        <div class="card" onclick="unidadeClicada('S2G07')">
-                            <div id="S2G07c" class="res-circle">
-                                <div id="S2G07t" class="circle-txt">07</div>
-                            </div>
-                        </div>
-                        <div class="card" onclick="unidadeClicada('S2G08')">
-                            <div id="S2G08c" class="res-circle">
-                                <div id="S2G08t" class="circle-txt">08</div>
-                            </div>
-                        </div>
-                        <div class="card" onclick="unidadeClicada('S2G09')">
-                            <div id="S2G09c" class="res-circle">
-                                <div id="S2G09t" class="circle-txt">09</div>
-                            </div>
-                        </div>
-                        <div class="card" onclick="unidadeClicada('S2G10')">
-                            <div id="S2G10c" class="res-circle">
-                                <div id="S2G10t" class="circle-txt">10</div>
-                            </div>
-                        </div>
-                        <div class="card" onclick="unidadeClicada('S2G11')">
-                            <div id="S2G11c" class="res-circle">
-                                <div id="S2G11t" class="circle-txt">11</div>
-                            </div>
-                        </div>
+                        <% lista_vagas.forEach(function(row) {
+                            if (row.codigo.substring(0,2) == 'S2' ) { %>
+                                <div class="card" onclick="unidadeClicada('<%- row.codigo %>')">
+                                    <div id="<%- row.codigo %>c" class="res-circle">
+                                        <div id="<%- row.codigo %>t" class="circle-txt">
+                                            <%- row.codigo.substring(3) %>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% }
+                            }) %>
                     </div>
                 </div>                  
               </p>
               <p>
-                <input type="text" id="unidades_escolhidas" name="unidades_escolhidas" style="display: none;">
+                <input type="text" id="vagas_escolhidas" name="vagas_escolhidas" style="display: none;">
                 <button class="w3-button w3-black" type="submit">
                     <i class="fa fa-paper-plane"></i> ENVIAR
                 </button>
@@ -282,40 +233,40 @@
   </div>
   
   <!-- Footer -->
-  <footer class="w3-center w3-black w3-padding-64">
-    <a href="#home" class="w3-button w3-light-grey"><i class="fa fa-arrow-up w3-margin-right"></i>To the top</a>
-    <div class="w3-xlarge w3-section">
-      <i class="fa fa-facebook-official w3-hover-opacity"></i>
-      <i class="fa fa-instagram w3-hover-opacity"></i>
-      <i class="fa fa-snapchat w3-hover-opacity"></i>
-      <i class="fa fa-pinterest-p w3-hover-opacity"></i>
-      <i class="fa fa-twitter w3-hover-opacity"></i>
-      <i class="fa fa-linkedin w3-hover-opacity"></i>
-    </div>
+  <footer class="w3-center w3-black w3-padding-24">
+    <a href="#meusdados" class="w3-button w3-light-grey"><i class="fa fa-arrow-up w3-margin-right"></i>Vai para o início</a>
     <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank" class="w3-hover-text-green">w3.css</a></p>
   </footer>
    
   <script>
-  var lista_unidades_escolhidas = []
+  var lista_vagas_escolhidas = []
+
+  function loadFunction() {    
+    let vagas_escolhidas = '<%= vagas_escolhidas %>'.split(',')
+    vagas_escolhidas.forEach(vaga => {
+        unidadeClicada(vaga)
+    }) 
+  }
+  window.onload = loadFunction();
 
   function apagaMensagem() {
     document.getElementById("mensagem").innerHTML = '';  
   }
 
   function unidadeClicada(valor) {
-    var posicao = lista_unidades_escolhidas.indexOf(valor);
+    var posicao = lista_vagas_escolhidas.indexOf(valor);
     if (posicao > -1) {
       document.getElementById(valor+'c').style.background = "#F2F2F2";
       document.getElementById(valor+'t').style.color = "#000000";
-      lista_unidades_escolhidas.splice(posicao,1);
+      lista_vagas_escolhidas.splice(posicao,1);
     } else {
       document.getElementById(valor+'c').style.background = "#008000";
       document.getElementById(valor+'t').style.color = "#FFFFFF";
-      lista_unidades_escolhidas.push(valor);
-      lista_unidades_escolhidas.sort();
+      lista_vagas_escolhidas.push(valor);
+      lista_vagas_escolhidas.sort();
     }
-    var lista_unidades = document.getElementById("unidades_escolhidas");      
-    lista_unidades.value = lista_unidades_escolhidas;
+    var lista_unidades = document.getElementById("vagas_escolhidas");      
+    lista_unidades.value = lista_vagas_escolhidas;
   }
 
   function abreSubsolo(subsolo) {
@@ -331,6 +282,30 @@
     var element = document.getElementById(subsolo+"b");
     element.classList.add("aba-subsolo");
     document.getElementById(subsolo).style.display = "grid";  
+  }
+
+  // Get the modal
+  var modal = document.getElementById("myModal");
+
+  // Get the <span> element that closes the modal
+  var span = document.getElementsByClassName("close")[0];
+
+  // Show messagem when has content
+  var mensagem = '<%= mensagem %>';
+  if (mensagem != '') {
+    modal.style.display = "block";
+  }
+
+  // When the user clicks on <span> (x), close the modal
+  span.onclick = function() {
+    modal.style.display = "none";
+  }
+
+  // When the user clicks anywhere outside of the modal, close it
+  window.onclick = function(event) {
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
   }
 
   // Toggle between showing and hiding the sidebar when clicking the menu icon
