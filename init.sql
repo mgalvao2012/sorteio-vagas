@@ -4,12 +4,21 @@
 -- CREATE DATABASE sorteio_vagas;
 -- \c sorteio_vagas
 
+DROP TABLE IF EXISTS configuracao;
 DROP TABLE IF EXISTS unidades;
 DROP TABLE IF EXISTS vagas;
 
+CREATE TABLE configuracao (
+  id SERIAL PRIMARY KEY,
+  ultimo_sorteio TIMESTAMP,
+  resultado_sorteio VARCHAR(255)
+);
+INSERT INTO configuracao (ultimo_sorteio, resultado_sorteio) values (NOW(), 'Sorteio não realizado');
+
 CREATE TABLE vagas (
   codigo CHAR(5) PRIMARY KEY,
-  bloqueada BOOLEAN
+  bloqueada BOOLEAN,
+  ultima_gravacao TIMESTAMP default CURRENT_TIMESTAMP
 );
 
 CREATE TABLE unidades (
@@ -19,6 +28,7 @@ CREATE TABLE unidades (
   adimplente BOOLEAN,
   vaga_sorteada CHAR(5) REFERENCES Vagas (codigo),
   user_id CHAR(80),
+  ultima_gravacao TIMESTAMP default CURRENT_TIMESTAMP,
   vagas_escolhidas JSONB
 );
 

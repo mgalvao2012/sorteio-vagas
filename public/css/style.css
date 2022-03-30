@@ -125,3 +125,122 @@ body, html {
     text-align: left;
   }
 }
+
+.aba-subsolo-foco {
+  color: #FFFFFF;
+  background-color: #00000080!important;
+}
+.aba-subsolo {
+  color: #000;
+  background-color: #F2F2F2;
+}
+
+.card {
+  padding: 0.5rem;
+  height: 3rem;
+}
+
+.cards {
+  max-width: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(45px, 1fr));
+  background-color: #FFFFFF;
+}      
+
+tr:nth-child(even) {background-color: #F2F2F2;}
+
+.res-circle {
+  width: 30px;
+  border-radius: 30px;
+  border: 1px solid #008000;
+
+  /* (B) BACKGROUND COLOR */ 
+  background: #F2F2F2;
+ 
+  /* (C) NECESSARY TO POSITION TEXT BLOCK */
+  line-height: 0;
+  position: relative;
+}
+ 
+/* (D) MATCH HEIGHT */
+.res-circle::after {
+  content: "";
+  display: block;
+  padding-bottom: 100%;
+}
+ 
+/* (E) TEXT BLOCK */
+.circle-txt {
+  /* (E1) CENTER TEXT IN CIRCLE */
+  position: absolute;
+  bottom: 50%;
+  width: 100%;
+  text-align: center;
+  color: #000;  
+}
+
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+}
+
+/* The Close Button */
+.close {
+  color: #aaaaaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.card-sorteio {
+  padding: 0.5rem;
+  max-height: 1.5rem;
+  max-height: 4rem;
+}
+
+.cards-sorteio {
+  max-width: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  background-color: #FFFFFF;
+  white-space: nowrap;
+}      
+
+.cards-sorteio-vagas {
+  max-width: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 2fr));
+  background-color: #FFFFFF;
+}      

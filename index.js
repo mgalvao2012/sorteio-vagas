@@ -1,3 +1,5 @@
+require('dotenv').config()
+const development_env = process.env.ENV == 'development' ? true : false
 const express = require('express')
 const request = require('request-promise-native');
 const bcrypt = require('bcrypt')
@@ -58,8 +60,10 @@ initializePassport(
     id => users.find(user => user.id === id)
 )
 const users = []
+const usuarios_admin = process.env.USUARIOS_ADMIN;
 
 app.use(flash())
+/*
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: true,
@@ -67,6 +71,22 @@ app.use(session({
     store: sessionStore,
     cookie  : { maxAge: 60 * 1000 * 2 }
 }))
+*/
+var sess = {
+  secret: process.env.SESSION_SECRET,
+  resave: true,
+  saveUninitialized: true,
+  store: sessionStore,
+  cookie  : { maxAge: 60 * 1000 * 2 }
+}
+
+// habilita a cookies seguros apenas em produção
+if (development_env) {
+  app.set('trust proxy', 1) // trust first proxy
+  sess.cookie.secure = true // serve secure cookies
+}
+
+app.use(session(sess))
 app.use(passport.initialize())
 app.use(passport.session())
 app.use(methodOverride('_method'))
@@ -83,7 +103,8 @@ const postLimiter = rateLimit({
 })
 
 app.use(limiter, (request, response, next) => {
-  if (request.url != '/' && request.url != '/sorteio' && request.url != '/setup' && request.url != '/meusdados') {
+  const url_permitidas = process.env.URL_PERMITIDAS
+  if (!url_permitidas.includes(request.url)) {
     if (
       !request.header('apiKey') ||
       request.header('apiKey') !== process.env.API_KEY
@@ -92,6 +113,11 @@ app.use(limiter, (request, response, next) => {
         .status(401)
         .json({ status: 'error', message: 'Acesso não autorizado.' })
     }
+  }  
+  if(request.oidc.user != null) {
+    request.session.usuario_admin = usuarios_admin.includes(request.oidc.user.email)
+  } else {
+    request.session.usuario_admin = null
   }
   next()
 })
@@ -104,7 +130,8 @@ app.get('/', async (request, response) => {
       nickname: request.oidc.user.nickname,
       picture: request.oidc.user.picture,
       name: request.oidc.user.name,
-      mensagem: null
+      mensagem: null,
+      usuario_admin: request.session.usuario_admin   
     })
   } else {
     response.render('index.ejs', { 
@@ -112,7 +139,8 @@ app.get('/', async (request, response) => {
       nickname: null,
       picture: null,
       name: null,
-      mensagem: null
+      mensagem: null,
+      usuario_admin: request.session.usuario_admin    
     })
   }
 })
@@ -136,15 +164,19 @@ app.get('/meusdados', requiresAuth(), (request, response) => {
           unidade: null,
           vagas_escolhidas: null,
           mensagem: null,
-          lista_vagas: results[0].rows
+          lista_vagas: results[0].rows,
+          vaga_sorteada: null,
+          usuario_admin: request.session.usuario_admin
         })  
       } else {
         // converte de '[{"vaga": "S1G27"},{"vaga": "S1G28"}]' -> ['S1G27, S1G28']
         let vagas_escolhidas_array = results[1].rows[0].vagas_escolhidas
         let vagas_escolhidas = []
+        // console.log('vagas_escolhidas_array '+vagas_escolhidas_array)
         vagas_escolhidas_array.forEach(item => {
           vagas_escolhidas.push(item.vaga)
         })
+        // console.log('vagas_escolhidas '+vagas_escolhidas)
         response.render('meusdados.ejs', {
           user_id: user_id,
           email: request.oidc.user.email, 
@@ -152,7 +184,9 @@ app.get('/meusdados', requiresAuth(), (request, response) => {
           unidade: results[1].rows[0].unidade,
           vagas_escolhidas: vagas_escolhidas,
           mensagem: mensagem,
-          lista_vagas: results[0].rows
+          lista_vagas: results[0].rows,
+          vaga_sorteada: results[1].rows[0].vaga_sorteada,
+          usuario_admin: request.session.usuario_admin
         })
       }
     }
@@ -162,16 +196,19 @@ app.get('/meusdados', requiresAuth(), (request, response) => {
 app.post('/meusdados', requiresAuth(), (request, response) => {
   let user_id = request.oidc.user.sub
   let unidade = request.body.unidade 
-  console.log('request.body.vagas_escolhidas ['+request.body.vagas_escolhidas+']')
+  console.log(`Vagas escolhidas pela unidade ${unidade} [${request.body.vagas_escolhidas}]`)
   var vagas_escolhidas_array = [], vagas_escolhidas
-  console.log(request.body.vagas_escolhidas)
-  let vagas_escolhidas_preenchida = request.body.vagas_escolhidas.split(',')
-  if(vagas_escolhidas_preenchida.length > 0) {
-    vagas_escolhidas_preenchida.forEach(vaga => {
-      vagas_escolhidas_array.push({"vaga": vaga})
-    })
-    console.log(vagas_escolhidas_array);
-    vagas_escolhidas = JSON.stringify(vagas_escolhidas_array);
+  if (request.body.vagas_escolhidas.length > 0) {
+    //console.log(request.body.vagas_escolhidas)
+    let vagas_escolhidas_preenchida = request.body.vagas_escolhidas.split(',')
+    console.log('vagas_escolhidas_preenchida '+vagas_escolhidas_preenchida.length)
+    if(vagas_escolhidas_preenchida.length > 0 ) {
+      vagas_escolhidas_preenchida.forEach(vaga => {
+        vagas_escolhidas_array.push({"vaga": vaga})
+      })
+      //console.log(vagas_escolhidas_array);
+      vagas_escolhidas = JSON.stringify(vagas_escolhidas_array);
+    }
   }
   var query = `UPDATE unidades SET user_id = NULL WHERE user_id = '${user_id}';`
   if (vagas_escolhidas == undefined) {
@@ -180,7 +217,6 @@ app.post('/meusdados', requiresAuth(), (request, response) => {
     query += `UPDATE unidades SET user_id = '${user_id}', vagas_escolhidas = '${vagas_escolhidas}' WHERE unidade = '${unidade}';`
   }
   query += `SELECT codigo FROM vagas WHERE bloqueada = false ORDER BY codigo;`
-  console.log(query)
   pool.query(query, (error, results) => {
     if (error) {
       console.log("erro: "+error.message)
@@ -204,29 +240,37 @@ app.post('/meusdados', requiresAuth(), (request, response) => {
 })
 
 app.get('/setup', requiresAuth(), (request, response) => {
-  var fs = require('fs');
-  fs.readFile('init.sql', 'utf8', function(error, data) {
-    if (error) {
-      response.status(500).json({ status: 'error', message: error.message })
-    } else {
-      const query = data
-      pool.query(query, (error, results) => {
-        if (error) {
-          response.status(500).json({ status: 'error', message: error.message })
-        } else {
-          response.send('Setup finalizado com sucesso.')
-        }
-      })    
-    }
-  })
+  if (usuarios_admin.includes(request.oidc.user.email)) {
+    var fs = require('fs');
+    fs.readFile('init.sql', 'utf8', function(error, data) {
+      if (error) {
+        response.status(500).json({ status: 'error', message: error.message })
+      } else {
+        const query = data
+        pool.query(query, (error, results) => {
+          if (error) {
+            response.status(500).json({ status: 'error', message: error.message })
+          } else {
+            console.log('Setup finalizado com sucesso.')
+            response.send('Setup finalizado com sucesso.')
+          }
+        })    
+      }
+    })
+  } else {
+    console.log('Você não tem permissão para realizar esta ação.')
+    response.send('Você não tem permissão para realizar esta ação.')
+  }
 })
 
-function sorteia_vagas(objetivo, vagas_disponiveis, query) {
-  return new Promise(function(resolve, reject) {
+const sorteia_vagas = (objetivo, vagas_disponiveis, query) => {
+  return new Promise((resolve, reject) => {
     var unidades_e_vagas_sorteadas = []
     pool.query(query, (error, results) => {
       if (error) {
-        response.status(500).json({ status: 'warning', message: error.message })
+        //response.status(500).json({ status: 'warning', message: error.message })
+        reject(error.message)
+        return
       }
       var unidades = results.rows
       // sorteia aleatoriamente a lista de unidades
@@ -270,7 +314,78 @@ function sorteia_vagas(objetivo, vagas_disponiveis, query) {
   })
 }
 
-app.get('/sorteio', (request, response) => {
+function padTo2Digits(num) {
+  return num.toString().padStart(2, '0');
+}
+
+function formatDate(date, format) {
+  if(format == 1) {
+    return (
+      [
+        padTo2Digits(date.getDate()),
+        padTo2Digits(date.getMonth() + 1),
+        date.getFullYear(),
+      ].join('/') +
+      ' ' +
+      [
+        padTo2Digits(date.getHours()),
+        padTo2Digits(date.getMinutes()),
+        padTo2Digits(date.getSeconds()),
+      ].join(':')
+    )
+  } else {
+    return (
+      [
+        date.getFullYear(),
+        padTo2Digits(date.getMonth() + 1),
+        padTo2Digits(date.getDate()),
+      ].join('-') +
+      ' ' +
+      [
+        padTo2Digits(date.getHours()),
+        padTo2Digits(date.getMinutes()),
+        padTo2Digits(date.getSeconds()),
+      ].join(':')
+    )
+  }
+}
+
+app.get('/sorteio', requiresAuth(), (request, response) => {
+  // mensagem preenchida quando é realizada o sorteio
+  var mensagem = request.flash('success')
+  let user_id = request.oidc.user.sub
+  pool.query(`SELECT * FROM configuracao;
+              SELECT unidade, vaga_sorteada, vagas_escolhidas FROM unidades ORDER BY unidade;`, (error, results) => {
+    if (error) {
+      console.log(error.message)
+    } else {
+      if (results[0].rows[0] == undefined) {
+        response.render('sorteio.ejs', {
+          email: request.oidc.user.email,
+          name: request.oidc.user.name, 
+          ultimo_sorteio: null,
+          resultado_sorteio: null,
+          lista_vagas_sorteadas: null,
+          mensagem: null,
+          usuario_admin: request.session.usuario_admin
+        })  
+      } else {
+        let ultimo_sorteio = formatDate(results[0].rows[0].ultimo_sorteio, 1)
+        response.render('sorteio.ejs', {
+          email: request.oidc.user.email,
+          name: request.oidc.user.name, 
+          ultimo_sorteio: ultimo_sorteio,
+          resultado_sorteio: results[0].rows[0].resultado_sorteio,
+          lista_vagas_sorteadas: results[1].rows,
+          mensagem: mensagem,
+          usuario_admin: request.session.usuario_admin
+        })
+      }
+    }
+  })  
+})
+
+app.post('/sorteio', (request, response) => {
   pool.query('SELECT codigo FROM vagas WHERE bloqueada = false', (error, results) => {
     if (error) {
       response.status(500).json({ status: 'error', message: 'Não há vagas disponíveis' })
@@ -290,104 +405,125 @@ app.get('/sorteio', (request, response) => {
         var unidades_e_vagas_sorteadas = []
         var query_gravacao = ''
 
-        let retornoGrupo1 = sorteia_vagas('sorteio de unidades COM portadores de necessidade especiais', 
+        sorteia_vagas('sorteio de unidades COM portadores de necessidade especiais', 
           vagas_disponiveis, 
           `SELECT unidade, vaga_sorteada, vagas_escolhidas FROM unidades 
             WHERE pne = true AND presente = true AND vaga_sorteada IS NULL`)
-          .then((retorno) => {
-            return retorno
-          })        
-        let acessaRetornoGrupo1 = () => {
-          retornoGrupo1.then((retorno) => {
-            vagas_disponiveis = retorno[0]
-            //console.log('vagas_disponiveis (1) = '+vagas_disponiveis)
-            retorno[1].forEach(element => {
-              unidades_e_vagas_sorteadas.push(element)
-              query_gravacao += `UPDATE unidades SET vaga_sorteada = '${element[1]}' WHERE unidade = '${element[0]}'; `
-            })
+        .then(retorno => {
+          vagas_disponiveis = retorno[0]
+          //console.log('vagas_disponiveis (1) = '+vagas_disponiveis)
+          retorno[1].forEach(element => {
+            unidades_e_vagas_sorteadas.push(element)
+            query_gravacao += `UPDATE unidades SET vaga_sorteada = '${element[1]}' WHERE unidade = '${element[0]}'; `
           })
-        }
-        acessaRetornoGrupo1()
+          //console.log('terminou sorteio de unidades COM portadores de necessidade especiais')
 
-        let retornoGrupo2 = sorteia_vagas('sorteio de unidades SEM portadores de necessidade especiais e ADIMPLENTES',
+          sorteia_vagas('sorteio de unidades SEM portadores de necessidade especiais e ADIMPLENTES',
           vagas_disponiveis, 
           `SELECT unidade, vaga_sorteada, vagas_escolhidas FROM unidades 
             WHERE pne = false AND adimplente = true AND presente = true AND vaga_sorteada IS NULL`)
-          .then((retorno) => {
-            return retorno
-          })        
-        let acessaRetornoGrupo2 = () => {
-          retornoGrupo2.then((retorno) => {
+          .then(retorno => {
             vagas_disponiveis = retorno[0]
             retorno[1].forEach(element => {
               unidades_e_vagas_sorteadas.push(element)
               query_gravacao += `UPDATE unidades SET vaga_sorteada = '${element[1]}' WHERE unidade = '${element[0]}'; `
             })
-          })
-        }
-        acessaRetornoGrupo2()
 
-        let retornoGrupo3 = sorteia_vagas('sorteio de unidades SEM portadores de necessidade especiais e INADIMPLENTES',
-          vagas_disponiveis, 
-          `SELECT unidade, vaga_sorteada, vagas_escolhidas FROM unidades 
-            WHERE pne = false AND adimplente = false AND presente = true AND vaga_sorteada IS NULL`)
-          .then((retorno) => {
-            return retorno
-          })        
-        let acessaRetornoGrupo3 = () => {
-          retornoGrupo3.then((retorno) => {
-            vagas_disponiveis = retorno[0]
-            retorno[1].forEach(element => {
-              unidades_e_vagas_sorteadas.push(element)
-              query_gravacao += `UPDATE unidades SET vaga_sorteada = '${element[1]}' WHERE unidade = '${element[0]}'; `
-            })
-          })
-        }
-        acessaRetornoGrupo3()
+            sorteia_vagas('sorteio de unidades SEM portadores de necessidade especiais e INADIMPLENTES',
+            vagas_disponiveis, 
+            `SELECT unidade, vaga_sorteada, vagas_escolhidas FROM unidades 
+              WHERE pne = false AND adimplente = false AND presente = true AND vaga_sorteada IS NULL`)
+            .then((retorno) => {
+              vagas_disponiveis = retorno[0]
+              retorno[1].forEach(element => {
+                unidades_e_vagas_sorteadas.push(element)
+                query_gravacao += `UPDATE unidades SET vaga_sorteada = '${element[1]}' WHERE unidade = '${element[0]}'; `
+              })
 
-        let retornoGrupo4 = sorteia_vagas('sorteio de unidades SEM portadores de necessidade especiais e AUSENTES',
-          vagas_disponiveis, 
-          `SELECT unidade, vaga_sorteada, vagas_escolhidas FROM unidades 
-            WHERE pne = false AND presente = false AND vaga_sorteada IS NULL`)
-          .then((retorno) => {
-            return retorno
-          })        
-        let acessaRetornoGrupo4 = () => {
-          retornoGrupo4.then((retorno) => {
-            vagas_disponiveis = retorno[0]
-            retorno[1].forEach(element => {
-              unidades_e_vagas_sorteadas.push(element)
-              query_gravacao += `UPDATE unidades SET vaga_sorteada = '${element[1]}' WHERE unidade = '${element[0]}'; `              
-            })
-            // verifica se todas as unidades foram contempladas pelo sorteio
-            var qtd_unidades_sorteadas = 0, qtd_vagas_sorteadas = 0
-            unidades_e_vagas_sorteadas.forEach(element => {
-              qtd_unidades_sorteadas += (element[0] != null ? 1 : 0 )
-              qtd_vagas_sorteadas += (element[1] != null ? 1 : 0 )
-            })
-            if ((qtd_vagas_sorteadas == 0 && qtd_unidades_sorteadas == 0) || qtd_vagas_sorteadas != qtd_unidades_sorteadas) {
-              response.status(500).json({ status: 'error', 
-                message: 'Falha no sorteio. Unidades: ' + qtd_unidades_sorteadas + ' - Vagas: ' +qtd_vagas_sorteadas})
-            } else {              
-              pool.query(query_gravacao, (error, results) => {
-                if (error) {
-                  response.status(500).json({ status: 'warning', message: error.message })      
-                } else {
-                  response.status(200).json({ status: 'success', message: 'Sorteio realizado com sucesso. Unidades: '+
-                    qtd_unidades_sorteadas + ' - Vagas: ' +qtd_vagas_sorteadas })
+              sorteia_vagas('sorteio de unidades SEM portadores de necessidade especiais e AUSENTES',
+              vagas_disponiveis, 
+              `SELECT unidade, vaga_sorteada, vagas_escolhidas FROM unidades 
+                WHERE pne = false AND presente = false AND vaga_sorteada IS NULL`)
+              .then((retorno) => {
+                vagas_disponiveis = retorno[0]
+                retorno[1].forEach(element => {
+                  unidades_e_vagas_sorteadas.push(element)
+                  query_gravacao += `UPDATE unidades SET vaga_sorteada = '${element[1]}' WHERE unidade = '${element[0]}'; `              
+                })
+                // verifica se todas as unidades foram contempladas pelo sorteio
+                var qtd_unidades_sorteadas = 0, qtd_vagas_sorteadas = 0
+                unidades_e_vagas_sorteadas.forEach(element => {
+                  //console.log('qtd_unidades_sorteadas (element[0]) '+element[0]+' qtd_vagas_sorteadas (element[1]) '+element[1])
+                  qtd_unidades_sorteadas += (element[0] != null ? 1 : 0 )
+                  qtd_vagas_sorteadas += (element[1] != null ? 1 : 0 )
+                })
+                let data_atual = formatDate(new Date(), 2)
+                if ((qtd_vagas_sorteadas == 0 && qtd_unidades_sorteadas == 0) || qtd_vagas_sorteadas != qtd_unidades_sorteadas) {
+                  let mensagem = 'Falha no sorteio. Unidades: ' + qtd_unidades_sorteadas + ' - Vagas: ' +qtd_vagas_sorteadas
+                  query_gravacao += `UPDATE configuracao SET ultimo_sorteio = '${data_atual}', resultado_sorteio = '${mensagem}' WHERE id = 1; `              
+                  response.status(500).json({ status: 'error', message: mensagem })
+                } else {   
+                  // console.log(query_gravacao)           
+                  let mensagem = 'Sorteio realizado com sucesso. Unidades: '+qtd_unidades_sorteadas + ' - Vagas: ' +qtd_vagas_sorteadas
+                  query_gravacao += `UPDATE configuracao SET ultimo_sorteio = '${data_atual}', resultado_sorteio = '${mensagem}' WHERE id = 1; `              
+                  pool.query(query_gravacao, (error, results) => {
+                    if (error) {
+                      // console.log(query_gravacao)
+                      console.log('Falha no sorteio. Mensagem de erro: '+error.message)
+                      // response.status(500).json({ status: 'warning', message: error.message })      
+                    } else {                      
+                      // response.status(200).json({ status: 'success', message: mensagem })
+                      request.flash('success', mensagem);
+                      response.redirect(301, '/sorteio')                    
+                    }
+                  })
                 }
               })
-            }
-          })
-        }
-        acessaRetornoGrupo4()
+              .catch(error => {
+                console.log(error)
+                response.status(500).json({ status: 'error', message: error })
+                return
+              })        
+
+            })        
+            .catch(error => {
+              console.log(error)
+              response.status(500).json({ status: 'error', message: error })
+              return
+            })        
+  
+          })        
+          .catch(error => {
+            console.log(error)
+            response.status(500).json({ status: 'error', message: error })
+            return
+          })        
+
+        })
+        .catch(error => {
+          console.log(error)
+          response.status(500).json({ status: 'error', message: error })
+          return
+        })        
+
       }
     }
   })
 })
 
+app.get('/recomecar_sorteio', requiresAuth(), (request, response) => {
+  pool.query(`UPDATE unidades SET vaga_sorteada = null;
+              UPDATE configuracao SET resultado_sorteio = 'Sorteio não realizado';`, (error, results) => {
+    if (error) {
+      console.log(error.message)
+    } else {
+      response.redirect(301, '/sorteio') 
+    }
+  })  
+})
+
 // Start server
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
-  console.log(`Server listening at ${PORT}`)
+  console.log(`Server listening at ${PORT}. Environment development: ${development_env}`)
 })

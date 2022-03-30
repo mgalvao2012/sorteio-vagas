@@ -11,203 +11,9 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link href="./css/style.css" rel='stylesheet' type='text/css' />
-<style>
-      .aba-subsolo {
-        color: #FFFFFF;
-        background-color: #00000080!important;
-      }
-    
-      .card {
-        padding: 0.5rem;
-        height: 3rem;
-      }
-      
-      .cards {
-        max-width: 100%;
-        margin: 0 auto;
-        display: grid;
-        grid-gap: 10px;
-        grid-template-columns: repeat(auto-fit, minmax(45px, 1fr));
-        background-color: #FFFFFF;
-      }      
-      
-      tr:nth-child(even) {background-color: #F2F2F2;}
-      
-      .res-circle {
-        width: 30px;
-        border-radius: 30px;
-        border: 1px solid #008000;
-      
-        /* (B) BACKGROUND COLOR */ 
-        background: #F2F2F2;
-       
-        /* (C) NECESSARY TO POSITION TEXT BLOCK */
-        line-height: 0;
-        position: relative;
-      }
-       
-      /* (D) MATCH HEIGHT */
-      .res-circle::after {
-        content: "";
-        display: block;
-        padding-bottom: 100%;
-      }
-       
-      /* (E) TEXT BLOCK */
-      .circle-txt {
-        /* (E1) CENTER TEXT IN CIRCLE */
-        position: absolute;
-        bottom: 50%;
-        width: 100%;
-        text-align: center;
-        color: #000;  
-      }
-
-    /* The Modal (background) */
-    .modal {
-        display: none; /* Hidden by default */
-        position: fixed; /* Stay in place */
-        z-index: 1; /* Sit on top */
-        padding-top: 100px; /* Location of the box */
-        left: 0;
-        top: 0;
-        width: 100%; /* Full width */
-        height: 100%; /* Full height */
-        overflow: auto; /* Enable scroll if needed */
-        background-color: rgb(0,0,0); /* Fallback color */
-        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-    }
-    
-    /* Modal Content */
-    .modal-content {
-        background-color: #fefefe;
-        margin: auto;
-        padding: 20px;
-        border: 1px solid #888;
-        width: 80%;
-    }
-    
-    /* The Close Button */
-    .close {
-        color: #aaaaaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-    }
-    
-    .close:hover,
-    .close:focus {
-        color: #000;
-        text-decoration: none;
-        cursor: pointer;
-    }
-
-    .imagem-subsolo1 {
-      background: url(../images/subsolo1.jpg) no-repeat center top;
-      background-size: auto auto;
-      background-size: 100% auto;
-      margin: 0;
-      padding: 0;
-      min-height: 300px;
-      width:100%;
-    }
-    .imagem-subsolo2 {
-      background: url(../images/subsolo2.jpg) no-repeat center top;
-      background-size: auto auto;
-      background-size: 100% auto;
-      margin: 0;
-      padding: 0;
-      min-height:300px;
-      width:100%;
-    }
-    /*
-    @media screen and (max-width:1400px) {
-      .imagem-subsolo1, .imagem-subsolo2 {
-        min-height:900px;
-      }
-    }    
-    @media screen and (max-width:1200px) {
-      .imagem-subsolo1, .imagem-subsolo2 {
-        min-height:750px;
-      }
-    }    
-    @media screen and (max-width: 800px) {
-      .imagem-subsolo1, .imagem-subsolo2 {
-        min-height:650px;
-      }
-    }
-    @media screen and (max-width: 600px) {
-      .imagem-subsolo1, .imagem-subsolo2 {
-        min-height:450px;
-      }
-    }
-    @media screen and (max-width: 600px) {
-      .imagem-subsolo1, .imagem-subsolo2 {
-        min-height:300px;
-      }
-    }
-    */
-</style>
 </head>
 <body>
-
-<!-- Navbar (sit on top) -->
-<div class="w3-top">
-  <div class="w3-bar w3-white w3-card" id="myNavbar">
-    <a href="/" class="w3-bar-item w3-button w3-wide">SVE</a>
-    <!-- Right-sided navbar links -->
-    <div class="w3-right w3-hide-small">
-      <a href="/#about" class="w3-bar-item w3-button"> ABOUT</a>
-      <a href="/#contact" class="w3-bar-item w3-button"><i class="fa fa-envelope"></i> CONTACT</a>
-      <% if (email) { %>
-        <div class="dropdown">
-          <button class="dropbtn"><%= name %> 
-            <i class="fa fa-caret-down"></i>
-          </button>
-          <div class="dropdown-content">
-            <a href="/meusdados">Meus dados</a>
-            <a href="/logout">Logout</a>
-          </div>
-        </div> 
-      <% } else { %>
-        <a href="/login" onclick="w3_close()" class="w3-bar-item w3-button">Login</a>
-      <% } %>
-      <!--
-      <a href="#team" class="w3-bar-item w3-button"><i class="fa fa-user"></i> TEAM</a>
-      <a href="#work" class="w3-bar-item w3-button"><i class="fa fa-th"></i> WORK</a>
-      <a href="#pricing" class="w3-bar-item w3-button"><i class="fa fa-usd"></i> PRICING</a>
-      -->
-    </div>
-    <!-- Hide right-floated links on small screens and replace them with a menu icon -->
-
-    <a href="javascript:void(0)" class="w3-bar-item w3-button w3-right w3-hide-large w3-hide-medium" onclick="w3_open()">
-      <i class="fa fa-bars"></i>
-    </a>
-  </div>
-</div>
-
-<!-- Sidebar on small screens when clicking the menu icon -->
-<nav class="w3-sidebar w3-bar-block w3-black w3-card w3-animate-left w3-hide-medium w3-hide-large" style="display:none" id="mySidebar">
-  <a href="javascript:void(0)" onclick="w3_close()" class="w3-bar-item w3-button w3-large w3-padding-16">Close ×</a>
-  <a href="#about" onclick="w3_close()" class="w3-bar-item w3-button">ABOUT</a>
-  <a href="#contact" onclick="w3_close()" class="w3-bar-item w3-button">CONTACT</a>
-  <% if (email) { %>
-    <div class="w3-dropdown-hover w3-mobile">
-      <button class="w3-button"><%= name %><i class="fa fa-caret-down"></i></button>
-      <div class="w3-dropdown-content w3-bar-block w3-dark-grey">
-        <a href="/meusdados" class="w3-bar-item w3-button">Meus dados</a>
-        <a href="/logout" class="w3-bar-item w3-button">Logout</a>
-      </div>
-    </div>
-  <% } else { %>
-    <a href="/login" onclick="w3_close()" class="w3-bar-item w3-button">Login</a>
-  <% } %>
-<!--
-  <a href="#team" onclick="w3_close()" class="w3-bar-item w3-button">TEAM</a>
-  <a href="#work" onclick="w3_close()" class="w3-bar-item w3-button">WORK</a>
-  <a href="#pricing" onclick="w3_close()" class="w3-bar-item w3-button">PRICING</a>
--->  
-</nav>
+<%- include('navbar.ejs') %>
 
 <!-- The Modal Message -->
 <div id="myModal" class="modal">
@@ -230,32 +36,19 @@
               <input class="w3-input w3-border" type="text" required name="name" value="<%= name %>"></p>
               <p><label class="w3-label">Email</label>
               <input class="w3-input w3-border" type="text" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" required name="email" value="<%= email %>"></p>
-              <p><label class="w3-label">Unidade: exemplo <span>T1041</span>, T + (torre 1 ou 2) + (número do apartamento)</label>
-              <input class="w3-input w3-border" type="text" pattern="T[1-2][0-1][0-9][1-4]" required name="unidade" value="<%= unidade %>" oninput="apagaMensagem()"></p>
-              <p>
+              <% if(vaga_sorteada == null) { %>
+                <p><label class="w3-label">Unidade: exemplo <span>T1041</span>, T + (torre 1 ou 2) + (número do apartamento)</label>
+                <input class="w3-input w3-border" type="text" pattern="T[1-2][0-1][0-9][1-4]" required name="unidade" value="<%= unidade %>" oninput="apagaMensagem()"></p>
                 <div>
-                    <div class="w3-bar" >
-                        <input id="S1b" type="button" class="aba-subsolo" onclick="abreSubsolo('S1')" value="Sub-solo 1">
-                        <input id="S2b" type="button" onclick="abreSubsolo('S2')" value="Sub-solo 2">
-                        <input id="S3b" type="button" onclick="abreSubsolo('S3')" value="Mapa S1">
-                        <input id="S4b" type="button" onclick="abreSubsolo('S4')" value="Mapa S2">
-                    </div> 
-                    <div id="S1" class="cards subsolo w3-border">  
-                        <% lista_vagas.forEach(function(row) { %>
-                            <% if (row.codigo.substring(0,2) == 'S1' ) { %>
-                                <div class="card" onclick="unidadeClicada('<%- row.codigo %>')">
-                                    <div id="<%- row.codigo %>c" class="res-circle">
-                                        <div id="<%- row.codigo %>t" class="circle-txt">
-                                            <%- row.codigo.substring(3) %>
-                                        </div>
-                                    </div>
-                                </div>
-                            <% } %>
-                        <% }) %>
-                    </div>
-                    <div id="S2" class="cards subsolo w3-border" style="display:none">                     
-                      <% lista_vagas.forEach(function(row) {
-                          if (row.codigo.substring(0,2) == 'S2' ) { %>
+                  <div class="w3-bar" >
+                      <input id="S1b" type="button" class="aba-subsolo aba-subsolo-foco" onclick="abreSubsolo('S1')" value="Sub-solo 1">
+                      <input id="S2b" type="button" class="aba-subsolo" onclick="abreSubsolo('S2')" value="Sub-solo 2">
+                      <input id="S3b" type="button" class="aba-subsolo" onclick="abreSubsolo('S3')" value="Mapa S1">
+                      <input id="S4b" type="button" class="aba-subsolo" onclick="abreSubsolo('S4')" value="Mapa S2">
+                  </div> 
+                  <div id="S1" class="cards subsolo w3-border">                      
+                      <% lista_vagas.forEach(function(row) { %>
+                          <% if (row.codigo.substring(0,2) == 'S1' ) { %>
                               <div class="card" onclick="unidadeClicada('<%- row.codigo %>')">
                                   <div id="<%- row.codigo %>c" class="res-circle">
                                       <div id="<%- row.codigo %>t" class="circle-txt">
@@ -265,15 +58,31 @@
                               </div>
                           <% } %>
                       <% }) %>
-                    </div>
-                    <div id="S3" class="subsolo" style="display:none"> 
-                      <div class="imagem-subsolo1"></div>
-                    </div>
-                    <div id="S4" class="subsolo" style="display:none"> 
-                      <div class="imagem-subsolo2"></div>
-                    </div>
+                  </div>
+                  <div id="S2" class="cards subsolo w3-border" style="display:none">                     
+                    <% lista_vagas.forEach(function(row) {
+                        if (row.codigo.substring(0,2) == 'S2' ) { %>
+                            <div class="card" onclick="unidadeClicada('<%- row.codigo %>')">
+                                <div id="<%- row.codigo %>c" class="res-circle">
+                                    <div id="<%- row.codigo %>t" class="circle-txt">
+                                        <%- row.codigo.substring(3) %>
+                                    </div>
+                                </div>
+                            </div>
+                        <% } %>
+                    <% }) %>
+                  </div>
+                  <div id="S3" class="subsolo" style="display:none"> 
+                    <img src="../images/subsolo1.jpg" width="100%">
+                  </div>
+                  <div id="S4" class="subsolo" style="display:none"> 
+                    <img src="../images/subsolo2.jpg" width="100%">
+                  </div>
                 </div>                  
-              </p>
+              <% } else { %>
+                <p><label class="w3-label">Unidade: <span style="font-weight: bold;"><%= unidade %></span> </label></p>
+                <p><label class="w3-label">Vaga sorteada: <span style="font-weight: bold;"><%= vaga_sorteada %></span> </label></p>
+              <% } %>
               <p>
                 <input type="text" id="vagas_escolhidas" name="vagas_escolhidas" style="display: none;">
                 <button class="w3-button w3-black" type="submit">
@@ -296,10 +105,14 @@
   var lista_vagas_escolhidas = []
 
   function loadFunction() {    
-    let vagas_escolhidas = '<%= vagas_escolhidas %>'.split(',')
-    vagas_escolhidas.forEach(vaga => {
-        unidadeClicada(vaga)
-    }) 
+    let vagas_escolhidas = '<%= vagas_escolhidas %>'
+    let vaga_sorteada = '<%= vaga_sorteada %>'
+    if(vagas_escolhidas != '' & vaga_sorteada == '') {
+      vagas_escolhidas = vagas_escolhidas.split(',')
+      vagas_escolhidas.forEach(vaga => {
+          unidadeClicada(vaga)
+      }) 
+    }
   }
   window.onload = loadFunction();
 
@@ -307,7 +120,7 @@
     document.getElementById("mensagem").innerHTML = '';  
   }
 
-  function unidadeClicada(valor) {
+  function unidadeClicada(valor) {  
     var posicao = lista_vagas_escolhidas.indexOf(valor);
     if (posicao > -1) {
       document.getElementById(valor+'c').style.background = "#F2F2F2";
@@ -323,27 +136,23 @@
     lista_unidades.value = lista_vagas_escolhidas;
   }
 
-  function abreSubsolo(subsolo) {
+  function abreSubsolo(subsolo) { 
     var i;
     var x = document.getElementsByClassName("subsolo");
     for (i = 0; i < x.length; i++) {
       x[i].style.display = "none";  
     }
-    var element = document.getElementById("S1b");
-    element.classList.remove("aba-subsolo");
-    element = document.getElementById("S2b");
-    element.classList.remove("aba-subsolo");
-    element = document.getElementById("S3b");
-    element.classList.remove("aba-subsolo");
-    element = document.getElementById("S4b");
-    element.classList.remove("aba-subsolo");
+    x = document.getElementsByClassName("aba-subsolo");
+    for (i = 0; i < x.length; i++) {
+      x[i].classList.remove("aba-subsolo-foco"); 
+    }    
     var element = document.getElementById(subsolo+"b");
-    element.classList.add("aba-subsolo");
+    element.classList.add("aba-subsolo-foco");
     if(subsolo == 'S1' || subsolo == 'S2') {
       document.getElementById(subsolo).style.display = "grid";  
     } else {
       document.getElementById(subsolo).style.display = "block";  
-    }
+    }   
   }
 
   // Get the modal
