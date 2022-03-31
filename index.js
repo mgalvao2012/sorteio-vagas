@@ -542,6 +542,75 @@ app.post('/atualiza_presenca', requiresAuth(), (request, response) => {
   })  
 })
 
+app.get('/unidades/', requiresAuth(), (request, response) => {
+  // mensagem preenchida quando ?????
+  var mensagem = request.flash('success')
+  pool.query(`SELECT * FROM configuracao;
+              SELECT unidade, pne, adimplente FROM unidades ORDER BY unidade;`, (error, results) => {
+    if (error) {
+      console.log(error.message)
+    } else {
+      if (results[0].rows[0] == undefined) {
+        response.render('unidades.ejs', {
+          email: request.oidc.user.email,
+          name: request.oidc.user.name, 
+          lista_unidades: null,
+          lista_ajustada_unidades: null,
+          resultado_sorteio: null,
+          mensagem: null,
+          usuario_admin: request.session.usuario_admin
+        })  
+      } else {
+        if (results[0].rows[0].resultado_sorteio != 'Sorteio não realizado' ) {
+          mensagem = 'As condições não podem ser alteradas porque o sorteio foi realizado. É preciso reiniciar o processo!'
+        }
+        let lista_unidades = []  // lista criada para facilitar o tratamento de presenca
+        results[1].rows.forEach(row => {
+          lista_unidades.push(row.unidade+'-'+row.pne.toString()+'-'+row.adimplente.toString())
+        })
+        response.render('unidades.ejs', {
+          email: request.oidc.user.email,
+          name: request.oidc.user.name, 
+          lista_unidades: results[1].rows,
+          lista_ajustada_unidades: lista_unidades,
+          resultado_sorteio: results[0].rows[0].resultado_sorteio,
+          mensagem: mensagem,
+          usuario_admin: request.session.usuario_admin
+        })
+      }
+    }
+  })  
+})
+
+app.post('/unidade/atualiza_pne', requiresAuth(), (request, response) => {
+  const unidade = request.body.unidade
+  const pne = request.body.pne
+  const query = `UPDATE unidades SET pne = '${pne}' WHERE unidade = '${unidade}';`
+  console.log(query);
+  pool.query(query, (error, results) => {
+    if (error) {
+      response.status(500).json({ status: 'error', message: error })
+    } else {
+      response.status(200).json({ status: 'success', message: 'registro atualizado com sucesso!' }) 
+    }
+  })  
+})
+
+app.post('/unidade/atualiza_adimplente', requiresAuth(), (request, response) => {
+  const unidade = request.body.unidade
+  const adimplente = request.body.adimplente
+  const query = `UPDATE unidades SET adimplente = '${adimplente}' WHERE unidade = '${unidade}';`
+  console.log(query);
+  pool.query(query, (error, results) => {
+    if (error) {
+      response.status(500).json({ status: 'error', message: error })
+    } else {
+      response.status(200).json({ status: 'success', message: 'registro atualizado com sucesso!' }) 
+    }
+  })  
+})
+
+
 // Start server
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
