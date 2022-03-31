@@ -42,8 +42,11 @@
         <button class="w3-button"><%= name %><i class="fa fa-caret-down"></i></button>
         <div class="w3-dropdown-content w3-bar-block w3-dark-grey">
           <a href="/meusdados" class="w3-bar-item w3-button">Meus dados</a>
-          <a href="/sorteio" class="w3-bar-item w3-button">Sorteio</a>
-          <a href="/logout" class="w3-bar-item w3-button">Logout</a>
+          <% if (usuario_admin) { %>
+            <a href="/sorteio" class="w3-bar-item w3-button">Sorteio</a>
+            <a href="/setup" class="w3-bar-item w3-button">Setup</a>
+            <a href="/logout" class="w3-bar-item w3-button">Logout</a>
+          <% } %>
         </div>
       </div>
     <% } else { %>

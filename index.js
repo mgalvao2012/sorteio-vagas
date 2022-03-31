@@ -355,7 +355,7 @@ app.get('/sorteio', requiresAuth(), (request, response) => {
   var mensagem = request.flash('success')
   let user_id = request.oidc.user.sub
   pool.query(`SELECT * FROM configuracao;
-              SELECT unidade, vaga_sorteada, vagas_escolhidas FROM unidades ORDER BY unidade;`, (error, results) => {
+              SELECT unidade, vaga_sorteada, vagas_escolhidas, presente FROM unidades ORDER BY unidade;`, (error, results) => {
     if (error) {
       console.log(error.message)
     } else {
@@ -366,17 +366,23 @@ app.get('/sorteio', requiresAuth(), (request, response) => {
           ultimo_sorteio: null,
           resultado_sorteio: null,
           lista_vagas_sorteadas: null,
+          lista_presenca: null,
           mensagem: null,
           usuario_admin: request.session.usuario_admin
         })  
       } else {
         let ultimo_sorteio = formatDate(results[0].rows[0].ultimo_sorteio, 1)
+        let lista_presenca = []  // lista criada para facilitar o tratamento de presenca
+        results[1].rows.forEach(row => {
+          lista_presenca.push(row.unidade+'-'+row.presente.toString())
+        })
         response.render('sorteio.ejs', {
           email: request.oidc.user.email,
           name: request.oidc.user.name, 
           ultimo_sorteio: ultimo_sorteio,
           resultado_sorteio: results[0].rows[0].resultado_sorteio,
           lista_vagas_sorteadas: results[1].rows,
+          lista_presenca: lista_presenca,
           mensagem: mensagem,
           usuario_admin: request.session.usuario_admin
         })
@@ -518,6 +524,20 @@ app.get('/recomecar_sorteio', requiresAuth(), (request, response) => {
       console.log(error.message)
     } else {
       response.redirect(301, '/sorteio') 
+    }
+  })  
+})
+
+app.post('/atualiza_presenca', /* requiresAuth(), */(request, response) => {
+  const unidade = request.body.unidade
+  const presente = request.body.presente
+  const query = `UPDATE unidades SET presente = '${presente}' WHERE unidade = '${unidade}';`
+  console.log(query);
+  pool.query(query, (error, results) => {
+    if (error) {
+      response.status(500).json({ status: 'error', message: error })
+    } else {
+      response.status(200).json({ status: 'success', message: 'registro atualizado com sucesso!' }) 
     }
   })  
 })

@@ -29,7 +29,8 @@
     <div style="padding: 10px; box-shadow: 0 3px 18px 8px rgb(38 24 24 / 25%);">
       <h3 class="w3-center">Sorteio das vagas</h3>
       <% if(resultado_sorteio == 'Sorteio não realizado') { %>
-        <p class="w3-center w3-medium">Antes de executar o sorteio confirme que todos fizeram suas escolhas</p>
+        <p class="w3-center w3-medium">Antes de executar o sorteio confirme se todos fizeram suas escolhas<br/>
+        Clicando <span class="fa fa-hand-pointer-o icon-hand-pointer"></span> na unidade é possível atualizar a presença ou ausência no sorteio.</p>
       <% } %>        
       <div style="margin-top:28px; width: 90%; margin: auto;">
         <div>
@@ -89,7 +90,7 @@
                 <div id="S1" class="cards-sorteio-vagas subsolo w3-border">  
                     <% lista_vagas_sorteadas.forEach(function(row) { %>                          
                         <% if (row.unidade.substring(0,2) == 'T1' ) { %>
-                          <div class="card-sorteio-vagas">
+                          <div class="card-sorteio-vagas" onclick="unidadeClicada('<%- row.unidade %>')" id="<%- row.unidade %>u">
                             <span style="font-weight: bold;">
                               <%- row.unidade.substring(2) %>
                             </span>- 
@@ -99,10 +100,11 @@
                                     vagas.push(item.vaga)
                                   })              
                             %>                              
-                                <%- '('+vagas.toString().replace(',',', ')+')' %>
+                                <%- '('+vagas.toString().replace(',',', ')+')' %>                                
                             <% } else { %>
                               Sem escolhas
-                            <% }%>
+                            <% } %>
+                            <span id="<%- row.unidade %>-icon"></span>
                           </div>
                         <% } %>
                     <% }) %>
@@ -110,7 +112,7 @@
                 <div id="S2" class="cards-sorteio-vagas subsolo w3-border" style="display:none">                     
                   <% lista_vagas_sorteadas.forEach(function(row) {
                       if (row.unidade.substring(0,2) == 'T2' ) { %>
-                        <div class="card-sorteio-vagas">
+                        <div class="card-sorteio-vagas" onclick="unidadeClicada('<%- row.unidade %>')" id="<%- row.unidade %>u">
                           <span style="font-weight: bold;">
                             <%- row.unidade.substring(2) %>
                           </span>- 
@@ -124,6 +126,7 @@
                           <% } else { %>
                             Sem escolhas
                           <% }%>
+                          <span id="<%- row.unidade %>-icon"></span>
                         </div>
                       <% } %>
                   <% }) %>
@@ -135,7 +138,16 @@
                   <img src="../images/subsolo2.jpg" width="100%">
                 </div>
               </div>
-              <label class="w3-label">Formato: Unidade - Vagas escolhidas</label>                
+              <div class="w3-row">
+                <div class="w3-col m6 l6">
+                  <label class="w3-label">Formato: Unidade - Vagas escolhidas</label> 
+                </div>
+                <div class="w3-col m6 l6">
+                  Unidade:
+                  <i class="fa fa-check" style="font-size:16px;color:green;text-shadow:2px 2px 4px #CCC;"></i> Presente
+                  <i class="fa fa-remove" style="font-size:16px;color:#cc2727;text-shadow:2px 2px 4px #CCC;"></i> Ausente  
+                </div>
+              </div>              
             <% } %>
               <p>
                 <% if(resultado_sorteio == 'Sorteio não realizado') { %>
@@ -161,16 +173,67 @@
     <a href="#sorteio" class="w3-button w3-light-grey"><i class="fa fa-arrow-up w3-margin-right"></i>Vai para o início</a>
     <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank" class="w3-hover-text-green">w3.css</a></p>
   </footer>
-   
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script>
   var lista_vagas_sorteadas = '<%= lista_vagas_sorteadas %>'
+  var lista_presenca = '<%= lista_presenca %>'.split(',')
+  var lista_presenca_vagas = []
 
-  function loadFunction() {    
+  // atualiza as unidades com o status de presença gravado no banco de dados
+  function loadFunction(aba) { 
+    for(var i=0; i<lista_presenca.length; i++) {
+      let unidade = lista_presenca[i].split('-')[0]
+      if (lista_presenca[i].split('-')[1] == 'true') {
+        document.getElementById(unidade+'-icon').innerHTML = '<i class="fa fa-check icon-check"></i>'
+        lista_presenca_vagas.push(unidade)
+      } else {
+        document.getElementById(unidade+'-icon').innerHTML = '<i class="fa fa-remove icon-remove"></i>'
+      }
+    }
   }
   window.onload = loadFunction();
 
   function apagaMensagem() {
     document.getElementById("mensagem").innerHTML = '';  
+  }
+
+  function unidadeClicada(valor) {  
+    var posicao = lista_presenca_vagas.indexOf(valor);
+    if (posicao > -1) {
+      $(document).ready(function(){
+        $.post("/atualiza_presenca",
+          {
+            "unidade": valor,
+            "presente": "false"
+          },
+          function(data,status){
+            document.getElementById(valor+'-icon').innerHTML = '<i class="fa fa-remove icon-remove"></i>';
+            lista_presenca_vagas.splice(posicao,1);
+          }
+        );
+      });    
+    } else {
+      let i = -1
+      for(i=0; i<lista_vagas_sorteadas.length; i++) {
+        if (lista_vagas_sorteadas[i].unidade == valor) {
+          break
+        }
+      }
+      if (i > -1) {
+        $(document).ready(function(){
+          $.post("/atualiza_presenca",
+            {
+              "unidade": valor,
+              "presente": "true"
+            },
+            function(data,status){
+              document.getElementById(valor+'-icon').innerHTML = '<i class="fa fa-check icon-check"></i>';
+              lista_presenca_vagas.push(valor);
+            }
+          );
+        });
+      }
+    }
   }
 
   function abreSubsolo(subsolo) { 

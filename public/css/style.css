@@ -147,6 +147,7 @@ body, html {
   grid-gap: 10px;
   grid-template-columns: repeat(auto-fit, minmax(45px, 1fr));
   background-color: #FFFFFF;
+  cursor: pointer;
 }      
 
 tr:nth-child(even) {background-color: #F2F2F2;}
@@ -239,8 +240,27 @@ tr:nth-child(even) {background-color: #F2F2F2;}
 .cards-sorteio-vagas {
   max-width: 100%;
   margin: 0 auto;
+  padding: 5px;
   display: grid;
   grid-gap: 10px;
   grid-template-columns: repeat(auto-fit, minmax(250px, 2fr));
   background-color: #FFFFFF;
+  cursor: pointer;
 }      
+
+.icon-remove {
+  font-size:16px;
+  color:#cc2727;
+  text-shadow:2px 2px 4px #CCC;
+}
+
+.icon-check {
+  font-size:16px;
+  color:green;
+  text-shadow:2px 2px 4px #CCC;
+}
+
+.icon-hand-pointer {
+  font-size:16px;
+  text-shadow:2px 2px 4px #CCC;
+}

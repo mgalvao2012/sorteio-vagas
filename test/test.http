@@ -44,11 +44,20 @@ ApiKey: hunter2
             }]
 }
 
-
 ### local - delete
 DELETE http://localhost:3002/books/5
 ApiKey: hunter2
 Content-Type: application/json
+
+### local - atualiza presenca da unidade
+POST http://localhost:3000/atualiza_presenca HTTP/1.1
+Content-Type: application/json
+ApiKey: hunter2
+
+{
+    "unidade": "T1041",
+    "presenca": "false"
+}
 
 ### Heroku - get
 GET https://mgalvao-example-node-api.herokuapp.com/books HTTP/1.1
