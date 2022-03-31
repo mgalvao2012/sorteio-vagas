@@ -528,7 +528,7 @@ app.get('/recomecar_sorteio', requiresAuth(), (request, response) => {
   })  
 })
 
-app.post('/atualiza_presenca', /* requiresAuth(), */(request, response) => {
+app.post('/atualiza_presenca', requiresAuth(), (request, response) => {
   const unidade = request.body.unidade
   const presente = request.body.presente
   const query = `UPDATE unidades SET presente = '${presente}' WHERE unidade = '${unidade}';`
