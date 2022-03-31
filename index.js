@@ -414,7 +414,7 @@ app.post('/sorteio', (request, response) => {
         sorteia_vagas('sorteio de unidades COM portadores de necessidade especiais', 
           vagas_disponiveis, 
           `SELECT unidade, vaga_sorteada, vagas_escolhidas FROM unidades 
-            WHERE pne = true AND presente = true AND vaga_sorteada IS NULL`)
+            WHERE pne = true AND vaga_sorteada IS NULL`)
         .then(retorno => {
           vagas_disponiveis = retorno[0]
           //console.log('vagas_disponiveis (1) = '+vagas_disponiveis)
@@ -424,7 +424,7 @@ app.post('/sorteio', (request, response) => {
           })
           //console.log('terminou sorteio de unidades COM portadores de necessidade especiais')
 
-          sorteia_vagas('sorteio de unidades SEM portadores de necessidade especiais e ADIMPLENTES',
+          sorteia_vagas('sorteio de unidades SEM portadores de necessidade especiais, PRESENTES e  ADIMPLENTES',
           vagas_disponiveis, 
           `SELECT unidade, vaga_sorteada, vagas_escolhidas FROM unidades 
             WHERE pne = false AND adimplente = true AND presente = true AND vaga_sorteada IS NULL`)
@@ -435,7 +435,7 @@ app.post('/sorteio', (request, response) => {
               query_gravacao += `UPDATE unidades SET vaga_sorteada = '${element[1]}' WHERE unidade = '${element[0]}'; `
             })
 
-            sorteia_vagas('sorteio de unidades SEM portadores de necessidade especiais e INADIMPLENTES',
+            sorteia_vagas('sorteio de unidades SEM portadores de necessidade especiais, PRESENTES e INADIMPLENTES',
             vagas_disponiveis, 
             `SELECT unidade, vaga_sorteada, vagas_escolhidas FROM unidades 
               WHERE pne = false AND adimplente = false AND presente = true AND vaga_sorteada IS NULL`)

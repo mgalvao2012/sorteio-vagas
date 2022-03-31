@@ -178,17 +178,20 @@
   var lista_vagas_sorteadas = '<%= lista_vagas_sorteadas %>'
   var lista_presenca = '<%= lista_presenca %>'.split(',')
   var lista_presenca_vagas = []
+  var resultado_sorteio = '<%= resultado_sorteio %>'
 
   // atualiza as unidades com o status de presença gravado no banco de dados
   function loadFunction(aba) { 
-    for(var i=0; i<lista_presenca.length; i++) {
-      let unidade = lista_presenca[i].split('-')[0]
-      if (lista_presenca[i].split('-')[1] == 'true') {
-        document.getElementById(unidade+'-icon').innerHTML = '<i class="fa fa-check icon-check"></i>'
-        lista_presenca_vagas.push(unidade)
-      } else {
-        document.getElementById(unidade+'-icon').innerHTML = '<i class="fa fa-remove icon-remove"></i>'
-      }
+    if(resultado_sorteio == 'Sorteio não realizado') {
+      for(var i=0; i<lista_presenca.length; i++) {
+        let unidade = lista_presenca[i].split('-')[0]
+        if (lista_presenca[i].split('-')[1] == 'true') {
+          document.getElementById(unidade+'-icon').innerHTML = '<i class="fa fa-check icon-check"></i>'
+          lista_presenca_vagas.push(unidade)
+        } else {
+          document.getElementById(unidade+'-icon').innerHTML = '<i class="fa fa-remove icon-remove"></i>'
+        }
+      }  
     }
   }
   window.onload = loadFunction();

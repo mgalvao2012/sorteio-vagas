@@ -32,36 +32,34 @@
       <div style="margin-top:28px; width: 90%; margin: auto;">
         <div>
             <form action="/meusdados" method="POST">
-              <p><label class="w3-label">Nome</label>
-              <input class="w3-input w3-border" type="text" required name="name" value="<%= name %>"></p>
-              <p><label class="w3-label">Email</label>
-              <input class="w3-input w3-border" type="text" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" required name="email" value="<%= email %>"></p>
+              <div class="w3-row">
+                <div class="w3-col m6 l6" style="padding-right:10px;">
+                  <p>
+                    <label class="w3-label">Nome</label>
+                    <input class="w3-input w3-border" type="text" required name="name" value="<%= name %>">
+                  </p>
+                </div>
+                <div class="w3-col m6 l6">
+                  <p>
+                    <label class="w3-label">Email</label>
+                    <input class="w3-input w3-border" type="text" disabled name="email" value="<%= email %>">
+                  </p>
+                </div>
+              <div>
               <% if(vaga_sorteada == null) { %>
-                <p><label class="w3-label">Unidade: exemplo <span>T1041</span>, T + (torre 1 ou 2) + (número do apartamento)</label>
-                <input class="w3-input w3-border" type="text" pattern="T[1-2][0-1][0-9][1-4]" required name="unidade" value="<%= unidade %>" oninput="apagaMensagem()"></p>
-                <div>
-                  <div class="w3-bar" >
-                      <input id="S1b" type="button" class="aba-subsolo aba-subsolo-foco" onclick="abreSubsolo('S1')" value="Sub-solo 1">
-                      <input id="S2b" type="button" class="aba-subsolo" onclick="abreSubsolo('S2')" value="Sub-solo 2">
-                      <input id="S3b" type="button" class="aba-subsolo" onclick="abreSubsolo('S3')" value="Mapa S1">
-                      <input id="S4b" type="button" class="aba-subsolo" onclick="abreSubsolo('S4')" value="Mapa S2">
-                  </div> 
-                  <div id="S1" class="cards subsolo w3-border">                      
-                      <% lista_vagas.forEach(function(row) { %>
-                          <% if (row.codigo.substring(0,2) == 'S1' ) { %>
-                              <div class="card" onclick="unidadeClicada('<%- row.codigo %>')">
-                                  <div id="<%- row.codigo %>c" class="res-circle">
-                                      <div id="<%- row.codigo %>t" class="circle-txt">
-                                          <%- row.codigo.substring(3) %>
-                                      </div>
-                                  </div>
-                              </div>
-                          <% } %>
-                      <% }) %>
-                  </div>
-                  <div id="S2" class="cards subsolo w3-border" style="display:none">                     
-                    <% lista_vagas.forEach(function(row) {
-                        if (row.codigo.substring(0,2) == 'S2' ) { %>
+                <p>
+                  <label class="w3-label">Unidade: exemplo <span>T1041</span>, T + (torre 1 ou 2) + (número do apartamento)</label>
+                  <input class="w3-input w3-border" type="text" pattern="T[1-2][0-1][0-9][1-4]" required name="unidade" value="<%= unidade %>" oninput="apagaMensagem()">
+                </p>
+                <div class="w3-bar" >
+                    <input id="S1b" type="button" class="aba-subsolo aba-subsolo-foco" onclick="abreSubsolo('S1')" value="Sub-solo 1">
+                    <input id="S2b" type="button" class="aba-subsolo" onclick="abreSubsolo('S2')" value="Sub-solo 2">
+                    <input id="S3b" type="button" class="aba-subsolo" onclick="abreSubsolo('S3')" value="Mapa S1">
+                    <input id="S4b" type="button" class="aba-subsolo" onclick="abreSubsolo('S4')" value="Mapa S2">
+                </div> 
+                <div id="S1" class="cards subsolo w3-border">                      
+                    <% lista_vagas.forEach(function(row) { %>
+                        <% if (row.codigo.substring(0,2) == 'S1' ) { %>
                             <div class="card" onclick="unidadeClicada('<%- row.codigo %>')">
                                 <div id="<%- row.codigo %>c" class="res-circle">
                                     <div id="<%- row.codigo %>t" class="circle-txt">
@@ -71,14 +69,26 @@
                             </div>
                         <% } %>
                     <% }) %>
-                  </div>
-                  <div id="S3" class="subsolo" style="display:none"> 
-                    <img src="../images/subsolo1.jpg" width="100%">
-                  </div>
-                  <div id="S4" class="subsolo" style="display:none"> 
-                    <img src="../images/subsolo2.jpg" width="100%">
-                  </div>
-                </div>                  
+                </div>
+                <div id="S2" class="cards subsolo w3-border" style="display:none">                     
+                  <% lista_vagas.forEach(function(row) {
+                      if (row.codigo.substring(0,2) == 'S2' ) { %>
+                          <div class="card" onclick="unidadeClicada('<%- row.codigo %>')">
+                              <div id="<%- row.codigo %>c" class="res-circle">
+                                  <div id="<%- row.codigo %>t" class="circle-txt">
+                                      <%- row.codigo.substring(3) %>
+                                  </div>
+                              </div>
+                          </div>
+                      <% } %>
+                  <% }) %>
+                </div>
+                <div id="S3" class="subsolo" style="display:none"> 
+                  <img src="../images/subsolo1.jpg" width="100%">
+                </div>
+                <div id="S4" class="subsolo" style="display:none"> 
+                  <img src="../images/subsolo2.jpg" width="100%">
+                </div>
               <% } else { %>
                 <p><label class="w3-label">Unidade: <span style="font-weight: bold;"><%= unidade %></span> </label></p>
                 <p><label class="w3-label">Vaga sorteada: <span style="font-weight: bold;"><%= vaga_sorteada %></span> </label></p>
