@@ -125,13 +125,17 @@ app.use(limiter, (request, response, next) => {
 app.get('/', async (request, response) => {
   if (request.oidc.isAuthenticated()) {  
     // envia alguns dados do usuário logado para configurar a pagina principal
+    let mensagem 
+    if (!request.oidc.user.email_verified == true) {
+      mensagem = 'Um email foi enviado para que sua conta seja ativada. Sem essa ativação alguns recursos não estarão disponíveis!'
+    }
     response.render('index.ejs', { 
       email: request.oidc.user.email, 
       nickname: request.oidc.user.nickname,
       picture: request.oidc.user.picture,
       name: request.oidc.user.name,
-      mensagem: null,
-      usuario_admin: request.session.usuario_admin   
+      mensagem: mensagem,
+      usuario_admin: request.session.usuario_admin
     })
   } else {
     response.render('index.ejs', { 
@@ -542,7 +546,7 @@ app.post('/atualiza_presenca', requiresAuth(), (request, response) => {
   })  
 })
 
-app.get('/unidades/', requiresAuth(), (request, response) => {
+app.get('/unidades', requiresAuth(), (request, response) => {
   // mensagem preenchida quando ?????
   var mensagem = request.flash('success')
   pool.query(`SELECT * FROM configuracao;
@@ -561,13 +565,15 @@ app.get('/unidades/', requiresAuth(), (request, response) => {
           usuario_admin: request.session.usuario_admin
         })  
       } else {
-        if (results[0].rows[0].resultado_sorteio != 'Sorteio não realizado' ) {
-          mensagem = 'As condições não podem ser alteradas porque o sorteio foi realizado. É preciso reiniciar o processo!'
+        if (results[0].rows[0].resultado_sorteio != 'Sorteio não realizado' ) {  
+          let ultimo_sorteio = formatDate(results[0].rows[0].ultimo_sorteio, 1)        
+          mensagem = `As condições não podem ser alteradas porque o sorteio foi realizado em ${ultimo_sorteio}. É preciso reiniciar o processo!`
         }
         let lista_unidades = []  // lista criada para facilitar o tratamento de presenca
         results[1].rows.forEach(row => {
           lista_unidades.push(row.unidade+'-'+row.pne.toString()+'-'+row.adimplente.toString())
         })
+        console.log(mensagem)
         response.render('unidades.ejs', {
           email: request.oidc.user.email,
           name: request.oidc.user.name, 

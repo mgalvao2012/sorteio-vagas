@@ -15,64 +15,42 @@
 <body>
 <%- include('navbar.ejs') %>
 
-<!-- The Modal Message -->
-<div id="myModal" class="modal">
-    <!-- Modal content -->
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      <p><%= mensagem %></p>
-    </div>  
-</div> 
-
-<!-- Form Section -->
-<div class="w3-container w3-light-grey" style="padding:78px 16px;" id="meusdados">
+  <!-- Form Section -->
+  <div class="w3-container w3-light-grey" style="padding:78px 16px;" id="meusdados">
     <div style="padding: 10px; box-shadow: 0 3px 18px 8px rgb(38 24 24 / 25%);">
       <h3 class="w3-center">Meus dados</h3>
       <p class="w3-center w3-medium">Atualize suas informações para participar do sorteio.</p>
       <div style="margin-top:28px; width: 90%; margin: auto;">
         <div>
-            <form action="/meusdados" method="POST">
-              <div class="w3-row">
-                <div class="w3-col m6 l6" style="padding-right:10px;">
-                  <p>
-                    <label class="w3-label">Nome</label>
-                    <input class="w3-input w3-border" type="text" required name="name" value="<%= name %>">
-                  </p>
-                </div>
-                <div class="w3-col m6 l6">
-                  <p>
-                    <label class="w3-label">Email</label>
-                    <input class="w3-input w3-border" type="text" disabled name="email" value="<%= email %>">
-                  </p>
-                </div>
-              <div>
-              <% if(vaga_sorteada == null) { %>
+          <form action="/meusdados" method="POST">
+            <div class="w3-row">
+              <div class="w3-col m6 l6" style="padding-right:10px;">
                 <p>
-                  <label class="w3-label">Unidade: exemplo <span>T1041</span>, T + (torre 1 ou 2) + (número do apartamento)</label>
-                  <input class="w3-input w3-border" type="text" pattern="T[1-2][0-1][0-9][1-4]" required name="unidade" value="<%= unidade %>" oninput="apagaMensagem()">
+                  <label class="w3-label">Nome</label>
+                  <input class="w3-input w3-border" type="text" required name="name" value="<%= name %>">
                 </p>
-                <div class="w3-bar" >
-                    <input id="S1b" type="button" class="aba-subsolo aba-subsolo-foco" onclick="abreSubsolo('S1')" value="Sub-solo 1">
-                    <input id="S2b" type="button" class="aba-subsolo" onclick="abreSubsolo('S2')" value="Sub-solo 2">
-                    <input id="S3b" type="button" class="aba-subsolo" onclick="abreSubsolo('S3')" value="Mapa S1">
-                    <input id="S4b" type="button" class="aba-subsolo" onclick="abreSubsolo('S4')" value="Mapa S2">
-                </div> 
-                <div id="S1" class="cards subsolo w3-border">                      
-                    <% lista_vagas.forEach(function(row) { %>
-                        <% if (row.codigo.substring(0,2) == 'S1' ) { %>
-                            <div class="card" onclick="unidadeClicada('<%- row.codigo %>')">
-                                <div id="<%- row.codigo %>c" class="res-circle">
-                                    <div id="<%- row.codigo %>t" class="circle-txt">
-                                        <%- row.codigo.substring(3) %>
-                                    </div>
-                                </div>
-                            </div>
-                        <% } %>
-                    <% }) %>
-                </div>
-                <div id="S2" class="cards subsolo w3-border" style="display:none">                     
-                  <% lista_vagas.forEach(function(row) {
-                      if (row.codigo.substring(0,2) == 'S2' ) { %>
+              </div>
+              <div class="w3-col m6 l6">
+                <p>
+                  <label class="w3-label">Email</label>
+                  <input class="w3-input w3-border" type="text" disabled name="email" value="<%= email %>">
+                </p>
+              </div>
+            </div>
+            <% if(vaga_sorteada == null) { %>
+              <p>
+                <label class="w3-label">Unidade: exemplo <span>T1041</span>, T + (torre 1 ou 2) + (número do apartamento)</label>
+                <input class="w3-input w3-border" type="text" pattern="T[1-2][0-1][0-9][1-4]" required name="unidade" value="<%= unidade %>" oninput="apagaMensagem()">
+              </p>
+              <div class="w3-bar" >
+                  <input id="S1b" type="button" class="aba-subsolo aba-subsolo-foco" onclick="abreSubsolo('S1')" value="Sub-solo 1">
+                  <input id="S2b" type="button" class="aba-subsolo" onclick="abreSubsolo('S2')" value="Sub-solo 2">
+                  <input id="S3b" type="button" class="aba-subsolo" onclick="abreSubsolo('S3')" value="Mapa S1">
+                  <input id="S4b" type="button" class="aba-subsolo" onclick="abreSubsolo('S4')" value="Mapa S2">
+              </div> 
+              <div id="S1" class="cards subsolo w3-border">                      
+                  <% lista_vagas.forEach(function(row) { %>
+                      <% if (row.codigo.substring(0,2) == 'S1' ) { %>
                           <div class="card" onclick="unidadeClicada('<%- row.codigo %>')">
                               <div id="<%- row.codigo %>c" class="res-circle">
                                   <div id="<%- row.codigo %>t" class="circle-txt">
@@ -82,35 +60,47 @@
                           </div>
                       <% } %>
                   <% }) %>
-                </div>
-                <div id="S3" class="subsolo" style="display:none"> 
-                  <img src="../images/subsolo1.jpg" width="100%">
-                </div>
-                <div id="S4" class="subsolo" style="display:none"> 
-                  <img src="../images/subsolo2.jpg" width="100%">
-                </div>
-              <% } else { %>
-                <p><label class="w3-label">Unidade: <span style="font-weight: bold;"><%= unidade %></span> </label></p>
-                <p><label class="w3-label">Vaga sorteada: <span style="font-weight: bold;"><%= vaga_sorteada %></span> </label></p>
-              <% } %>
-              <p>
-                <input type="text" id="vagas_escolhidas" name="vagas_escolhidas" style="display: none;">
-                <button class="w3-button w3-black" type="submit">
-                    <i class="fa fa-paper-plane"></i> ENVIAR
-                </button>
-              </p>
-            </form>
+              </div>
+              <div id="S2" class="cards subsolo w3-border" style="display:none">                     
+                <% lista_vagas.forEach(function(row) {
+                    if (row.codigo.substring(0,2) == 'S2' ) { %>
+                        <div class="card" onclick="unidadeClicada('<%- row.codigo %>')">
+                            <div id="<%- row.codigo %>c" class="res-circle">
+                                <div id="<%- row.codigo %>t" class="circle-txt">
+                                    <%- row.codigo.substring(3) %>
+                                </div>
+                            </div>
+                        </div>
+                    <% } %>
+                <% }) %>
+              </div>
+              <div id="S3" class="subsolo" style="display:none"> 
+                <img src="../images/subsolo1.jpg" width="100%">
+              </div>
+              <div id="S4" class="subsolo" style="display:none"> 
+                <img src="../images/subsolo2.jpg" width="100%">
+              </div>
+            <% } else { %>
+              <p><label class="w3-label">Unidade: <span style="font-weight: bold;"><%= unidade %></span> </label></p>
+              <p><label class="w3-label">Vaga sorteada: <span style="font-weight: bold;"><%= vaga_sorteada %></span> </label></p>
+            <% } %>
+            <p>
+              <input type="text" id="vagas_escolhidas" name="vagas_escolhidas" style="display: none;">
+              <button class="w3-button w3-black" type="submit">
+                  <i class="fa fa-paper-plane"></i> ENVIAR
+              </button>
+            </p>
+          </form>
         </div>
       </div>
     </div>
   </div>
-  
   <!-- Footer -->
   <footer class="w3-center w3-black w3-padding-24">
     <a href="#meusdados" class="w3-button w3-light-grey"><i class="fa fa-arrow-up w3-margin-right"></i>Vai para o início</a>
     <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank" class="w3-hover-text-green">w3.css</a></p>
   </footer>
-   
+  <script sr="./js/script.js"></script>
   <script>
   var lista_vagas_escolhidas = []
 
@@ -164,48 +154,7 @@
       document.getElementById(subsolo).style.display = "block";  
     }   
   }
-
-  // Get the modal
-  var modal = document.getElementById("myModal");
-
-  // Get the <span> element that closes the modal
-  var span = document.getElementsByClassName("close")[0];
-
-  // Show messagem when has content
-  var mensagem = '<%= mensagem %>';
-  if (mensagem != '') {
-    modal.style.display = "block";
-  }
-
-  // When the user clicks on <span> (x), close the modal
-  span.onclick = function() {
-    modal.style.display = "none";
-  }
-
-  // When the user clicks anywhere outside of the modal, close it
-  window.onclick = function(event) {
-    if (event.target == modal) {
-      modal.style.display = "none";
-    }
-  }
-
-  // Toggle between showing and hiding the sidebar when clicking the menu icon
-  var mySidebar = document.getElementById("mySidebar");
-  
-  function w3_open() {
-    if (mySidebar.style.display === 'block') {
-      mySidebar.style.display = 'none';
-    } else {
-      mySidebar.style.display = 'block';
-    }
-  }
-  
-  // Close the sidebar with the close button
-  function w3_close() {
-      mySidebar.style.display = "none";
-  }
   </script>
-  
-  </body>
-  </html>
+</body>
+</html>
   
