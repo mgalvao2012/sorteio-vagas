@@ -155,7 +155,7 @@ app.get('/meusdados', requiresAuth(), (request, response) => {
   // mensagem preenchida quando é realizada a atualização dos dados
   var mensagem = request.flash('success')
   let user_id = request.oidc.user.sub
-  pool.query(`SELECT codigo FROM vagas WHERE bloqueada = false ORDER BY codigo;
+  pool.query(`SELECT codigo FROM vagas WHERE disponivel = true ORDER BY codigo;
               SELECT * FROM unidades WHERE user_id = '${user_id}';`, (error, results) => {
     if (error) {
       console.log(error.message)
@@ -177,9 +177,11 @@ app.get('/meusdados', requiresAuth(), (request, response) => {
         let vagas_escolhidas_array = results[1].rows[0].vagas_escolhidas
         let vagas_escolhidas = []
         // console.log('vagas_escolhidas_array '+vagas_escolhidas_array)
-        vagas_escolhidas_array.forEach(item => {
-          vagas_escolhidas.push(item.vaga)
-        })
+        if (vagas_escolhidas_array != null) {
+          vagas_escolhidas_array.forEach(item => {
+            vagas_escolhidas.push(item.vaga)
+          })
+        }
         // console.log('vagas_escolhidas '+vagas_escolhidas)
         response.render('meusdados.ejs', {
           user_id: user_id,
@@ -216,11 +218,11 @@ app.post('/meusdados', requiresAuth(), (request, response) => {
   }
   var query = `UPDATE unidades SET user_id = NULL WHERE user_id = '${user_id}';`
   if (vagas_escolhidas == undefined) {
-    query += `UPDATE unidades SET user_id = '${user_id}' WHERE unidade = '${unidade}';`
+    query += `UPDATE unidades SET user_id = '${user_id}', vagas_escolhidas = NULL WHERE unidade = '${unidade}';`
   } else {
     query += `UPDATE unidades SET user_id = '${user_id}', vagas_escolhidas = '${vagas_escolhidas}' WHERE unidade = '${unidade}';`
   }
-  query += `SELECT codigo FROM vagas WHERE bloqueada = false ORDER BY codigo;`
+  query += `SELECT codigo FROM vagas WHERE disponivel = true ORDER BY codigo;`
   pool.query(query, (error, results) => {
     if (error) {
       console.log("erro: "+error.message)
@@ -396,7 +398,7 @@ app.get('/sorteio', requiresAuth(), (request, response) => {
 })
 
 app.post('/sorteio', (request, response) => {
-  pool.query('SELECT codigo FROM vagas WHERE bloqueada = false', (error, results) => {
+  pool.query('SELECT codigo FROM vagas WHERE disponivel = true', (error, results) => {
     if (error) {
       response.status(500).json({ status: 'error', message: 'Não há vagas disponíveis' })
     } else {
@@ -521,7 +523,7 @@ app.post('/sorteio', (request, response) => {
   })
 })
 
-app.get('/recomecar_sorteio', requiresAuth(), (request, response) => {
+app.get('/sorteio/recomecar', requiresAuth(), (request, response) => {
   pool.query(`UPDATE unidades SET vaga_sorteada = null;
               UPDATE configuracao SET resultado_sorteio = 'Sorteio não realizado';`, (error, results) => {
     if (error) {
@@ -532,7 +534,61 @@ app.get('/recomecar_sorteio', requiresAuth(), (request, response) => {
   })  
 })
 
-app.post('/atualiza_presenca', requiresAuth(), (request, response) => {
+app.get('/vagas', requiresAuth(), (request, response) => {
+  var mensagem = request.flash('success')
+  let user_id = request.oidc.user.sub
+  pool.query(`SELECT * FROM configuracao;
+              SELECT codigo, disponivel FROM vagas ORDER BY codigo;`, (error, results) => {
+    if (error) {
+      console.log(error.message)
+    } else {
+      if (results[0].rows[0] == undefined) {
+        response.render('vagas.ejs', {
+          email: request.oidc.user.email,
+          name: request.oidc.user.name, 
+          ultimo_sorteio: null,
+          resultado_sorteio: null,
+          lista_vagas: null,
+          lista_ajustada_vagas: null,
+          mensagem: null,
+          usuario_admin: request.session.usuario_admin
+        })  
+      } else {
+        let ultimo_sorteio = formatDate(results[0].rows[0].ultimo_sorteio, 1)
+        let lista_vagas = []  // lista criada para facilitar o tratamento da vaga
+        results[1].rows.forEach(row => {
+          lista_vagas.push(row.codigo+'-'+row.disponivel.toString())
+        })
+        response.render('vagas.ejs', {
+          email: request.oidc.user.email,
+          name: request.oidc.user.name, 
+          ultimo_sorteio: ultimo_sorteio,
+          resultado_sorteio: results[0].rows[0].resultado_sorteio,
+          lista_vagas: results[1].rows,
+          lista_ajustada_vagas: lista_vagas,
+          mensagem: mensagem,
+          usuario_admin: request.session.usuario_admin
+        })
+      }
+    }
+  })  
+})
+
+app.post('/vagas/atualiza_disponibilidade', requiresAuth(), (request, response) => {
+  const codigo = request.body.codigo
+  const disponivel = request.body.disponivel
+  const query = `UPDATE vagas SET disponivel = '${disponivel}' WHERE codigo = '${codigo}';`
+  console.log(query);
+  pool.query(query, (error, results) => {
+    if (error) {
+      response.status(500).json({ status: 'error', message: error })
+    } else {
+      response.status(200).json({ status: 'success', message: 'registro atualizado com sucesso!' }) 
+    }
+  })  
+})
+
+app.post('/unidades/atualiza_presenca', requiresAuth(), (request, response) => {
   const unidade = request.body.unidade
   const presente = request.body.presente
   const query = `UPDATE unidades SET presente = '${presente}' WHERE unidade = '${unidade}';`
@@ -547,8 +603,6 @@ app.post('/atualiza_presenca', requiresAuth(), (request, response) => {
 })
 
 app.get('/unidades', requiresAuth(), (request, response) => {
-  // mensagem preenchida quando ?????
-  var mensagem = request.flash('success')
   pool.query(`SELECT * FROM configuracao;
               SELECT unidade, pne, adimplente FROM unidades ORDER BY unidade;`, (error, results) => {
     if (error) {
@@ -565,6 +619,7 @@ app.get('/unidades', requiresAuth(), (request, response) => {
           usuario_admin: request.session.usuario_admin
         })  
       } else {
+        var mensagem
         if (results[0].rows[0].resultado_sorteio != 'Sorteio não realizado' ) {  
           let ultimo_sorteio = formatDate(results[0].rows[0].ultimo_sorteio, 1)        
           mensagem = `As condições não podem ser alteradas porque o sorteio foi realizado em ${ultimo_sorteio}. É preciso reiniciar o processo!`
@@ -573,7 +628,6 @@ app.get('/unidades', requiresAuth(), (request, response) => {
         results[1].rows.forEach(row => {
           lista_unidades.push(row.unidade+'-'+row.pne.toString()+'-'+row.adimplente.toString())
         })
-        console.log(mensagem)
         response.render('unidades.ejs', {
           email: request.oidc.user.email,
           name: request.oidc.user.name, 
@@ -588,7 +642,7 @@ app.get('/unidades', requiresAuth(), (request, response) => {
   })  
 })
 
-app.post('/unidade/atualiza_pne', requiresAuth(), (request, response) => {
+app.post('/unidades/atualiza_pne', requiresAuth(), (request, response) => {
   const unidade = request.body.unidade
   const pne = request.body.pne
   const query = `UPDATE unidades SET pne = '${pne}' WHERE unidade = '${unidade}';`
@@ -602,7 +656,7 @@ app.post('/unidade/atualiza_pne', requiresAuth(), (request, response) => {
   })  
 })
 
-app.post('/unidade/atualiza_adimplente', requiresAuth(), (request, response) => {
+app.post('/unidades/atualiza_adimplente', requiresAuth(), (request, response) => {
   const unidade = request.body.unidade
   const adimplente = request.body.adimplente
   const query = `UPDATE unidades SET adimplente = '${adimplente}' WHERE unidade = '${unidade}';`

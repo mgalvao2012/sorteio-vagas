@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Sorteio de vagas de estacionamento do Condomínio Grandlife Ipiranga</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'cross-origin'">
+-->
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link href="./css/style.css" rel='stylesheet' type='text/css' />
+</head>
+<body>
+<%- include('navbar.ejs') %>
+
+<!-- Form Section -->
+<div class="w3-container w3-light-grey" style="padding:78px 16px;" id="vagas">
+    <div style="padding: 10px; box-shadow: 0 3px 18px 8px rgb(38 24 24 / 25%);">
+      <h3 class="w3-center">Configuração das vagas</h3>
+      <% if(resultado_sorteio == 'Sorteio não realizado') { %>
+        <p class="w3-center w3-medium">Confirme as informações abaixo de cada vaga.<br/>
+        Clicando <span class="fa fa-hand-pointer-o icon-hand-pointer"></span> na vaga é possível atualizar a disponibilidade para o sorteio.</p>
+      <% } %>        
+      <div style="margin-top:28px; width: 90%; margin: auto;">
+        <div>
+            <form>
+              <% if(resultado_sorteio != 'Sorteio não realizado') { %>
+                <p><label class="w3-label">Último sorteio</label>
+                <input class="w3-input w3-border" type="text" name="ultimo_sorteio" value="<%= ultimo_sorteio %>" disabled></p>
+                <p><label class="w3-label">Resultado</label>
+                <input class="w3-input w3-border" type="text" name="resultado" value="<%= resultado_sorteio %>" disabled></p>
+                <div>
+                  <div class="w3-bar" >
+                      <input id="S1b" type="button" class="aba-subsolo aba-subsolo-foco" onclick="abreSubsolo('S1')" value="SubSolo 1">
+                      <input id="S2b" type="button" class="aba-subsolo" onclick="abreSubsolo('S2')" value="SubSolo 2">
+                      <input id="S3b" type="button" class="aba-subsolo" onclick="abreSubsolo('S3')" value="Mapa S1">
+                      <input id="S4b" type="button" class="aba-subsolo" onclick="abreSubsolo('S4')" value="Mapa S2">
+                  </div> 
+                  <div id="S1" class="cards-vagas subsolo w3-border">  
+                      <% lista_vagas.forEach(function(row) { %>                          
+                          <% if (row.codigo.substring(0,2) == 'S1' ) { %>
+                            <div class="card-vagas">
+                              <%- row.vaga %>
+                            </div>
+                          <% } %>
+                      <% }) %>
+                  </div>
+                  <div id="S2" class="cards-vagas subsolo w3-border" style="display:none">                     
+                    <% lista_vagas.forEach(function(row) {
+                        if (row.codigo.substring(0,2) == 'T2' ) { %>
+                          <div class="card-vagas">
+                            <%- row.vaga %>
+                          </div>
+                        <% } %>
+                    <% }) %>
+                  </div>
+                  <div id="S3" class="subsolo" style="display:none"> 
+                    <img src="../images/subsolo1.jpg" width="100%">
+                  </div>
+                  <div id="S4" class="subsolo" style="display:none"> 
+                    <img src="../images/subsolo2.jpg" width="100%">
+                  </div>
+                </div>
+                <label class="w3-label">
+                  Vaga:
+                  <i class="fa fa-check icon-color-ok"></i> Disponível
+                  <i class="fa fa-remove icon-color-no-ok"></i> Indisponível
+                </label>                
+              <% } else { %>
+              <div>
+                <div class="w3-bar" >
+                    <input id="S1b" type="button" class="aba-subsolo aba-subsolo-foco" onclick="abreSubsolo('S1')" value="SubSolo 1">
+                    <input id="S2b" type="button" class="aba-subsolo" onclick="abreSubsolo('S2')" value="Subsolo 2">
+                    <input id="S3b" type="button" class="aba-subsolo" onclick="abreSubsolo('S3')" value="Mapa S1">
+                    <input id="S4b" type="button" class="aba-subsolo" onclick="abreSubsolo('S4')" value="Mapa S2">
+                </div> 
+                <div id="S1" class="cards-vagas subsolo w3-border">  
+                    <% lista_vagas.forEach(function(row) { %>                          
+                        <% if (row.codigo.substring(0,2) == 'S1' ) { %>
+                          <div class="card-vagas" onclick="unidadeClicada('<%- row.codigo %>')" id="<%- row.codigo %>">
+                            <span style="font-weight: bold;">
+                              <%- row.codigo.substring(2) %>
+                            </span>-
+                            <span id="<%- row.codigo %>-icon"></span>
+                          </div>
+                        <% } %>
+                    <% }) %>
+                </div>
+                <div id="S2" class="cards-vagas subsolo w3-border" style="display:none">                     
+                  <% lista_vagas.forEach(function(row) {
+                      if (row.codigo.substring(0,2) == 'S2' ) { %>
+                        <div class="card-vagas" onclick="unidadeClicada('<%- row.codigo %>')" id="<%- row.codigo %>">
+                          <span style="font-weight: bold;">
+                            <%- row.codigo.substring(2) %>
+                          </span>- 
+                          <span id="<%- row.codigo %>-icon"></span>
+                        </div>
+                      <% } %>
+                  <% }) %>
+                </div>
+                <div id="S3" class="subsolo" style="display:none"> 
+                  <img src="../images/subsolo1.jpg" width="100%">
+                </div>
+                <div id="S4" class="subsolo" style="display:none"> 
+                  <img src="../images/subsolo2.jpg" width="100%">
+                </div>
+              </div>
+              <label class="w3-label">
+                Vaga:
+                <i class="fa fa-check icon-color-ok"></i> Disponível
+                <i class="fa fa-remove icon-color-no-ok"></i> Indisponível
+              </label>                
+            <% } %>
+            </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Footer -->
+  <footer class="w3-center w3-black w3-padding-24">
+    <a href="#vagas" class="w3-button w3-light-grey"><i class="fa fa-arrow-up w3-margin-right"></i>Vai para o início</a>
+    <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank" class="w3-hover-text-green">w3.css</a></p>
+  </footer>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="./js/script.js"></script>
+  <script>
+  var lista_vagas = '<%= lista_vagas %>'
+  var lista_ajustada_vagas = '<%= lista_ajustada_vagas %>'.split(',')
+  var lista_final_vagas = []
+  var resultado_sorteio = '<%= resultado_sorteio %>'
+
+  // atualiza as vagas com o status de bloqueio gravado no banco de dados
+  function loadFunction(aba) { 
+    if(resultado_sorteio == 'Sorteio não realizado') {
+      for(var i=0; i<lista_ajustada_vagas.length; i++) {
+        let vaga = lista_ajustada_vagas[i].split('-')[0]
+        if (lista_ajustada_vagas[i].split('-')[1] == 'true') {
+          document.getElementById(vaga+'-icon').innerHTML = '<i class="fa fa-check icon-color-ok"></i>'
+          lista_final_vagas.push(vaga)
+        } else {
+          document.getElementById(vaga+'-icon').innerHTML = '<i class="fa fa-remove icon-color-no-ok"></i>'
+        }
+      }  
+    }
+  }
+  window.onload = loadFunction();
+
+  function apagaMensagem() {
+    document.getElementById("mensagem").innerHTML = '';  
+  }
+
+  function unidadeClicada(valor) {  
+    var posicao = lista_final_vagas.indexOf(valor);
+    if (posicao > -1) {
+      $(document).ready(function(){
+        $.post("/vagas/atualiza_disponibilidade",
+          {
+            "codigo": valor,
+            "disponivel": "false"
+          },
+          function(data,status){
+            document.getElementById(valor+'-icon').innerHTML = '<i class="fa fa-remove icon-color-no-ok"></i>';
+            lista_final_vagas.splice(posicao,1);
+          }
+        );
+      });    
+    } else {
+      $(document).ready(function(){
+        $.post("/vagas/atualiza_disponibilidade",
+          {
+            "codigo": valor,
+            "disponivel": "true"
+          },
+          function(data,status){
+            document.getElementById(valor+'-icon').innerHTML = '<i class="fa fa-check icon-color-ok"></i>';
+            lista_final_vagas.push(valor);
+          }
+        );
+      });
+    }
+  }
+
+  function abreSubsolo(subsolo) { 
+    var i;
+    var x = document.getElementsByClassName("subsolo");
+    for (i = 0; i < x.length; i++) {
+      x[i].style.display = "none";  
+    }
+    x = document.getElementsByClassName("aba-subsolo");
+    for (i = 0; i < x.length; i++) {
+      x[i].classList.remove("aba-subsolo-foco"); 
+    }    
+    var element = document.getElementById(subsolo+"b");
+    element.classList.add("aba-subsolo-foco");
+    if(subsolo == 'S1' || subsolo == 'S2') {
+      document.getElementById(subsolo).style.display = "grid";  
+    } else {
+      document.getElementById(subsolo).style.display = "block";  
+    }   
+  }
+</script>
+</body>
+</html>
+  

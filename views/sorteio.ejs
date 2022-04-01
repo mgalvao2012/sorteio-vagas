@@ -196,7 +196,7 @@
     var posicao = lista_presenca_vagas.indexOf(valor);
     if (posicao > -1) {
       $(document).ready(function(){
-        $.post("/atualiza_presenca",
+        $.post("/unidades/atualiza_presenca",
           {
             "unidade": valor,
             "presente": "false"
@@ -216,7 +216,7 @@
       }
       if (i > -1) {
         $(document).ready(function(){
-          $.post("/atualiza_presenca",
+          $.post("/unidades/atualiza_presenca",
             {
               "unidade": valor,
               "presente": "true"

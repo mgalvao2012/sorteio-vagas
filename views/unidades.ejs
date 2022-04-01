@@ -141,7 +141,7 @@
     var posicao = lista_pne.indexOf(valor);
     if (posicao > -1) {
       $(document).ready(function(){
-        $.post("/unidade/atualiza_pne",
+        $.post("/unidades/atualiza_pne",
           {
             "unidade": valor,
             "pne": "false"
@@ -156,7 +156,7 @@
       });    
     } else {
       $(document).ready(function(){
-        $.post("/unidade/atualiza_pne",
+        $.post("/unidades/atualiza_pne",
           {
             "unidade": valor,
             "pne": "true"
@@ -176,7 +176,7 @@
     var posicao = lista_adimplente.indexOf(valor);
     if (posicao > -1) {
       $(document).ready(function(){
-        $.post("/unidade/atualiza_adimplente",
+        $.post("/unidades/atualiza_adimplente",
           {
             "unidade": valor,
             "adimplente": "false"
@@ -191,7 +191,7 @@
       });    
     } else {
       $(document).ready(function(){
-        $.post("/unidade/atualiza_adimplente",
+        $.post("/unidades/atualiza_adimplente",
           {
             "unidade": valor,
             "adimplente": "true"
