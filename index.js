@@ -398,11 +398,9 @@ app.get('/sorteio', requiresAuth(), (request, response) => {
         results[1].rows.forEach(row => {
           lista_presenca.push(row.unidade+'-'+row.presente.toString())
         })
-        console.log(`${results[2].rows.length} ${results[1].rows.length} ${mensagem.length}`)
         if(results[2].rows.length != results[1].rows.length && mensagem.length == 0) {
           mensagem = `A quantidade de vagas (${results[2].rows.length}) é insuficiente para atender todas as unidades (${results[1].rows.length}).`
         }
-        console.log(mensagem)
         response.render('sorteio.ejs', {
           email: request.oidc.user.email,
           name: request.oidc.user.name, 
@@ -560,13 +558,19 @@ app.post('/sorteio', (request, response) => {
   })
 })
 
-app.get('/sorteio/recomecar', requiresAuth(), (request, response) => {
+app.get('/sorteio/reiniciar', requiresAuth(), (request, response) => {
   pool.query(`UPDATE unidades SET vaga_sorteada = null;
-              UPDATE configuracao SET resultado_sorteio = 'Sorteio não realizado';`, (error, results) => {
+              UPDATE configuracao SET resultado_sorteio = 'Sorteio não realizado' RETURNING *;`, (error, results) => {
     if (error) {
       console.log(error.message)
-    } else {
-      response.redirect(301, '/sorteio') 
+      response.status(500).json({ status: 'error', message: error })
+    } else {      
+      if (results[1].rows[0].resultado_sorteio == 'Sorteio não realizado' ) {
+        console.log('Sorteio reiniciado com sucesso!')
+        response.redirect(301, '/sorteio') 
+      } else {
+        response.status(500).json({ status: 'error', message: 'Falha no processo de reinicio. Procure o administrador.' })
+      }
     }
   })  
 })
