@@ -282,13 +282,14 @@ tr:nth-child(even) {background-color: #F2F2F2;}
   text-shadow:2px 2px 4px #CCC;
 }
 
-.icon-color-ok {
+.icon-color-ok { 
   font-size:18px;
-  color:green;
+  color:#008000;
   text-shadow:2px 2px 4px #CCC;
 }
 
 .icon-hand-pointer {
-  font-size:18px;
-  text-shadow:2px 2px 4px #CCC;
+  width: 18px;
+  cursor: pointer;
+  filter:drop-shadow(3px 3px 3px #CCC);
 }

@@ -4,9 +4,6 @@
 <title>Sorteio de vagas de estacionamento do Condomínio Grandlife Ipiranga</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!--
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'cross-origin'">
--->
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -16,18 +13,22 @@
 <%- include('navbar.ejs') %>
 
 <!-- Form Section -->
-<div class="w3-container w3-light-grey" style="padding:78px 16px;" id="sorteio">
+  <div class="w3-container w3-light-grey" style="padding:78px 16px;" id="sorteio">
     <div style="padding: 10px; box-shadow: 0 3px 18px 8px rgb(38 24 24 / 25%);">
       <h3 class="w3-center">Configuração das unidades</h3>
       <p class="w3-center w3-medium">Confirme as informações abaixo de cada unidade.<br/>
-      Clicando <span class="fa fa-hand-pointer-o icon-hand-pointer"></span> nos ícones é possível atualizar as condições que irão influenciar no sorteio.</p>
+      Clicando <span class="fa fa-hand-pointer-o icon-hand-pointer"></span> nos ícones é possível atualizar as condições que irão influenciar no sorteio.</p>      
       <div style="margin-top:28px; width: 90%; margin: auto;">
         <div>
             <form>
               <div>
                 <div class="w3-bar" >
-                    <input id="S1b" type="button" class="aba-subsolo aba-subsolo-foco" onclick="abreSubsolo('S1')" value="Torre 1">
-                    <input id="S2b" type="button" class="aba-subsolo" onclick="abreSubsolo('S2')" value="Torre 2">
+                  <input id="S1b" type="button" class="aba-subsolo aba-subsolo-foco" value="Torre 1">
+                  <input id="S2b" type="button" class="aba-subsolo" value="Torre 2">
+                  <script>
+                    document.getElementById('S1b').addEventListener('click', function() { abreSubsolo('S1') })                      
+                    document.getElementById('S2b').addEventListener('click', function() { abreSubsolo('S2') })                      
+                  </script>
                 </div> 
                 <div id="S1" class="cards-sorteio subsolo w3-border">  
                     <% lista_unidades.forEach(function(row) { %>                          
@@ -36,21 +37,17 @@
                             <span style="font-weight: bold;">
                               <%- row.unidade.substring(2) %>
                             </span>-
-                            <% if(row.pne) { %>
-                              <i id="<%- row.unidade %>-pne-icon" class="fa-brands fa-accessible-icon icon-color-ok" 
-                                style="cursor: pointer;" onclick="unidadeClicadaPNE('<%- row.unidade %>')"></i>
+                            <% if(row.pne) { %>                              
+                              <img id="<%- row.unidade %>-pne-icon" src="../images/icon-pne-ok.png" class="icon-hand-pointer"></img>
                             <% } else { %>
-                              <i id="<%- row.unidade %>-pne-icon" class="fa-brands fa-accessible-icon icon-color-no-ok" 
-                                style="cursor: pointer;" onclick="unidadeClicadaPNE('<%- row.unidade %>')"></i>
-                            <% } %> - 
+                              <img id="<%- row.unidade %>-pne-icon" src="../images/icon-pne-no-ok.png" class="icon-hand-pointer"></img>
+                            <% } %> 
+                            -
                             <% if(row.adimplente) { %>
-                              <i id="<%- row.unidade %>-adimplente-icon" class="fa-solid fa-money-check-dollar icon-color-ok" 
-                                style="cursor: pointer;" onclick="unidadeClicadaAdimplente('<%- row.unidade %>')"></i>
+                              <img id="<%- row.unidade %>-adimplente-icon" src="../images/icon-adimplente-ok.png" class="icon-hand-pointer"></img>
                             <% } else { %>
-                              <i id="<%- row.unidade %>-adimplente-icon" class="fa-solid fa-money-check-dollar icon-color-no-ok"
-                                style="cursor: pointer;" onclick="unidadeClicadaAdimplente('<%- row.unidade %>')"></i>
+                              <img id="<%- row.unidade %>-adimplente-icon" src="../images/icon-adimplente-no-ok.png" class="icon-hand-pointer"></img>
                             <% } %>
-                            <span ></span>
                           </div>
                         <% } %>
                     <% }) %>
@@ -62,37 +59,32 @@
                           <span style="font-weight: bold;">
                             <%- row.unidade.substring(2) %>
                           </span>-
-                          <% if(row.pne) { %>
-                            <i id="<%- row.unidade %>-pne-icon" class="fa-brands fa-accessible-icon icon-color-ok" 
-                              style="cursor: pointer;" onclick="unidadeClicadaPNE('<%- row.unidade %>')"></i>
+                          <% if(row.pne) { %>                              
+                            <img id="<%- row.unidade %>-pne-icon" src="../images/icon-pne-ok.png" class="icon-hand-pointer"></img>
                           <% } else { %>
-                            <i id="<%- row.unidade %>-pne-icon" class="fa-brands fa-accessible-icon icon-color-no-ok" 
-                              style="cursor: pointer;" onclick="unidadeClicadaPNE('<%- row.unidade %>')"></i>
-                          <% } %> - 
+                            <img id="<%- row.unidade %>-pne-icon" src="../images/icon-pne-no-ok.png" class="icon-hand-pointer"></img>
+                          <% } %> 
+                          -
                           <% if(row.adimplente) { %>
-                            <i id="<%- row.unidade %>-adimplente-icon" class="fa-solid fa-money-check-dollar icon-color-ok" 
-                              style="cursor: pointer;" onclick="unidadeClicadaAdimplente('<%- row.unidade %>')"></i>
+                            <img id="<%- row.unidade %>-adimplente-icon" src="../images/icon-adimplente-ok.png" class="icon-hand-pointer"></img>
                           <% } else { %>
-                            <i id="<%- row.unidade %>-adimplente-icon" class="fa-solid fa-money-check-dollar icon-color-no-ok"
-                              style="cursor: pointer;" onclick="unidadeClicadaAdimplente('<%- row.unidade %>')"></i>
+                            <img id="<%- row.unidade %>-adimplente-icon" src="../images/icon-adimplente-no-ok.png" class="icon-hand-pointer"></img>
                           <% } %>
-                          <span ></span>
                         </div>
-                    <% } %>
+                  <% } %>
                   <% }) %>
                 </div>
               </div>
-              <div class="w3-row">
+              <div class="w3-row w3-medium">
                 <div class="w3-col m9 l9">
                   <label class="w3-label">
-                    Formato: Unidade - Portador de Necessidades Especiais (<i class="fa-brands fa-accessible-icon"></i>) 
-                    - Adimplente (<i class="fa-solid fa-money-check-dollar"></i>)
+                    Formato: Unidade - Portador de Necessidades Especiais ( <img src="../images/icon-pne.png" width="14px;"/> ) - Adimplente ( <img src="../images/icon-adimplente.png" width="18px;"/> )
                   </label> 
                 </div>
                 <div class="w3-col m3 l3">
                   Legenda:
-                  <i class="fa-solid fa-square icon-color-ok"></i> Sim&nbsp;&nbsp;&nbsp;
-                  <i class="fa-solid fa-square icon-color-no-ok"></i> Não
+                  <img src="../images/square-green.png" width="14px" height="14px"> Sim&nbsp;&nbsp;&nbsp;
+                  <img src="../images/square-red.png" width="14px" height="14px"> Não
                 </div>
               </div>              
             </form>
@@ -107,126 +99,126 @@
     <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank" class="w3-hover-text-green">w3.css</a></p>
   </footer>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  <script src="https://kit.fontawesome.com/5590365318.js" crossorigin="anonymous"></script>
-  <script src="./js/script.js"></script>
   <script>
-  var lista_unidades = '<%= lista_unidades %>'
-  var lista_ajustada_unidades = '<%= lista_ajustada_unidades %>'.split(',')
-  var resultado_sorteio = '<%= resultado_sorteio %>'
-  var lista_pne = []
-  var lista_adimplente= []
+    var mensagem = '<%= mensagem %>'
+    var lista_unidades = '<%= lista_unidades %>'
+    var lista_ajustada_unidades = '<%= lista_ajustada_unidades %>'.split(',')
+    var resultado_sorteio = '<%= resultado_sorteio %>'
+    var lista_pne = []
+    var lista_adimplente= []
 
-  // atualiza as unidades com o status de presença gravado no banco de dados
-  function loadFunction(aba) { 
+    // atualiza as unidades com o status de presença gravado no banco de dados
+    function loadFunction() { 
 
-    if(resultado_sorteio == 'Sorteio não realizado') {
-      for(var i=0; i<lista_ajustada_unidades.length; i++) {
-        let unidade = lista_ajustada_unidades[i].split('-')[0]
-        if (lista_ajustada_unidades[i].split('-')[1] == 'true') {
-          lista_pne.push(unidade)
-        }
-        if (lista_ajustada_unidades[i].split('-')[2] == 'true') {
-          lista_adimplente.push(unidade)
-        }
-      }  
-    }
-  }
-  window.onload = loadFunction();
-
-  function apagaMensagem() {
-    document.getElementById("mensagem").innerHTML = '';  
-  }
-
-  function unidadeClicadaPNE(valor) {  
-    var posicao = lista_pne.indexOf(valor);
-    if (posicao > -1) {
-      $(document).ready(function(){
-        $.post("/unidades/atualiza_pne",
-          {
-            "unidade": valor,
-            "pne": "false"
-          },
-          function(data,status){
-            let element = document.getElementById(valor+'-pne-icon');
-            element.classList.remove("icon-color-ok");
-            element.classList.add("icon-color-no-ok");
-            lista_pne.splice(posicao,1);
+      if(resultado_sorteio == 'Sorteio não realizado') {
+        for(var i=0; i<lista_ajustada_unidades.length; i++) {
+          let unidade = lista_ajustada_unidades[i].split('-')[0]
+          if (lista_ajustada_unidades[i].split('-')[1] == 'true') {
+            lista_pne.push(unidade)
           }
-        );
-      });    
-    } else {
-      $(document).ready(function(){
-        $.post("/unidades/atualiza_pne",
-          {
-            "unidade": valor,
-            "pne": "true"
-          },
-          function(data,status){
-            let element = document.getElementById(valor+'-pne-icon');
-            element.classList.add("icon-color-ok");
-            element.classList.remove("icon-color-no-ok");
-            lista_pne.push(valor);
+          if (lista_ajustada_unidades[i].split('-')[2] == 'true') {
+            lista_adimplente.push(unidade)
           }
-        );
-      });
+          // adiciona o evento onclick aos icones
+          document.getElementById(unidade+'-pne-icon').addEventListener('click', 
+            function() { unidadeClicadaPNE(unidade) })
+          document.getElementById(unidade+'-adimplente-icon').addEventListener('click', 
+            function() { unidadeClicadaAdimplente(unidade) })
+        }  
+      }
     }
-  }
+    window.onload = loadFunction();
 
-  function unidadeClicadaAdimplente(valor) {  
-    var posicao = lista_adimplente.indexOf(valor);
-    if (posicao > -1) {
-      $(document).ready(function(){
-        $.post("/unidades/atualiza_adimplente",
-          {
-            "unidade": valor,
-            "adimplente": "false"
-          },
-          function(data,status){
-            let element = document.getElementById(valor+'-adimplente-icon');
-            element.classList.remove("icon-color-ok");
-            element.classList.add("icon-color-no-ok");
-            lista_adimplente.splice(posicao,1);
-          }
-        );
-      });    
-    } else {
-      $(document).ready(function(){
-        $.post("/unidades/atualiza_adimplente",
-          {
-            "unidade": valor,
-            "adimplente": "true"
-          },
-          function(data,status){
-            let element = document.getElementById(valor+'-adimplente-icon');
-            element.classList.add("icon-color-ok");
-            element.classList.remove("icon-color-no-ok");
-            lista_adimplente.push(valor);
-          }
-        );
-      });
+    function apagaMensagem() {
+      document.getElementById("mensagem").innerHTML = '';  
     }
-  }
 
-  function abreSubsolo(subsolo) { 
-    var i;
-    var x = document.getElementsByClassName("subsolo");
-    for (i = 0; i < x.length; i++) {
-      x[i].style.display = "none";  
+    function unidadeClicadaPNE(valor) {  
+      var posicao = lista_pne.indexOf(valor);
+      if (posicao > -1) {
+        $(document).ready(function(){
+          $.post("/unidades/atualiza_pne",
+            {
+              "unidade": valor,
+              "pne": "false"
+            },
+            function(data,status){
+              let element = document.getElementById(valor+'-pne-icon');
+              element.src = '../images/icon-pne-no-ok.png'
+              lista_pne.splice(posicao,1);
+            }
+          );
+        });    
+      } else {
+        $(document).ready(function(){
+          $.post("/unidades/atualiza_pne",
+            {
+              "unidade": valor,
+              "pne": "true"
+            },
+            function(data,status){
+              let element = document.getElementById(valor+'-pne-icon');
+              element.src = '../images/icon-pne-ok.png'
+              lista_pne.push(valor);
+            }
+          );
+        });
+      }
     }
-    x = document.getElementsByClassName("aba-subsolo");
-    for (i = 0; i < x.length; i++) {
-      x[i].classList.remove("aba-subsolo-foco"); 
-    }    
-    var element = document.getElementById(subsolo+"b");
-    element.classList.add("aba-subsolo-foco");
-    if(subsolo == 'S1' || subsolo == 'S2') {
-      document.getElementById(subsolo).style.display = "grid";  
-    } else {
-      document.getElementById(subsolo).style.display = "block";  
-    }   
-  }
+
+    function unidadeClicadaAdimplente(valor) {  
+      var posicao = lista_adimplente.indexOf(valor);
+      if (posicao > -1) {
+        $(document).ready(function(){
+          $.post("/unidades/atualiza_adimplente",
+            {
+              "unidade": valor,
+              "adimplente": "false"
+            },
+            function(data,status){
+              let element = document.getElementById(valor+'-adimplente-icon');
+              element.src = '../images/icon-adimplente-no-ok.png'
+              lista_adimplente.splice(posicao,1);
+            }
+          );
+        });    
+      } else {
+        $(document).ready(function(){
+          $.post("/unidades/atualiza_adimplente",
+            {
+              "unidade": valor,
+              "adimplente": "true"
+            },
+            function(data,status){
+              let element = document.getElementById(valor+'-adimplente-icon');
+              element.src = '../images/icon-adimplente-ok.png'
+              lista_adimplente.push(valor);
+            }
+          );
+        });
+      }
+    }
+
+    function abreSubsolo(subsolo) { 
+      var i;
+      var x = document.getElementsByClassName("subsolo");
+      for (i = 0; i < x.length; i++) {
+        x[i].style.display = "none";  
+      }
+      x = document.getElementsByClassName("aba-subsolo");
+      for (i = 0; i < x.length; i++) {
+        x[i].classList.remove("aba-subsolo-foco"); 
+      }    
+      var element = document.getElementById(subsolo+"b");
+      element.classList.add("aba-subsolo-foco");
+      if(subsolo == 'S1' || subsolo == 'S2') {
+        document.getElementById(subsolo).style.display = "grid";  
+      } else {
+        document.getElementById(subsolo).style.display = "block";  
+      }   
+    }
   </script>
-  
+  <script nonce="EDNnf03nceIOfn39fn3e9h3sdfa" src="./js/script.js"></script>
   </body>
-  </html>
+</html>
   

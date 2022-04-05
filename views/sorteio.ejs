@@ -4,9 +4,6 @@
 <title>Sorteio de vagas de estacionamento do Condomínio Grandlife Ipiranga</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!--
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'cross-origin'">
--->
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -33,10 +30,16 @@
                 <input class="w3-input w3-border" type="text" name="resultado" value="<%= resultado_sorteio %>" disabled></p>
                 <div>
                   <div class="w3-bar" >
-                      <input id="S1b" type="button" class="aba-subsolo aba-subsolo-foco" onclick="abreSubsolo('S1')" value="Torre 1">
-                      <input id="S2b" type="button" class="aba-subsolo" onclick="abreSubsolo('S2')" value="Torre 2">
-                      <input id="S3b" type="button" class="aba-subsolo" onclick="abreSubsolo('S3')" value="Mapa S1">
-                      <input id="S4b" type="button" class="aba-subsolo" onclick="abreSubsolo('S4')" value="Mapa S2">
+                    <input id="S1b" type="button" class="aba-subsolo aba-subsolo-foco" value="Torre 1">
+                    <input id="S2b" type="button" class="aba-subsolo" value="Torre 2">
+                    <input id="S3b" type="button" class="aba-subsolo" value="Mapa S1">
+                    <input id="S4b" type="button" class="aba-subsolo" value="Mapa S2">
+                    <script>
+                      document.getElementById('S1b').addEventListener('click', function() { abreSubsolo('S1') })                      
+                      document.getElementById('S2b').addEventListener('click', function() { abreSubsolo('S2') })                      
+                      document.getElementById('S3b').addEventListener('click', function() { abreSubsolo('S3') })                      
+                      document.getElementById('S4b').addEventListener('click', function() { abreSubsolo('S4') })                      
+                    </script>
                   </div> 
                   <div id="S1" class="cards-sorteio subsolo w3-border">  
                       <% lista_vagas_sorteadas.forEach(function(row) { %>                          
@@ -73,15 +76,21 @@
               <% } else { %>
               <div>
                 <div class="w3-bar" >
-                    <input id="S1b" type="button" class="aba-subsolo aba-subsolo-foco" onclick="abreSubsolo('S1')" value="Torre 1">
-                    <input id="S2b" type="button" class="aba-subsolo" onclick="abreSubsolo('S2')" value="Torre 2">
-                    <input id="S3b" type="button" class="aba-subsolo" onclick="abreSubsolo('S3')" value="Mapa S1">
-                    <input id="S4b" type="button" class="aba-subsolo" onclick="abreSubsolo('S4')" value="Mapa S2">
+                  <input id="S1b" type="button" class="aba-subsolo aba-subsolo-foco" value="Torre 1">
+                  <input id="S2b" type="button" class="aba-subsolo" value="Torre 2">
+                  <input id="S3b" type="button" class="aba-subsolo" value="Mapa S1">
+                  <input id="S4b" type="button" class="aba-subsolo" value="Mapa S2">
+                  <script>
+                    document.getElementById('S1b').addEventListener('click', function() { abreSubsolo('S1') })                      
+                    document.getElementById('S2b').addEventListener('click', function() { abreSubsolo('S2') })                      
+                    document.getElementById('S3b').addEventListener('click', function() { abreSubsolo('S3') })                      
+                    document.getElementById('S4b').addEventListener('click', function() { abreSubsolo('S4') })                      
+                  </script>
                 </div> 
                 <div id="S1" class="cards-sorteio-vagas subsolo w3-border">  
                     <% lista_vagas_sorteadas.forEach(function(row) { %>                          
                         <% if (row.unidade.substring(0,2) == 'T1' ) { %>
-                          <div class="card-sorteio-vagas" onclick="unidadeClicada('<%- row.unidade %>')" id="<%- row.unidade %>u">
+                          <div class="card-sorteio-vagas" id="<%- row.unidade %>u">
                             <span style="font-weight: bold;">
                               <%- row.unidade.substring(2) %>
                             </span>- 
@@ -89,9 +98,9 @@
                                   let vagas = []
                                   row.vagas_escolhidas.forEach(function(item) {
                                     vagas.push(item.vaga)
-                                  })              
+                                  })
                             %>                              
-                                <%- '('+vagas.toString().replace(',',', ')+')' %>                                
+                                <%- '('+vagas.toString().replace(/,/gi, ', ')+')' %>                                
                             <% } else { %>
                               Sem escolhas
                             <% } %>
@@ -103,7 +112,7 @@
                 <div id="S2" class="cards-sorteio-vagas subsolo w3-border" style="display:none">                     
                   <% lista_vagas_sorteadas.forEach(function(row) {
                       if (row.unidade.substring(0,2) == 'T2' ) { %>
-                        <div class="card-sorteio-vagas" onclick="unidadeClicada('<%- row.unidade %>')" id="<%- row.unidade %>u">
+                        <div class="card-sorteio-vagas" id="<%- row.unidade %>u">
                           <span style="font-weight: bold;">
                             <%- row.unidade.substring(2) %>
                           </span>- 
@@ -113,7 +122,7 @@
                                   vagas.push(item.vaga)
                                 })              
                           %>                              
-                              <%- '('+vagas.toString().replace(',',', ')+')' %>
+                              <%- '('+vagas.toString().replace(/,/gi, ', ')+')' %>
                           <% } else { %>
                             Sem escolhas
                           <% }%>
@@ -146,7 +155,7 @@
                       <i class="fa fa-paper-plane"></i> SORTEAR
                   </button> 
                 <% } else { %>               
-                  <a href="/recomecar_sorteio"> 
+                  <a href="/sorteio/recomecar"> 
                     <button class="w3-button w3-black" type="button">
                       <i class="fa fa-paper-plane"></i> REINICIAR SORTEIO
                     </button>
@@ -165,91 +174,93 @@
     <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank" class="w3-hover-text-green">w3.css</a></p>
   </footer>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  <script src="./js/script.js"></script>
   <script>
-  var lista_vagas_sorteadas = '<%= lista_vagas_sorteadas %>'
-  var lista_presenca = '<%= lista_presenca %>'.split(',')
-  var lista_presenca_vagas = []
-  var resultado_sorteio = '<%= resultado_sorteio %>'
+    var mensagem = '<%= mensagem %>';
+    var lista_vagas_sorteadas = '<%= lista_vagas_sorteadas %>'
+    var lista_presenca = '<%= lista_presenca %>'.split(',')
+    var lista_presenca_vagas = []
+    var resultado_sorteio = '<%= resultado_sorteio %>'
 
-  // atualiza as unidades com o status de presença gravado no banco de dados
-  function loadFunction(aba) { 
-    if(resultado_sorteio == 'Sorteio não realizado') {
-      for(var i=0; i<lista_presenca.length; i++) {
-        let unidade = lista_presenca[i].split('-')[0]
-        if (lista_presenca[i].split('-')[1] == 'true') {
-          document.getElementById(unidade+'-icon').innerHTML = '<i class="fa fa-check icon-color-ok"></i>'
-          lista_presenca_vagas.push(unidade)
-        } else {
-          document.getElementById(unidade+'-icon').innerHTML = '<i class="fa fa-remove icon-color-no-ok"></i>'
-        }
-      }  
-    }
-  }
-  window.onload = loadFunction();
-
-  function apagaMensagem() {
-    document.getElementById("mensagem").innerHTML = '';  
-  }
-
-  function unidadeClicada(valor) {  
-    var posicao = lista_presenca_vagas.indexOf(valor);
-    if (posicao > -1) {
-      $(document).ready(function(){
-        $.post("/unidades/atualiza_presenca",
-          {
-            "unidade": valor,
-            "presente": "false"
-          },
-          function(data,status){
-            document.getElementById(valor+'-icon').innerHTML = '<i class="fa fa-remove icon-color-no-ok"></i>';
-            lista_presenca_vagas.splice(posicao,1);
+    // atualiza as unidades com o status de presença gravado no banco de dados
+    function loadFunction() { 
+      if(resultado_sorteio == 'Sorteio não realizado') {
+        for(var i=0; i<lista_presenca.length; i++) {
+          let unidade = lista_presenca[i].split('-')[0]
+          if (lista_presenca[i].split('-')[1] == 'true') {
+            document.getElementById(unidade+'-icon').innerHTML = '<i class="fa fa-check icon-color-ok"></i>'
+            lista_presenca_vagas.push(unidade)
+          } else {
+            document.getElementById(unidade+'-icon').innerHTML = '<i class="fa fa-remove icon-color-no-ok"></i>'
           }
-        );
-      });    
-    } else {
-      let i = -1
-      for(i=0; i<lista_vagas_sorteadas.length; i++) {
-        if (lista_vagas_sorteadas[i].unidade == valor) {
-          break
-        }
+          document.getElementById(unidade+'u').addEventListener('click', function() { unidadeClicada(unidade) })
+        }  
       }
-      if (i > -1) {
+    }
+    window.onload = loadFunction();
+
+    function apagaMensagem() {
+      document.getElementById("mensagem").innerHTML = '';  
+    }
+
+    function unidadeClicada(valor) {  
+      var posicao = lista_presenca_vagas.indexOf(valor);
+      if (posicao > -1) {
         $(document).ready(function(){
           $.post("/unidades/atualiza_presenca",
             {
               "unidade": valor,
-              "presente": "true"
+              "presente": "false"
             },
             function(data,status){
-              document.getElementById(valor+'-icon').innerHTML = '<i class="fa fa-check icon-color-ok"></i>';
-              lista_presenca_vagas.push(valor);
+              document.getElementById(valor+'-icon').innerHTML = '<i class="fa fa-remove icon-color-no-ok"></i>';
+              lista_presenca_vagas.splice(posicao,1);
             }
           );
-        });
+        });    
+      } else {
+        let i = -1
+        for(i=0; i<lista_vagas_sorteadas.length; i++) {
+          if (lista_vagas_sorteadas[i].unidade == valor) {
+            break
+          }
+        }
+        if (i > -1) {
+          $(document).ready(function(){
+            $.post("/unidades/atualiza_presenca",
+              {
+                "unidade": valor,
+                "presente": "true"
+              },
+              function(data,status){
+                document.getElementById(valor+'-icon').innerHTML = '<i class="fa fa-check icon-color-ok"></i>';
+                lista_presenca_vagas.push(valor);
+              }
+            );
+          });
+        }
       }
     }
-  }
 
-  function abreSubsolo(subsolo) { 
-    var i;
-    var x = document.getElementsByClassName("subsolo");
-    for (i = 0; i < x.length; i++) {
-      x[i].style.display = "none";  
+    function abreSubsolo(subsolo) { 
+      var i;
+      var x = document.getElementsByClassName("subsolo");
+      for (i = 0; i < x.length; i++) {
+        x[i].style.display = "none";  
+      }
+      x = document.getElementsByClassName("aba-subsolo");
+      for (i = 0; i < x.length; i++) {
+        x[i].classList.remove("aba-subsolo-foco"); 
+      }    
+      var element = document.getElementById(subsolo+"b");
+      element.classList.add("aba-subsolo-foco");
+      if(subsolo == 'S1' || subsolo == 'S2') {
+        document.getElementById(subsolo).style.display = "grid";  
+      } else {
+        document.getElementById(subsolo).style.display = "block";  
+      }   
     }
-    x = document.getElementsByClassName("aba-subsolo");
-    for (i = 0; i < x.length; i++) {
-      x[i].classList.remove("aba-subsolo-foco"); 
-    }    
-    var element = document.getElementById(subsolo+"b");
-    element.classList.add("aba-subsolo-foco");
-    if(subsolo == 'S1' || subsolo == 'S2') {
-      document.getElementById(subsolo).style.display = "grid";  
-    } else {
-      document.getElementById(subsolo).style.display = "block";  
-    }   
-  }
-</script>
+  </script>
+  <script nonce="EDNnf03nceIOfn39fn3e9h3sdfa" src="./js/script.js"></script>
 </body>
 </html>
   

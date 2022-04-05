@@ -1,5 +1,5 @@
 ### local - /
-GET http://localhost:3002/ HTTP/1.1
+GET http://localhost:3000/ HTTP/1.1
 
 ### local - /setup
 GET http://localhost:3002/setup HTTP/1.1
@@ -60,18 +60,7 @@ ApiKey: hunter2
 }
 
 ### Heroku - get
-GET https://mgalvao-example-node-api.herokuapp.com/books HTTP/1.1
-ApiKey: hunter2
-
-### Heroku - post
-POST https://mgalvao-example-node-api.herokuapp.com/books HTTP/1.1
-ApiKey: hunter2
-Content-Type: application/json
-
-{
-    "author": "J.K. Rowling", 
-    "title": "Harry Potter 2"
-}
+GET https://sorteio-vagas-gli.herokuapp.com HTTP/1.1
 
 ### heroku - /setup
 GET https://sorteio-vagas-gli.herokuapp.com/setup HTTP/1.1
@@ -84,4 +73,4 @@ ApiKey: tFe13jc8lzeKH9W6L5S^YwJWB&JmfJGa
 
 
 ### Heroku local
-GET http://localhost:5000/ HTTP/1.1
+GET https://localhost:3000/ HTTP/1.1

@@ -1,7 +1,3 @@
-<script>
-  var mensagem = '<%= mensagem %>';
-</script>
-
 <!-- The Modal Message -->
 <div id="myModal" class="modal">
   <!-- Modal content -->
@@ -36,22 +32,33 @@
             </div>
           </div> 
         <% } else { %>
-          <a href="/login" onclick="w3_close()" class="w3-bar-item w3-button">Login</a>
+          <a id="opcaoLogin" href="/login" class="w3-bar-item w3-button">Login</a>
+          <script>
+            document.getElementById('opcaoLogin').addEventListener('click', function() { w3_close() })                      
+          </script>
         <% } %>
       </div>
       <!-- Hide right-floated links on small screens and replace them with a menu icon -->
   
-      <a href="javascript:void(0)" class="w3-bar-item w3-button w3-right w3-hide-large w3-hide-medium" onclick="w3_open()">
+      <a id="abreMenu" href="javascript:void(0)" class="w3-bar-item w3-button w3-right w3-hide-large w3-hide-medium">
         <i class="fa fa-bars"></i>
       </a>
+      <script>
+        document.getElementById('abreMenu').addEventListener('click', function() { w3_open() })                      
+      </script>
     </div>
   </div>
   
   <!-- Sidebar on small screens when clicking the menu icon -->
   <nav class="w3-sidebar w3-bar-block w3-black w3-card w3-animate-left w3-hide-medium w3-hide-large" style="display:none" id="mySidebar">
-    <a href="javascript:void(0)" onclick="w3_close()" class="w3-bar-item w3-button w3-large w3-padding-16">Fechar ×</a>
-    <a href="#sobre" onclick="w3_close()" class="w3-bar-item w3-button">SOBRE NÓS</a>
-    <a href="#faleconosco" onclick="w3_close()" class="w3-bar-item w3-button">FALE CONOSCO</a>
+    <a id="opcaoFecharSC" href="javascript:void(0)" class="w3-bar-item w3-button w3-large w3-padding-16">Fechar ×</a>
+    <a id="opcaoSobreSC" href="/#sobre" class="w3-bar-item w3-button">SOBRE NÓS</a>
+    <a id="opcaoFaleSC" href="/#faleconosco" class="w3-bar-item w3-button">FALE CONOSCO</a>
+    <script>
+      document.getElementById('opcaoFecharSC').addEventListener('click', function() { w3_close() })                      
+      document.getElementById('opcaoSobreSC').addEventListener('click', function() { w3_close() })                      
+      document.getElementById('opcaoFaleSC').addEventListener('click', function() { w3_close() })                      
+    </script>
     <% if (email) { %>
       <div class="w3-dropdown-hover w3-mobile">
         <button class="w3-button"><%= name %><i class="fa fa-caret-down"></i></button>
@@ -67,6 +74,9 @@
         </div>
       </div>
     <% } else { %>
-      <a href="/login" onclick="w3_close()" class="w3-bar-item w3-button">Login</a>
+      <a id="opcaoLoginSC" href="/login" class="w3-bar-item w3-button">Login</a>
+      <script>
+        document.getElementById('opcaoLoginSC').addEventListener('click', function() { w3_close() })                      
+      </script>
     <% } %>
   </nav>
