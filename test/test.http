@@ -71,6 +71,11 @@ GET https://sorteio-vagas-gli.herokuapp.com/sorteio HTTP/1.1
 Content-Type: application/json
 ApiKey: tFe13jc8lzeKH9W6L5S^YwJWB&JmfJGa
 
+### heroku - reinicia sorteio 
+GET https://sorteio-vagas-gli.herokuapp.com/sorteio/recomecar HTTP/1.1
+Content-Type: application/json
+ApiKey: tFe13jc8lzeKH9W6L5S^YwJWB&JmfJGa
+
 
 ### Heroku local
 GET https://localhost:3000/ HTTP/1.1
