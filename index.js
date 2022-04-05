@@ -255,7 +255,7 @@ app.post('/meusdados', requiresAuth(), (request, response) => {
         })              
       } else {        
         request.flash('success', 'Dados atualizados com sucesso!');
-        response.redirect(301, '/meusdados')
+        response.redirect('/meusdados')
       }
     }
   })
@@ -521,7 +521,7 @@ app.post('/sorteio', (request, response) => {
                     } else {                      
                       // response.status(200).json({ status: 'success', message: mensagem })
                       request.flash('success', mensagem);
-                      response.redirect(301, '/sorteio')                    
+                      response.redirect('/sorteio')                    
                     }
                   })
                 }
@@ -567,7 +567,7 @@ app.get('/sorteio/reiniciar', requiresAuth(), (request, response) => {
     } else {      
       if (results[1].rows[0].resultado_sorteio == 'Sorteio não realizado' ) {
         console.log('Sorteio reiniciado com sucesso!')
-        response.redirect(301, '/sorteio') 
+        response.redirect('/sorteio') 
       } else {
         response.status(500).json({ status: 'error', message: 'Falha no processo de reinicio. Procure o administrador.' })
       }
