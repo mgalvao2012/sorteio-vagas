@@ -4,9 +4,6 @@
 <title>Sorteio de vagas de estacionamento do Condomínio Grandlife Ipiranga</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!--
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'cross-origin'">
--->
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -19,7 +16,9 @@
   <div class="w3-container w3-light-grey" style="padding:78px 16px;" id="meusdados">
     <div style="padding: 10px; box-shadow: 0 3px 18px 8px rgb(38 24 24 / 25%);">
       <h3 class="w3-center">Meus dados</h3>
-      <p class="w3-center w3-medium">Atualize suas informações para participar do sorteio.</p>
+      <% if(vaga_sorteada == null) { %>
+        <p class="w3-center w3-medium">Atualize suas informações para participar do sorteio.</p>
+      <% } %>
       <div style="margin-top:28px; width: 90%; margin: auto;">
         <div>
           <form action="/meusdados" method="POST">
@@ -98,13 +97,15 @@
               <p><label class="w3-label">Unidade: <span style="font-weight: bold;"><%= unidade %></span> </label></p>
               <p><label class="w3-label">Vaga sorteada: <span style="font-weight: bold;"><%= vaga_sorteada %></span> </label></p>
             <% } %>
-            <p>
-              <input type="text" id="vagas_escolhidas" name="vagas_escolhidas" style="display: none;">
-              <button class="w3-button w3-black" type="submit">
-                  <i class="fa fa-paper-plane"></i> ENVIAR
-              </button>
-            </p>
-          </form>
+            <% if(vaga_sorteada == null) { %>
+              <p>
+                <input type="text" id="vagas_escolhidas" name="vagas_escolhidas" style="display: none;">
+                <button class="w3-button w3-black" type="submit">
+                    <i class="fa fa-paper-plane"></i> ENVIAR
+                </button>
+              </p>
+            <% } %>
+            </form>
         </div>
       </div>
     </div>
@@ -172,4 +173,3 @@
   <script nonce="EDNnf03nceIOfn39fn3e9h3sdfa" src="./js/script.js"></script>    
 </body>
 </html>
-  

@@ -11,6 +11,7 @@
   "author": "Marcelo Galvão",
   "license": "ISC",
   "dependencies": {
+    "@sendgrid/mail": "^7.6.2",
     "bcrypt": "^5.0.1",
     "compression": "^1.7.4",
     "connect-flash": "^0.1.1",
@@ -29,7 +30,8 @@
     "passport-local": "^1.0.0",
     "passport-openidconnect": "^0.1.1",
     "pg": "^8.7.3",
-    "request-promise-native": "^1.0.9"
+    "request-promise-native": "^1.0.9",
+    "speakeasy": "^2.0.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"

@@ -102,6 +102,10 @@ if (development_env) {
   sess.cookie.secure = true // serve secure cookies
 }
 
+// Gera secret para gerar chaves de desbloqueio de operações (setup)
+var speakeasy = require("speakeasy");
+var secretTOTP = speakeasy.generateSecret({length: 20});
+
 app.use(session(sess))
 app.use(passport.initialize())
 app.use(passport.session())
@@ -125,9 +129,7 @@ app.use(limiter, (request, response, next) => {
       !request.header('apiKey') ||
       request.header('apiKey') !== process.env.API_KEY
     ) {
-      return response
-        .status(401)
-        .json({ status: 'error', message: 'Acesso não autorizado.' })
+      return response.status(401).json({ status: 'error', message: 'Acesso não autorizado.' })
     }
   }  
   if(request.oidc.user != null) {
@@ -262,22 +264,102 @@ app.post('/meusdados', requiresAuth(), (request, response) => {
 })
 
 app.get('/setup', requiresAuth(), (request, response) => {
-  if (usuarios_admin.includes(request.oidc.user.email)) {    
-    fs.readFile('init.sql', 'utf8', function(error, data) {
-      if (error) {
-        response.status(500).json({ status: 'error', message: error.message })
-      } else {
-        const query = data
-        pool.query(query, (error, results) => {
-          if (error) {
-            response.status(500).json({ status: 'error', message: error.message })
-          } else {
-            console.log('Setup finalizado com sucesso.')
-            response.send('Setup finalizado com sucesso.')
-          }
-        })    
-      }
+  if (usuarios_admin.includes(request.oidc.user.email)) {   
+    /*
+    var token = gerarToken()
+    console.log(new Date().toJSON()+' - '+token);
+    */
+    response.render('setup.ejs', { 
+      email: request.oidc.user.email, 
+      name: request.oidc.user.name,
+      usuario_admin: request.session.usuario_admin, 
+      mensagem: 'Esta operação é irreversível!' 
     })
+  } else {
+    console.log('Você não tem permissão para realizar esta ação.')
+    response.send('Você não tem permissão para realizar esta ação.')
+  }
+})
+
+function gerarToken() {
+  return speakeasy.totp({
+    secret: secretTOTP.base32,
+    encoding: 'base32',
+    step: 60,    
+    window: 3
+  });  
+}
+
+function enviarEmail(email, subject, content) {
+  const sgMail = require('@sendgrid/mail')
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY)
+  const msg = {
+    to: email,
+    from: process.env.SENDGRID_FROM,
+    subject: subject,
+    text: content,
+  }
+  sgMail
+    .send(msg)
+    .then(() => {
+      console.log('Email sent')
+    })
+    .catch((error) => {
+      console.error(error)
+    })
+}
+
+app.get('/setup/gerarToken', requiresAuth(), (request, response) => {
+  if (usuarios_admin.includes(request.oidc.user.email)) {    
+    var token = gerarToken()    
+    //console.log(new Date().toJSON()+' - '+token);
+    enviarEmail(request.oidc.user.email, 'Código para autorização', `Utilize este código ${token} para autorizar a conclusão do setup do Sorteio de Vagas de Estacionamento do Condomínio Grandlife Ipiranga`)
+    response.status(200).json({ status: 'success', message: 'Token gerado com sucesso!' })
+  } else {
+    console.log('Você não tem permissão para realizar esta ação.')
+    response.send('Você não tem permissão para realizar esta ação.')
+  }
+})
+
+app.post('/setup', requiresAuth(), (request, response) => {
+  if (usuarios_admin.includes(request.oidc.user.email)) {        
+    var chave = request.body.chave
+    var tokenValidates = speakeasy.totp.verify({
+      secret: secretTOTP.base32,
+      encoding: 'base32',
+      token: chave,
+      step: 60,    
+      window: 3
+    });
+    if (tokenValidates) {
+      fs.readFile('init.sql', 'utf8', function(error, data) {
+        if (error) {
+          response.status(500).json({ status: 'error', message: error.message })
+        } else {
+          const query = data
+          pool.query(query, (error, results) => {
+            if (error) {
+              response.status(500).json({ status: 'error', message: error.message })
+            } else {
+              console.log('Setup finalizado com sucesso!')
+              response.render('setup.ejs', { 
+                email: request.oidc.user.email, 
+                name: request.oidc.user.name,
+                usuario_admin: request.session.usuario_admin, 
+                mensagem: 'Setup finalizado com sucesso!' 
+              })
+            }
+          })    
+        }
+      })
+    } else {
+      response.render('setup.ejs', { 
+        email: request.oidc.user.email, 
+        name: request.oidc.user.name,
+        usuario_admin: request.session.usuario_admin, 
+        mensagem: 'A chave informada não é válida ou está expirada!' 
+      })
+    }
   } else {
     console.log('Você não tem permissão para realizar esta ação.')
     response.send('Você não tem permissão para realizar esta ação.')
@@ -596,6 +678,11 @@ app.get('/vagas', requiresAuth(), (request, response) => {
         })  
       } else {
         let ultimo_sorteio = formatDate(results[0].rows[0].ultimo_sorteio, 1)
+        var mensagem
+        if (results[0].rows[0].resultado_sorteio != 'Sorteio não realizado' ) {  
+          let ultimo_sorteio = formatDate(results[0].rows[0].ultimo_sorteio, 1)        
+          mensagem = `As condições não podem ser alteradas porque o sorteio foi realizado em ${ultimo_sorteio}. É preciso reiniciar o processo!`
+        }
         let lista_vagas = []  // lista criada para facilitar o tratamento da vaga
         results[1].rows.forEach(row => {
           lista_vagas.push(row.codigo+'-'+row.disponivel.toString())
