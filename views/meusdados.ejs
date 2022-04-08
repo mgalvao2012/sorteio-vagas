@@ -94,8 +94,14 @@
                 <img src="../images/subsolo2.jpg" width="100%">
               </div>
             <% } else { %>
-              <p><label class="w3-label">Unidade: <span style="font-weight: bold;"><%= unidade %></span> </label></p>
-              <p><label class="w3-label">Vaga sorteada: <span style="font-weight: bold;"><%= vaga_sorteada %></span> </label></p>
+              <p>
+                <label class="w3-label">Unidade: T + (torre 1 ou 2) + (número do apartamento)</label>
+                <input class="w3-input w3-border" type="text" required name="unidade" value="<%= unidade %>" disabled>
+              </p>
+              <p>
+                <label class="w3-label">Vaga sorteada: S + (subsolo 1 ou 2) + (número da vaga)</label>
+                <input class="w3-input w3-border" type="text" required name="unidade" value="<%= vaga_sorteada %>" disabled>
+              </p>
             <% } %>
             <% if(vaga_sorteada == null) { %>
               <p>

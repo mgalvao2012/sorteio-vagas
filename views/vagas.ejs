@@ -17,13 +17,18 @@
     <div style="padding: 10px; box-shadow: 0 3px 18px 8px rgb(38 24 24 / 25%);">
       <h3 class="w3-center">Configuração das vagas</h3>
       <% if(resultado_sorteio == 'Sorteio não realizado') { %>
-        <p class="w3-center w3-medium">Confirme as informações abaixo de cada vaga.<br/>
-        Clicando <span class="fa fa-hand-pointer-o icon-hand-pointer"></span> na vaga é possível atualizar a disponibilidade para o sorteio.</p>
+        <% if (usuario_admin) { %>
+          <p class="w3-center w3-medium">Confirme as informações abaixo de cada vaga.<br/>
+            Clicando <span class="fa fa-hand-pointer-o icon-hand-pointer"></span> na vaga é possível atualizar a disponibilidade para o sorteio.
+          </p>
+        <% } else { %>
+          <p class="w3-center w3-medium">Confira as informações abaixo sobre a disponibilidade das vagas.</p>
+        <% } %>
       <% } %>        
       <div style="margin-top:28px; width: 90%; margin: auto;">
         <div>
             <form>
-              <% if(resultado_sorteio != 'Sorteio não realizado') { %>
+              <% if(resultado_sorteio != 'Sorteio não realizado' && usuario_admin) { %>
                 <p><label class="w3-label">Último sorteio</label>
                 <input class="w3-input w3-border" type="text" name="ultimo_sorteio" value="<%= ultimo_sorteio %>" disabled></p>
                 <p><label class="w3-label">Resultado</label>
@@ -44,7 +49,7 @@
                   <div id="S1" class="cards-vagas subsolo w3-border" style="cursor: default;">  
                       <% lista_vagas.forEach(function(row) { %>                          
                           <% if (row.codigo.substring(0,2) == 'S1' ) { %>
-                            <div class="card-vagas">
+                            <div id="<%- row.codigo %>-card" class="card-vagas">
                               <span style="font-weight: bold;">
                                 <%- row.codigo.substring(2) %>
                               </span>-
@@ -56,7 +61,7 @@
                   <div id="S2" class="cards-vagas subsolo w3-border" style="display:none; cursor: default;">                     
                     <% lista_vagas.forEach(function(row) {
                         if (row.codigo.substring(0,2) == 'S2' ) { %>
-                          <div class="card-vagas" >
+                          <div id="<%- row.codigo %>-card" class="card-vagas" >
                             <span style="font-weight: bold;">
                               <%- row.codigo.substring(2) %>
                             </span>-
@@ -92,9 +97,9 @@
                     </script>
                   </div> 
                   <div id="S1" class="cards-vagas subsolo w3-border">                     
-                    <% lista_vagas.forEach(function(row) { console.log(row) %>                          
+                    <% lista_vagas.forEach(function(row) { %>                          
                         <% if (row.codigo.substring(0,2) == 'S1' ) { %>
-                          <div class="card-vagas">
+                          <div id="<%- row.codigo %>-card" class="card-vagas">
                             <span style="font-weight: bold;">
                               <%- row.codigo.substring(2) %>
                             </span>-
@@ -106,7 +111,7 @@
                   <div id="S2" class="cards-vagas subsolo w3-border" style="display:none">                     
                     <% lista_vagas.forEach(function(row) {
                         if (row.codigo.substring(0,2) == 'S2' ) { %>
-                          <div class="card-vagas">
+                          <div id="<%- row.codigo %>-card" class="card-vagas">
                             <span style="font-weight: bold;">
                               <%- row.codigo.substring(2) %>
                             </span>-
@@ -142,6 +147,7 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script>
     var mensagem = '<%= mensagem %>'
+    var usuario_admin = '<%= usuario_admin %>'
     var lista_vagas = '<%= lista_vagas %>'
     var lista_ajustada_vagas = '<%= lista_ajustada_vagas %>'.split(',')
     var lista_final_vagas = []
@@ -158,7 +164,13 @@
           } else {
             document.getElementById(vaga+'-icon').innerHTML = '<i class="fa fa-remove icon-color-no-ok"></i>'
           }
-          document.getElementById(vaga+'-icon').addEventListener('click', function() { unidadeClicada(vaga) })                      
+          if (usuario_admin == 'true') {            
+            document.getElementById(vaga+'-icon').addEventListener('click', function() { unidadeClicada(vaga) })                      
+          } else {
+            // redefine o cursor para o padrão para não confundir o usuário que não pode atualizar a vaga
+            document.getElementById(vaga+'-card').style = "cursor: default;"
+            document.getElementById(vaga+'-icon').style = "cursor: default;"
+          }
         }  
       } else {
         for(var i=0; i<lista_ajustada_vagas.length; i++) {
