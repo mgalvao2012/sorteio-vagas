@@ -134,7 +134,7 @@ app.use(limiter, (request, response, next) => {
   } else {
     request.session.usuario_admin = null
   }
-  if(request.session.unidade == null || request.session.unidade == undefined) {
+  if(request.oidc.isAuthenticated() && (request.session.unidade == null || request.session.unidade == undefined)) {
     let user_id = request.oidc.user.sub
     pool.query(`SELECT * FROM unidades WHERE user_id = '${user_id}';`, (error, results) => {
       if (error) {
