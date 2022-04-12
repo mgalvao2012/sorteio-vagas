@@ -93,7 +93,12 @@
                         <% if (row.unidade.substring(0,2) == 'T1' ) { %>
                           <div class="card-sorteio-vagas" id="<%- row.unidade %>u">
                             <span style="font-weight: bold;">
-                              <%- row.unidade.substring(2) %>
+                              <%- row.unidade.substring(2) %> - <span id="<%- row.unidade %>-icon"></span> -
+                              <% if (row.user_id != null) { %>
+                                <span class="fa fa-user icon-color-ok"></span>
+                              <% } else { %>
+                                <span class="fa fa-user icon-color-no-ok"></span>
+                              <% } %>
                             </span>- 
                             <% if(row.vagas_escolhidas != null) { 
                                   let vagas = []
@@ -104,8 +109,7 @@
                                 <%- '('+vagas.toString().replace(/,/gi, ', ')+')' %>                                
                             <% } else { %>
                               Sem escolhas
-                            <% } %>
-                            <span id="<%- row.unidade %>-icon"></span>
+                            <% } %>                            
                           </div>
                         <% } %>
                     <% }) %>
@@ -115,7 +119,12 @@
                       if (row.unidade.substring(0,2) == 'T2' ) { %>
                         <div class="card-sorteio-vagas" id="<%- row.unidade %>u">
                           <span style="font-weight: bold;">
-                            <%- row.unidade.substring(2) %>
+                            <%- row.unidade.substring(2) %> - <span id="<%- row.unidade %>-icon"></span> -
+                            <% if (row.user_id != null) { %>
+                              <span class="fa fa-user icon-color-ok"></span>
+                            <% } else { %>
+                              <span class="fa fa-user icon-color-no-ok"></span>
+                            <% } %>
                           </span>- 
                           <% if(row.vagas_escolhidas != null) { 
                                 let vagas = []
@@ -127,7 +136,6 @@
                           <% } else { %>
                             Sem escolhas
                           <% }%>
-                          <span id="<%- row.unidade %>-icon"></span>
                         </div>
                       <% } %>
                   <% }) %>
@@ -139,16 +147,12 @@
                   <img src="../images/subsolo2.jpg" width="100%">
                 </div>
               </div>
-              <div class="w3-row">
-                <div class="w3-col m6 l6">
-                  <label class="w3-label">Formato: Unidade - Vagas escolhidas</label> 
-                </div>
-                <div class="w3-col m6 l6">
-                  Unidade:
-                  <i class="fa fa-check icon-color-ok"></i> Presente
-                  <i class="fa fa-remove icon-color-no-ok"></i> Ausente  
-                </div>
-              </div>              
+              <label class="w3-label">
+                Formato: Unidade (<i class="fa fa-check icon-color-ok"></i> Presente / 
+                <i class="fa fa-remove icon-color-no-ok"></i> Ausente) - Usuário Registrado 
+                (<i class="fa fa-user icon-color-ok"></i> Sim / <i class="fa fa-user icon-color-no-ok"></i> Não) 
+                - Vagas escolhidas
+              </label> 
             <% } %>
               <p>
                 <% if(resultado_sorteio == 'Sorteio não realizado') { %>

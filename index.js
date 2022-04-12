@@ -140,9 +140,10 @@ app.use(limiter, (request, response, next) => {
       if (error) {
         console.log(error.message)
       } else {
-        console.log('unidade cadastrada '+results.rows[0].unidade)
-        request.session.unidade = results.rows[0].unidade;
-        console.log('unidade cadastrada '+request.session.unidade)
+        if (results.rows[0] != null) {
+          request.session.unidade = results.rows[0].unidade;
+          console.log('unidade cadastrada '+request.session.unidade)
+        }
       }
     })
   }
@@ -516,7 +517,7 @@ app.get('/sorteio', requiresAuth(), (request, response) => {
     var mensagem = request.flash('success')
     let user_id = request.oidc.user.sub
     pool.query(`SELECT * FROM configuracao;
-                SELECT unidade, vaga_sorteada, vagas_escolhidas, presente FROM unidades ORDER BY unidade;
+                SELECT unidade, vaga_sorteada, vagas_escolhidas, presente, user_id FROM unidades ORDER BY unidade;
                 SELECT codigo FROM vagas WHERE disponivel = true;`, (error, results) => {
       if (error) {
         console.log(error.message)
