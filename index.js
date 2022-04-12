@@ -156,7 +156,8 @@ app.get('/', async (request, response) => {
     if (request.session.unidade_usuario == undefined) {
       let user_id = request.oidc.user.sub
       pool.query(`SELECT codigo FROM vagas WHERE disponivel = true ORDER BY codigo;
-                  SELECT * FROM unidades WHERE user_id = '${user_id}';`, (error, results) => {
+                  SELECT * FROM unidades WHERE user_id = '${user_id}';
+                  SELECT unidade FROM unidades user_id IS NULL ORDER BY unidade;`, (error, results) => {
         if (error) {
           console.log(error.message)
         } else {
@@ -169,6 +170,7 @@ app.get('/', async (request, response) => {
               vagas_escolhidas: null,
               mensagem: ['warning', 'Atenção', 'Você precisa definir a sua unidade para ter acesso a outras funcionalidades!'],
               lista_vagas: results[0].rows,
+              lista_unidades: results[2].rows,
               vaga_sorteada: null,
               usuario_admin: request.session.usuario_admin
             })
@@ -218,10 +220,12 @@ app.get('/meusdados', requiresAuth(), (request, response) => {
   var mensagem = request.flash('success')
   let user_id = request.oidc.user.sub
   pool.query(`SELECT codigo FROM vagas WHERE disponivel = true ORDER BY codigo;
-              SELECT * FROM unidades WHERE user_id = '${user_id}';`, (error, results) => {
+              SELECT * FROM unidades WHERE user_id = '${user_id}';
+              SELECT unidade FROM unidades WHERE user_id IS NULL ORDER BY unidade;`, (error, results) => {
     if (error) {
       console.log(error.message)
     } else {
+      //console.log('results[2].rows[0] '+results[2].rows[0].unidade)
       if (results[1].rows[0] == undefined) {
         response.render('meusdados.ejs', {
           user_id: user_id,
@@ -231,6 +235,7 @@ app.get('/meusdados', requiresAuth(), (request, response) => {
           vagas_escolhidas: null,
           mensagem: null,
           lista_vagas: results[0].rows,
+          lista_unidades: results[2].rows,
           vaga_sorteada: null,
           usuario_admin: request.session.usuario_admin
         })  
@@ -246,6 +251,7 @@ app.get('/meusdados', requiresAuth(), (request, response) => {
         }
         // console.log('vagas_escolhidas '+vagas_escolhidas)
         // console.log('results[1].rows[0].unidade '+results[1].rows[0].unidade)
+        // console.log('results[1].rows[0] '+results[1].rows[0].unidade)
         response.render('meusdados.ejs', {
           user_id: user_id,
           email: request.oidc.user.email, 
@@ -254,6 +260,7 @@ app.get('/meusdados', requiresAuth(), (request, response) => {
           vagas_escolhidas: vagas_escolhidas,
           mensagem: ['success', 'Informação!', mensagem],
           lista_vagas: results[0].rows,
+          lista_unidades: results[2].rows,
           vaga_sorteada: results[1].rows[0].vaga_sorteada,
           usuario_admin: request.session.usuario_admin
         })
@@ -285,29 +292,61 @@ app.post('/meusdados', requiresAuth(), (request, response) => {
       vagas_escolhidas = JSON.stringify(vagas_escolhidas_array);
     }
   }
-  var query = `UPDATE unidades SET user_id = NULL WHERE user_id = '${user_id}';`
+  // var query = `UPDATE unidades SET user_id = NULL WHERE user_id = '${user_id}';`
+  var query = `SELECT user_id FROM unidades WHERE unidade = '${unidade}';`
+  query += `UPDATE unidades SET user_id = '${user_id}'`
   if (vagas_escolhidas == undefined) {
-    query += `UPDATE unidades SET user_id = '${user_id}', vagas_escolhidas = NULL WHERE unidade = '${unidade}';`
+    query += `, vagas_escolhidas = NULL WHERE unidade = '${unidade}' AND user_id IS NULL RETURNING *;`
   } else {
-    query += `UPDATE unidades SET user_id = '${user_id}', vagas_escolhidas = '${vagas_escolhidas}' WHERE unidade = '${unidade}';`
+    query += `, vagas_escolhidas = '${vagas_escolhidas}' WHERE unidade = '${unidade}' AND user_id IS NULL RETURNING *;`
   }
   query += `SELECT codigo FROM vagas WHERE disponivel = true ORDER BY codigo;`
+  query += `SELECT unidade FROM unidades WHERE user_id IS NULL ORDER BY unidade;`
   pool.query(query, (error, results) => {
     if (error) {
       console.log("erro: "+error.message)
     } else {
-      if (results[1].rowCount == 0) {
+      console.log('results[0].rows '+results[0].rows[0])
+      if (results[0].rowCount == 0) {
+        response.render('meusdados.ejs', {
+          user_id: user_id,
+          email: request.oidc.user.email, 
+          name: request.oidc.user.name,
+          unidade: null,
+          mensagem: ['warning', 'Atenção!', 'Unidade não encontrada!'] ,
+          vagas_escolhidas: (vagas_escolhidas == undefined || vagas_escolhidas == [] ? null : vagas_escolhidas),
+          lista_vagas: results[1].rows,
+          lista_unidades: results[3].rows,
+          vaga_sorteada: null,
+          usuario_admin: request.session.usuario_admin
+        })              
+      } else if (results[0].rows[0].user_id != null && results[0].rows[0].user_id != '') { 
+        response.render('meusdados.ejs', {
+          user_id: user_id,
+          email: request.oidc.user.email, 
+          name: request.oidc.user.name,
+          unidade: null,
+          mensagem: ['warning', 'Atenção!', 'Não foi possível atualizar os dados. Unidade associada a outro usuário!'] ,
+          vagas_escolhidas: (vagas_escolhidas == undefined || vagas_escolhidas == [] ? null : vagas_escolhidas),
+          lista_vagas: results[2].rows,
+          lista_unidades: results[3].rows,
+          vaga_sorteada: null,
+          usuario_admin: request.session.usuario_admin
+        })              
+      } else if (results[1].rowCount == 0) {
         response.render('meusdados.ejs', {
           user_id: user_id,
           email: request.oidc.user.email, 
           name: request.oidc.user.name,
           unidade: unidade,
-          mensagem: ['warning', 'Atenção!', 'Não foi possível atualizar os dados. Unidade não cadastrada.'] ,
-          vagas_escolhidas: results[2].rows[0].vagas_escolhidas,
+          mensagem: ['warning', 'Atenção!', 'Não foi possível atualizar os dados!'] ,
+          vagas_escolhidas: (vagas_escolhidas == undefined || vagas_escolhidas == [] ? null : vagas_escolhidas),
           lista_vagas: results[2].rows,
+          lista_unidades: results[3].rows,
+          vaga_sorteada: null,
           usuario_admin: request.session.usuario_admin
         })              
-      } else {        
+      } else {
         request.session.unidade_usuario = unidade
         request.flash('success', 'Dados atualizados com sucesso!');
         response.redirect('/meusdados')
@@ -318,10 +357,6 @@ app.post('/meusdados', requiresAuth(), (request, response) => {
 
 app.get('/setup', requiresAuth(), (request, response) => {
   if (request.session.usuario_admin) {   
-    /*
-    var token = gerarToken()
-    console.log(new Date().toJSON()+' - '+token);
-    */
     response.render('setup.ejs', { 
       email: request.oidc.user.email, 
       name: request.oidc.user.name,

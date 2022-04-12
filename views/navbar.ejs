@@ -61,7 +61,7 @@
     </script>
     <% if (email) { %>
       <div class="w3-dropdown-hover w3-mobile">
-        <button class="w3-button"><%= name %><i class="fa fa-caret-down"></i></button>
+        <button class="w3-button"><%= name.substring(0,24) %><i class="fa fa-caret-down"></i></button>
         <div class="w3-dropdown-content w3-bar-block w3-dark-grey">
           <a href="/meusdados" class="w3-bar-item w3-button">Meus dados</a>
           <a href="/vagas" class="w3-bar-item w3-button">Vagas</a>

@@ -27,7 +27,7 @@ CREATE TABLE unidades (
   presente BOOLEAN,
   adimplente BOOLEAN,
   vaga_sorteada CHAR(5) REFERENCES Vagas (codigo),
-  user_id CHAR(80),
+  user_id CHAR(80) UNIQUE,
   ultima_gravacao TIMESTAMP default CURRENT_TIMESTAMP,
   vagas_escolhidas JSONB
 );
@@ -238,15 +238,15 @@ INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_e
 INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T1032', false, true, true, NULL, NULL);
 INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T1033', false, true, true, NULL, NULL);
 INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T1034', false, true, true, NULL, NULL);
-INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T1041', false, true, true, NULL, '[{"vaga": "S1G01"},{"vaga": "S1G02"}]');
+INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T1041', false, true, true, NULL, NULL);
 INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T1042', false, true, true, NULL, NULL);
-INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T1043', false, true, false, NULL, '[{"vaga": "S1G01"},{"vaga": "S1G03"}]');
-INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T1044', false, true, true, NULL, '[{"vaga": "S1G04"},{"vaga": "S1G05"}]');
-INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T1051', false, false, true, NULL, '[{"vaga": "S1G04"},{"vaga": "S1G05"}]');
-INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T1052', false, false, true, NULL, '[{"vaga": "S1G03"},{"vaga": "S1G04"},{"vaga": "S1G05"}]');
-INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T1053', true, true, true, NULL, '[{"vaga": "S1G01"},{"vaga": "S1G08"},{"vaga": "S1G04"}]');
-INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T1054', true, true, true, NULL, '[{"vaga": "S1G01"},{"vaga": "S1G08"},{"vaga": "S1G04"}]');
-INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T1061', true, true, true, NULL, NULL);
+INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T1043', false, true, true, NULL, NULL);
+INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T1044', false, true, true, NULL, NULL);
+INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T1051', false, true, true, NULL, NULL);
+INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T1052', false, true, true, NULL, NULL);
+INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T1053', false, true, true, NULL, NULL);
+INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T1054', false, true, true, NULL, NULL);
+INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T1061', false, true, true, NULL, NULL);
 INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T1062', false, true, true, NULL, NULL);
 INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T1063', false, true, true, NULL, NULL);
 INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T1064', false, true, true, NULL, NULL);
@@ -335,15 +335,15 @@ INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_e
 INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T2032', false, true, true, NULL, NULL);
 INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T2033', false, true, true, NULL, NULL);
 INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T2034', false, true, true, NULL, NULL);
-INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T2041', false, true, true, NULL, '[{"vaga": "S1G01"},{"vaga": "S1G02"}]');
+INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T2041', false, true, true, NULL, NULL);
 INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T2042', false, true, true, NULL, NULL);
-INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T2043', false, true, false, NULL, '[{"vaga": "S1G01"},{"vaga": "S1G03"}]');
-INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T2044', false, true, true, NULL, '[{"vaga": "S1G04"},{"vaga": "S1G05"}]');
-INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T2051', false, false, true, NULL, '[{"vaga": "S1G04"},{"vaga": "S1G05"}]');
-INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T2052', false, false, true, NULL, '[{"vaga": "S1G03"},{"vaga": "S1G04"},{"vaga": "S1G05"}]');
-INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T2053', true, true, true, NULL, '[{"vaga": "S1G01"},{"vaga": "S1G08"},{"vaga": "S1G04"}]');
-INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T2054', true, true, true, NULL, '[{"vaga": "S1G01"},{"vaga": "S1G08"},{"vaga": "S1G04"}]');
-INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T2061', true, true, true, NULL, NULL);
+INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T2043', false, true, true, NULL, NULL);
+INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T2044', false, true, true, NULL, NULL);
+INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T2051', false, true, true, NULL, NULL);
+INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T2052', false, true, true, NULL, NULL);
+INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T2053', false, true, true, NULL, NULL);
+INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T2054', false, true, true, NULL, NULL);
+INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T2061', false, true, true, NULL, NULL);
 INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T2062', false, true, true, NULL, NULL);
 INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T2063', false, true, true, NULL, NULL);
 INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T2064', false, true, true, NULL, NULL);
