@@ -5,9 +5,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link href="./css/style.css" rel='stylesheet' type='text/css' />
+<link href='./css/notify.min.css' rel='stylesheet' type='text/css' />
+<link href='./css/sticky.css' rel='stylesheet' type='text/css' />
 </head>
 <body>
 <%- include('navbar.ejs') %>
@@ -43,26 +44,41 @@
     <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank" class="w3-hover-text-green">w3.css</a></p>
   </footer>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script nonce="EDNnf03nceIOfn39fn3e9h3sdfa" src="./js/notify.js"></script>  
   <script nonce="EDNnf03nceIOfn39fn3e9h3sdfa"> 
-    var mensagem = '<%= mensagem %>'; 
     document.getElementById("btnGerarToken").addEventListener('click', function() { gerarToken() })
 
-    function apagaMensagem() {
-      document.getElementById("mensagem").innerHTML = '';  
+    const notify = new Notify();
+    var estilo = '<%= (mensagem != null ? mensagem[0] : "") %>';
+    var titulo = '<%= (mensagem != null ? mensagem[1] : "") %>';
+    var mensagem = '<%= (mensagem != null ? mensagem[2] : "") %>';
+    if (mensagem != '') {
+        notify.render({
+        head: titulo,
+        style: estilo,
+        content: mensagem
+      });
     }
 
     function gerarToken() {
       $(document).ready(function(){
-        $.get("/setup/gerarToken",
-          function(data,status){
-            var modal = document.getElementById("myModal")
-            document.getElementById("messageMyModal").innerHTML = data.message + ' Por favor, consulte o seu email!'
-            modal.style.display = "block";
-          }
-        );
+        $(document).ajaxError(function(e, xhr, opt) {
+          notify.render({
+            head: 'Atenção!',
+            style: 'error',
+            content: xhr.responseJSON.message
+          })
+        });
+        $.get("/setup/gerarToken", function(data,status){
+          notify.render({
+            head: 'Informação',
+            style: 'info',
+            content: data.message + ' Por favor, consulte o seu email!'
+          });
+        })
       });
     }
-  </script>
-  <script nonce="EDNnf03nceIOfn39fn3e9h3sdfa" src="./js/script.js"></script>    
+  </script>   
+  <script nonce="EDNnf03nceIOfn39fn3e9h3sdfa" src="./js/script.js"></script>
 </body>
 </html>

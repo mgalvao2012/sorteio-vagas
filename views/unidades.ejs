@@ -5,9 +5,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link href="./css/style.css" rel='stylesheet' type='text/css' />
+<link href='./css/notify.min.css' rel='stylesheet' type='text/css' />
+<link href='./css/sticky.css' rel='stylesheet' type='text/css' />
 </head>
 <body>
 <%- include('navbar.ejs') %>
@@ -99,13 +100,25 @@
     <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank" class="w3-hover-text-green">w3.css</a></p>
   </footer>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  <script>
-    var mensagem = '<%= mensagem %>'
+  <script nonce="EDNnf03nceIOfn39fn3e9h3sdfa" src="./js/notify.js"></script>  
+  <script nonce="EDNnf03nceIOfn39fn3e9h3sdfa"> 
     var lista_unidades = '<%= lista_unidades %>'
     var lista_ajustada_unidades = '<%= lista_ajustada_unidades %>'.split(',')
     var resultado_sorteio = '<%= resultado_sorteio %>'
     var lista_pne = []
     var lista_adimplente= []
+
+    const notify = new Notify();
+    var estilo = '<%= (mensagem != null ? mensagem[0] : "") %>';
+    var titulo = '<%= (mensagem != null ? mensagem[1] : "") %>';
+    var mensagem = '<%= (mensagem != null ? mensagem[2] : "") %>';
+    if (mensagem != '') {
+        notify.render({
+        head: titulo,
+        style: estilo,
+        content: mensagem
+      });
+    }
 
     // atualiza as unidades com o status de presença gravado no banco de dados
     function loadFunction() { 
@@ -129,14 +142,17 @@
     }
     window.onload = loadFunction();
 
-    function apagaMensagem() {
-      document.getElementById("mensagem").innerHTML = '';  
-    }
-
     function unidadeClicadaPNE(valor) {  
       var posicao = lista_pne.indexOf(valor);
       if (posicao > -1) {
         $(document).ready(function(){
+          $(document).ajaxError(function(e, xhr, opt) {
+            notify.render({
+              head: 'Atenção!',
+              style: 'error',
+              content: xhr.responseJSON.message
+            })
+          });
           $.post("/unidades/atualiza_pne",
             {
               "unidade": valor,
@@ -146,11 +162,31 @@
               let element = document.getElementById(valor+'-pne-icon');
               element.src = '../images/icon-pne-no-ok.png'
               lista_pne.splice(posicao,1);
+              if( data.status == 'success') {
+                notify.render({
+                  head: 'Informação',
+                  style: 'warning',
+                  content: 'Unidade '+valor+' não possui PNE!'
+                });
+              } else {
+                notify.render({
+                  head: 'Atenção',
+                  style: 'error',
+                  content: 'Unidade '+valor+'. Erro: '+data.message
+                });
+              }
             }
           );
         });    
       } else {
         $(document).ready(function(){
+          $(document).ajaxError(function(e, xhr, opt) {
+            notify.render({
+              head: 'Atenção!',
+              style: 'error',
+              content: xhr.responseJSON.message
+            })
+          });
           $.post("/unidades/atualiza_pne",
             {
               "unidade": valor,
@@ -160,6 +196,19 @@
               let element = document.getElementById(valor+'-pne-icon');
               element.src = '../images/icon-pne-ok.png'
               lista_pne.push(valor);
+              if( data.status == 'success') {
+                notify.render({
+                  head: 'Informação',
+                  style: 'success',
+                  content: 'Unidade '+valor+' possui PNE!'
+                });
+              } else {
+                notify.render({
+                  head: 'Atenção',
+                  style: 'error',
+                  content: 'Unidade '+valor+'. Erro: '+data.message
+                });
+              }
             }
           );
         });
@@ -170,6 +219,13 @@
       var posicao = lista_adimplente.indexOf(valor);
       if (posicao > -1) {
         $(document).ready(function(){
+          $(document).ajaxError(function(e, xhr, opt) {
+            notify.render({
+              head: 'Atenção!',
+              style: 'error',
+              content: xhr.responseJSON.message
+            })
+          });
           $.post("/unidades/atualiza_adimplente",
             {
               "unidade": valor,
@@ -179,11 +235,31 @@
               let element = document.getElementById(valor+'-adimplente-icon');
               element.src = '../images/icon-adimplente-no-ok.png'
               lista_adimplente.splice(posicao,1);
+              if( data.status == 'success') {
+                notify.render({
+                  head: 'Atenção',
+                  style: 'warning',
+                  content: 'Unidade '+valor+' está INADIMPLENTE!'
+                });
+              } else {
+                notify.render({
+                  head: 'Atenção',
+                  style: 'error',
+                  content: 'Unidade '+valor+'. Erro: '+data.message
+                });
+              }
             }
           );
         });    
       } else {
         $(document).ready(function(){
+          $(document).ajaxError(function(e, xhr, opt) {
+            notify.render({
+              head: 'Atenção!',
+              style: 'error',
+              content: xhr.responseJSON.message
+            })
+          });
           $.post("/unidades/atualiza_adimplente",
             {
               "unidade": valor,
@@ -193,6 +269,19 @@
               let element = document.getElementById(valor+'-adimplente-icon');
               element.src = '../images/icon-adimplente-ok.png'
               lista_adimplente.push(valor);
+              if( data.status == 'success') {
+                notify.render({
+                  head: 'Informação',
+                  style: 'success',
+                  content: 'Unidade '+valor+' está ADIMPLENTE!'
+                });
+              } else {
+                notify.render({
+                  head: 'Atenção',
+                  style: 'error',
+                  content: 'Unidade '+valor+'. Erro: '+data.message
+                });
+              }
             }
           );
         });

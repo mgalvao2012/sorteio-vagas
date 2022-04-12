@@ -1,3 +1,4 @@
+/*
 // Get the modal
 var modal = document.getElementById("myModal");
 
@@ -20,7 +21,7 @@ window.onclick = function(event) {
     modal.style.display = "none";
   }
 }
-
+*/
 // Toggle between showing and hiding the sidebar when clicking the menu icon
 var mySidebar = document.getElementById("mySidebar");
 

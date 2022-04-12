@@ -134,6 +134,18 @@ app.use(limiter, (request, response, next) => {
   } else {
     request.session.usuario_admin = null
   }
+  if(request.session.unidade == null || request.session.unidade == undefined) {
+    let user_id = request.oidc.user.sub
+    pool.query(`SELECT * FROM unidades WHERE user_id = '${user_id}';`, (error, results) => {
+      if (error) {
+        console.log(error.message)
+      } else {
+        console.log('unidade cadastrada '+results.rows[0].unidade)
+        request.session.unidade = results.rows[0].unidade;
+        console.log('unidade cadastrada '+request.session.unidade)
+      }
+    })
+  }
   next()
 })
 
@@ -154,9 +166,18 @@ app.get('/', async (request, response) => {
               name: request.oidc.user.name, 
               unidade: null,
               vagas_escolhidas: null,
-              mensagem: 'Você precisa definir a sua unidade para ter acesso a outras funcionalidades!',
+              mensagem: ['warning', 'Atenção', 'Você precisa definir a sua unidade para ter acesso a outras funcionalidades!'],
               lista_vagas: results[0].rows,
               vaga_sorteada: null,
+              usuario_admin: request.session.usuario_admin
+            })
+          } else {
+            response.render('index.ejs', { 
+              email: request.oidc.user.email, 
+              nickname: request.oidc.user.nickname,
+              picture: request.oidc.user.picture,
+              name: request.oidc.user.name,
+              mensagem: null,
               usuario_admin: request.session.usuario_admin
             })
           }
@@ -173,7 +194,7 @@ app.get('/', async (request, response) => {
         nickname: request.oidc.user.nickname,
         picture: request.oidc.user.picture,
         name: request.oidc.user.name,
-        mensagem: mensagem,
+        mensagem: (mensagem != null ? ['warning', 'Atenção', mensagem] : null),
         usuario_admin: request.session.usuario_admin
       })
     }
@@ -223,13 +244,14 @@ app.get('/meusdados', requiresAuth(), (request, response) => {
           })
         }
         // console.log('vagas_escolhidas '+vagas_escolhidas)
+        // console.log('results[1].rows[0].unidade '+results[1].rows[0].unidade)
         response.render('meusdados.ejs', {
           user_id: user_id,
           email: request.oidc.user.email, 
           name: request.oidc.user.name,
           unidade: results[1].rows[0].unidade,
           vagas_escolhidas: vagas_escolhidas,
-          mensagem: mensagem,
+          mensagem: ['success', 'Informação!', mensagem],
           lista_vagas: results[0].rows,
           vaga_sorteada: results[1].rows[0].vaga_sorteada,
           usuario_admin: request.session.usuario_admin
@@ -242,6 +264,12 @@ app.get('/meusdados', requiresAuth(), (request, response) => {
 app.post('/meusdados', requiresAuth(), (request, response) => {
   let user_id = request.oidc.user.sub
   let unidade = request.body.unidade 
+  // como o campo unidade fica desabilitado a informação precisa lida da sessão
+  if (unidade == null || unidade == '') {
+    unidade = request.session.unidade
+  } else {
+    request.session.unidade = unidade
+  }
   console.log(`Vagas escolhidas pela unidade ${unidade} [${request.body.vagas_escolhidas}]`)
   var vagas_escolhidas_array = [], vagas_escolhidas
   if (request.body.vagas_escolhidas.length > 0) {
@@ -273,9 +301,10 @@ app.post('/meusdados', requiresAuth(), (request, response) => {
           email: request.oidc.user.email, 
           name: request.oidc.user.name,
           unidade: unidade,
-          mensagem: 'Não foi possível atualizar os dados. Unidade não cadastrada.',
+          mensagem: ['warning', 'Atenção!', 'Não foi possível atualizar os dados. Unidade não cadastrada.'] ,
           vagas_escolhidas: results[2].rows[0].vagas_escolhidas,
-          lista_vagas: results[3].rows
+          lista_vagas: results[2].rows,
+          usuario_admin: request.session.usuario_admin
         })              
       } else {        
         request.session.unidade_usuario = unidade
@@ -296,7 +325,7 @@ app.get('/setup', requiresAuth(), (request, response) => {
       email: request.oidc.user.email, 
       name: request.oidc.user.name,
       usuario_admin: request.session.usuario_admin, 
-      mensagem: 'Esta operação é irreversível!' 
+      mensagem: ['warning', 'Atenção!', 'Esta operação é irreversível!'] 
     })
   } else {
     console.log('Você não está autorizado a acessar este recurso!')
@@ -304,8 +333,8 @@ app.get('/setup', requiresAuth(), (request, response) => {
   } 
 })
 
-function gerarToken() {
-  if (request.session.usuario_admin) {  
+function gerarToken(usuario_admin) {
+  if (usuario_admin) {  
     return speakeasy.totp({
       secret: secretTOTP.base32,
       encoding: 'base32',
@@ -338,8 +367,8 @@ function enviarEmail(email, subject, content) {
 }
 
 app.get('/setup/gerarToken', requiresAuth(), (request, response) => {
-  if (usuarios_admin.includes(request.oidc.user.email)) {    
-    var token = gerarToken()    
+  if (request.session.usuario_admin) {    
+    var token = gerarToken(true)    
     //console.log(new Date().toJSON()+' - '+token);
     enviarEmail(request.oidc.user.email, 'Código para autorização', `Utilize este código ${token} para autorizar a conclusão do setup do Sorteio de Vagas de Estacionamento do Condomínio Grandlife Ipiranga`)
     response.status(200).json({ status: 'success', message: 'Token gerado com sucesso!' })
@@ -374,7 +403,7 @@ app.post('/setup', requiresAuth(), (request, response) => {
                 email: request.oidc.user.email, 
                 name: request.oidc.user.name,
                 usuario_admin: request.session.usuario_admin, 
-                mensagem: 'Setup finalizado com sucesso!' 
+                mensagem: ['success', 'Sucesso!', 'Setup finalizado com sucesso!']
               })
             }
           })    
@@ -385,7 +414,7 @@ app.post('/setup', requiresAuth(), (request, response) => {
         email: request.oidc.user.email, 
         name: request.oidc.user.name,
         usuario_admin: request.session.usuario_admin, 
-        mensagem: 'A chave informada não é válida ou está expirada!' 
+        mensagem: ['warning', 'Atenção', 'A chave informada não é válida ou está expirada!']
       })
     }
   } else {
@@ -509,8 +538,14 @@ app.get('/sorteio', requiresAuth(), (request, response) => {
           results[1].rows.forEach(row => {
             lista_presenca.push(row.unidade+'-'+row.presente.toString())
           })
+          let estilo, titulo
           if(results[2].rows.length != results[1].rows.length && mensagem.length == 0) {
             mensagem = `A quantidade de vagas (${results[2].rows.length}) é insuficiente para atender todas as unidades (${results[1].rows.length}).`
+            estilo = 'warning'
+            titulo = 'Atenção!'
+          } else { 
+            estilo = 'info'
+            titulo = 'Informação!'
           }
           response.render('sorteio.ejs', {
             email: request.oidc.user.email,
@@ -519,7 +554,7 @@ app.get('/sorteio', requiresAuth(), (request, response) => {
             resultado_sorteio: results[0].rows[0].resultado_sorteio,
             lista_vagas_sorteadas: results[1].rows,
             lista_presenca: lista_presenca,
-            mensagem: mensagem,
+            mensagem: [estilo, titulo, mensagem],
             usuario_admin: request.session.usuario_admin
           })
         }
@@ -688,6 +723,7 @@ app.get('/sorteio/reiniciar', requiresAuth(), (request, response) => {
       } else {      
         if (results[1].rows[0].resultado_sorteio == 'Sorteio não realizado' ) {
           console.log('Sorteio reiniciado com sucesso!')
+          request.flash('success', 'Sorteio reiniciado com sucesso!');
           response.redirect('/sorteio') 
         } else {
           response.status(500).json({ status: 'error', message: 'Falha no processo de reinicio. Procure o administrador.' })
@@ -716,7 +752,7 @@ app.get('/vagas', requiresAuth(), (request, response) => {
             name: request.oidc.user.name, 
             unidade: null,
             vagas_escolhidas: null,
-            mensagem: 'Você precisa definir a sua unidade para ter acesso a outras funcionalidades!',
+            mensagem: ['warning', 'Atenção!', 'Você precisa definir a sua unidade para ter acesso a outras funcionalidades!'],
             lista_vagas: results[0].rows,
             vaga_sorteada: null,
             usuario_admin: request.session.usuario_admin
@@ -765,7 +801,7 @@ app.get('/vagas', requiresAuth(), (request, response) => {
             resultado_sorteio: results[0].rows[0].resultado_sorteio,
             lista_vagas: results[1].rows,
             lista_ajustada_vagas: lista_vagas,
-            mensagem: mensagem,
+            mensagem: ['warning', 'Atenção!', mensagem],
             usuario_admin: request.session.usuario_admin
           })
         }
@@ -813,6 +849,32 @@ app.post('/unidades/atualiza_presenca', requiresAuth(), (request, response) => {
 })
 
 app.get('/unidades', requiresAuth(), (request, response) => {
+    // verifica se o usuario já definiu sua unidade para liberar o acesso a outras funcionalidades
+  if (request.session.unidade_usuario == undefined) {
+    let user_id = request.oidc.user.sub
+    pool.query(`SELECT codigo FROM vagas WHERE disponivel = true ORDER BY codigo;
+                SELECT * FROM unidades WHERE user_id = '${user_id}';`, (error, results) => {
+      if (error) {
+        console.log(error.message)
+      } else {
+        if (results[1].rows[0] == undefined || results[1].rows.unidade == null) {
+          response.render('meusdados.ejs', {
+            user_id: user_id,
+            email: request.oidc.user.email,
+            name: request.oidc.user.name, 
+            unidade: null,
+            vagas_escolhidas: null,
+            mensagem: ['warning', 'Atenção!', 'Você precisa definir a sua unidade para ter acesso a outras funcionalidades!'],
+            lista_vagas: results[0].rows,
+            vaga_sorteada: null,
+            usuario_admin: request.session.usuario_admin
+          })
+        } else {
+          request.session.unidade_usuario = results[1].rows.unidade
+        }
+      }
+    })  
+  } 
   if (request.session.usuario_admin) {
     pool.query(`SELECT * FROM configuracao;
                 SELECT unidade, pne, adimplente FROM unidades ORDER BY unidade;`, (error, results) => {

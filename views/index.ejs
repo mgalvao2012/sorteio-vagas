@@ -5,9 +5,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+<!-- <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway"> -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link href="./css/style.css" rel='stylesheet' type='text/css' />
+<link href='./css/notify.min.css' rel='stylesheet' type='text/css' />
+<link href='./css/sticky.css' rel='stylesheet' type='text/css' />
 </head>
 <body>
 
@@ -31,7 +33,7 @@
     <div class="w3-quarter">
       <i class="fa fa-mobile w3-margin-bottom w3-jumbo w3-center"></i>
       <p class="w3-large">Responsive</p>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore.</p>
+      <p><span class="fa fa-circle-check"></span>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore.</p>
     </div>
     <div class="w3-quarter">
       <i class="fa fa-heart w3-margin-bottom w3-jumbo"></i>
@@ -57,8 +59,6 @@
     <h3 class="w3-center">FALE CONOSCO</h3>
     <p class="w3-center w3-large">Envie sua mensagem com comentários, críticas ou sugestões:</p>
     <div style="margin-top:48px; width: 70%; margin: auto;">
-      <p><i class="fa fa-envelope fa-fw w3-xxlarge w3-margin-right"> </i> email: mgalvao2012@gmail.com</p>
-      <br>
       <div>
           <form action="#" target="_blank">
             <p><input class="w3-input w3-border" type="text" placeholder="Nome" required name="Name"></p>
@@ -81,8 +81,19 @@
   <a href="#home" class="w3-button w3-light-grey"><i class="fa fa-arrow-up w3-margin-right"></i>Vai para o início</a>
   <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank" class="w3-hover-text-green">w3.css</a></p>
 </footer>
-<script nonce="EDNnf03nceIOfn39fn3e9h3sdfa">
-  var mensagem = '<%= mensagem %>';
+<script nonce="EDNnf03nceIOfn39fn3e9h3sdfa" src="./js/notify.js"></script>
+<script nonce="EDNnf03nceIOfn39fn3e9h3sdfa">  
+  const notify = new Notify();
+  var estilo = '<%= (mensagem != null ? mensagem[0] : "") %>';
+  var titulo = '<%= (mensagem != null ? mensagem[1] : "") %>';
+  var mensagem = '<%= (mensagem != null ? mensagem[2] : "") %>';
+  if (mensagem != '') {
+    notify.render({
+      head: titulo,
+      style: estilo,
+      content: mensagem
+    });
+  }
 </script>
 <script nonce="EDNnf03nceIOfn39fn3e9h3sdfa" src="./js/script.js"></script>
 </body>
