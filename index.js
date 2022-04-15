@@ -26,13 +26,10 @@ app.use(
   helmet.contentSecurityPolicy({
     useDefaults: true,
     directives: {
-      "script-src": ["'self'", `'unsafe-inline'`, `${process.env.baseURL}`, "https://ajax.googleapis.com",
-        "https://ka-f.fontawesome.com", "https://kit.fontawesome.com/"], 
-      "style-src": ["'self'", `'unsafe-inline'`, `${process.env.baseURL}`,"https://www.w3schools.com/", 
-        "https://fonts.googleapis.com/", "https://cdnjs.cloudflare.com/"],
-      "font-src": ["'self'", `${process.env.baseURL}`, "https://fonts.googleapis.com/", 
-        "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com/", "https://ka-f.fontawesome.com", 
-        "https://kit.fontawesome.com/"]
+      "default-src": "https:",
+      "style-src": ["https:", "'unsafe-inline'"], 
+      "script-src": ["https:", "'unsafe-inline'"], 
+      "font-src": ["https:", "'unsafe-inline'"]
     },
   })
  )

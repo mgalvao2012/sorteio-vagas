@@ -63,7 +63,7 @@
                 <input id="S2b" type="button" class="aba-subsolo" value="Sub-solo 2">
                 <input id="S3b" type="button" class="aba-subsolo" value="Mapa S1">
                 <input id="S4b" type="button" class="aba-subsolo" value="Mapa S2">
-                <script nonce="EDNnf03nceIOfn39fn3e9h3sdfa">
+                <script>
                   document.getElementById('S1b').addEventListener('click', function() { abreSubsolo('S1') })                      
                   document.getElementById('S2b').addEventListener('click', function() { abreSubsolo('S2') })                      
                   document.getElementById('S3b').addEventListener('click', function() { abreSubsolo('S3') })                      
@@ -80,7 +80,7 @@
                                   </div>
                               </div>
                           </div>
-                          <script nonce="EDNnf03nceIOfn39fn3e9h3sdfa">
+                          <script>
                             document.getElementById('<%- row.codigo %>card').addEventListener('click', 
                               function() { unidadeClicada('<%- row.codigo %>') })                      
                           </script>
@@ -97,7 +97,7 @@
                                 </div>
                             </div>
                         </div>
-                        <script nonce="EDNnf03nceIOfn39fn3e9h3sdfa">
+                        <script>
                           document.getElementById('<%- row.codigo %>card').addEventListener('click', 
                             function() { unidadeClicada('<%- row.codigo %>') })                      
                         </script>
@@ -138,9 +138,9 @@
     <a href="#meusdados" class="w3-button w3-light-grey"><i class="fa fa-arrow-up w3-margin-right"></i>Vai para o início</a>
     <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank" class="w3-hover-text-green">w3.css</a></p>
   </footer>
-  <script nonce="EDNnf03nceIOfn39fn3e9h3sdfa" src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  <script nonce="EDNnf03nceIOfn39fn3e9h3sdfa" src="./js/notify.js"></script>  
-  <script nonce="EDNnf03nceIOfn39fn3e9h3sdfa"> 
+  <script" src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script" src="./js/notify.js"></script>  
+  <script> 
     var lista_vagas_escolhidas = []
     const notify = new Notify();
     var estilo = '<%= (mensagem != null ? mensagem[0] : "") %>';
@@ -201,6 +201,6 @@
       }   
     }
   </script>
-  <script nonce="EDNnf03nceIOfn39fn3e9h3sdfa" src="./js/script.js"></script>    
+  <script src="./js/script.js"></script>    
 </body>
 </html>
