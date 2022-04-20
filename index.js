@@ -112,7 +112,7 @@ app.use(session({
   sameSite: 'strict',
   cookie: { 
     secure: true, // if true only transmit cookie over https
-    httpOnly: true, // if true prevent client side JS from reading the cookie 
+    httpOnly: false, // if true prevent client side JS from reading the cookie 
     maxAge: 60 * 60 * 1000 // 60 min * 60 seg * 1000 milisegundos = 3600000 ms = 1h
   }
 }));
