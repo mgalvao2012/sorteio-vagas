@@ -154,13 +154,13 @@ app.use(limiter, (request, response, next) => {
       } else {
         if (results.rows[0] != null) {
           request.session.unidade_usuario = results.rows[0].unidade;
-          //console.log('request.session.unidade_usuario '+request.session.unidade_usuario)
+          console.log('request.session.unidade_usuario '+request.session.unidade_usuario)
         }
       }
     })
   }
-  //console.log('request.session.usuario_admin '+request.session.usuario_admin)
-  //console.log('sessionId: '+request.sessionID)
+  console.log('request.session.usuario_admin '+request.session.usuario_admin)
+  console.log('sessionId: '+request.sessionID)
   next()
 })
 
