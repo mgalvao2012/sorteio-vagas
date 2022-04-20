@@ -286,6 +286,7 @@ app.post('/meusdados', requiresAuth(), (request, response) => {
   // como o campo unidade fica desabilitado a informação precisa lida da sessão
   if (unidade == null || unidade == '' || unidade == undefined) {
     unidade = request.session.unidade_usuario
+    console.log('post /meusdados unidade '+unidade)
   } else {
     request.session.unidade_usuario = unidade
   }
