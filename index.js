@@ -32,7 +32,7 @@ app.use(
       "font-src": ["https:", "'unsafe-inline'"]
     },
   })
- )
+)
 
 const passport = require('passport')
 const flash = require('connect-flash')
@@ -46,8 +46,6 @@ const origin = {
   optionsSuccessStatus: 200, // For legacy browser support
   methods: "GET, POST"
 }
-
-var sessionStore = new session.MemoryStore;
 
 const config = {
   authRequired: false,
@@ -76,41 +74,58 @@ const users = []
 const usuarios_admin = process.env.USUARIOS_ADMIN;
 
 app.use(flash())
-/*
+
+// Redis
+const { v4: uuidv4 } = require('uuid');
+// uuidv4(); // ⇨ '1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed'
+const redis = require('redis');
+const redisStore = require('connect-redis')(session);	
+const redisClient = redis.createClient({
+  url: process.env.REDIS_TLS_URL,
+  legacyMode: true,
+  socket: {
+    tls: (development_env ? false : true),
+    rejectUnauthorized: false
+  }
+})
+
+// Conecta no Redis
+async function redisConnect() {
+  await redisClient.connect();
+  console.log('Redis '+redisClient.isOpen); // this is true
+  redisClient.on('error', (err) => {
+    console.log('Redis error: ', err);
+  });
+}
+redisConnect();
+
+// Configura a sessao para usar Redis
 app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave: true,
-    saveUninitialized: true,
-    store: sessionStore,
-    cookie  : { maxAge: 60 * 1000 * 2 }
-}))
-*/
-var sess = {
+  genid: (req) => {
+    return uuidv4()
+  },
+  store: new redisStore({ client: redisClient }),
+  name: '_sessionID', 
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  store: sessionStore,
   sameSite: 'strict',
-  cookie: { maxAge: 60 * 60 * 1000 } // 60 min * 60 seg * 1000 milisegundos = 3600000 ms = 1h
-}
+  cookie: { 
+    secure: true, // if true only transmit cookie over https
+    httpOnly: true, // if true prevent client side JS from reading the cookie 
+    maxAge: 60 * 60 * 1000 // 60 min * 60 seg * 1000 milisegundos = 3600000 ms = 1h
+  }
+}));
 
-// habilita a cookies seguros apenas em produção
-if (development_env) {
-  app.set('trust proxy', 1) // trust first proxy
-  sess.cookie.secure = true // serve secure cookies
-}
+app.use(passport.initialize())
+app.use(passport.session())
+app.use(methodOverride('_method'))
 
 // Gera secret para gerar chaves de desbloqueio de operações (setup)
 var speakeasy = require("speakeasy");
 var secretTOTP = speakeasy.generateSecret({length: 20});
 
-app.use(session(sess))
-app.use(passport.initialize())
-app.use(passport.session())
-app.use(methodOverride('_method'))
-
-//app.use(cors(origin))
-
+// limita chamadas das urls para bloquear ataques
 const limiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
   max: 20, // 20 requests,
@@ -139,10 +154,13 @@ app.use(limiter, (request, response, next) => {
       } else {
         if (results.rows[0] != null) {
           request.session.unidade_usuario = results.rows[0].unidade;
+          //console.log('request.session.unidade_usuario '+request.session.unidade_usuario)
         }
       }
     })
   }
+  //console.log('request.session.usuario_admin '+request.session.usuario_admin)
+  //console.log('sessionId: '+request.sessionID)
   next()
 })
 

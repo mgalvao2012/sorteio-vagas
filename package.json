@@ -15,9 +15,10 @@
     "bcrypt": "^5.0.1",
     "compression": "^1.7.4",
     "connect-flash": "^0.1.1",
+    "connect-redis": "^6.1.3",
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",
-    "ejs": "^3.1.6",
+    "ejs": "^3.0.2",
     "express": "^4.17.3",
     "express-openid-connect": "^2.7.1",
     "express-rate-limit": "^6.3.0",
@@ -30,8 +31,10 @@
     "passport-local": "^1.0.0",
     "passport-openidconnect": "^0.1.1",
     "pg": "^8.7.3",
+    "redis": "^4.0.6",
     "request-promise-native": "^1.0.9",
-    "speakeasy": "^2.0.0"
+    "speakeasy": "^2.0.0",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"
