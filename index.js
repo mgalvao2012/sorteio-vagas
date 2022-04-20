@@ -284,8 +284,9 @@ app.post('/meusdados', requiresAuth(), (request, response) => {
   var user_id = request.oidc.user.sub
   var unidade = request.body.unidade 
   console.log('unidade '+unidade)
-  // como o campo unidade fica desabilitado a informação precisa lida da sessão
-  if (unidade == null || unidade == '' || unidade == undefined) {
+  console.log('request.session.unidade_usuario '+request.session.unidade_usuario)
+  // como o campo unidade fica desabilitado a informação precisa ser lida da sessão
+  if (unidade == undefined || unidade == null || unidade == '') {
     unidade = request.session.unidade_usuario
   } else {
     request.session.unidade_usuario = unidade
