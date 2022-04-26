@@ -154,13 +154,13 @@ app.use(limiter, (request, response, next) => {
       } else {
         if (results.rows[0] != null) {
           request.session.unidade_usuario = results.rows[0].unidade;
-          //console.log('request.session.unidade_usuario '+request.session.unidade_usuario)
+          console.log('request.session.unidade_usuario '+request.session.unidade_usuario)
         }
       }
     })
   }
-  //console.log('request.session.usuario_admin '+request.session.usuario_admin)
-  //console.log('sessionId: '+request.sessionID)
+  console.log('request.session.usuario_admin '+request.session.usuario_admin)
+  console.log('sessionId: '+request.sessionID)
   next()
 })
 
@@ -281,10 +281,12 @@ app.get('/meusdados', requiresAuth(), (request, response) => {
 })
 
 app.post('/meusdados', requiresAuth(), (request, response) => {
-  let user_id = request.oidc.user.sub
-  let unidade = request.body.unidade 
-  // como o campo unidade fica desabilitado a informação precisa lida da sessão
-  if (unidade == null || unidade == '' || unidade == undefined) {
+  var user_id = request.oidc.user.sub
+  var unidade = request.body.unidade 
+  console.log('unidade '+unidade)
+  console.log('request.session.unidade_usuario '+request.session.unidade_usuario)
+  // como o campo unidade fica desabilitado a informação precisa ser lida da sessão
+  if (unidade == undefined || unidade == null || unidade == '') {
     unidade = request.session.unidade_usuario
     console.log('post /meusdados unidade '+unidade)
   } else {
