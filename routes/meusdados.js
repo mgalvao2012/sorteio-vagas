@@ -3,60 +3,69 @@ const router = express.Router();
 const { requiresAuth } = require("express-openid-connect");
 const { pool } = require("../config");
 
-router.get("/meusdados", requiresAuth(), (request, response) => {
-  // mensagem preenchida quando é realizada a atualização dos dados
-  // na sequencia é retirada da sessão para evitar apresentá-la sem atualização nos dados
-  var mensagem = request.session.meusdados_mensagem;
-  request.session.meusdados_mensagem = "";
-  let user_id = request.oidc.user.sub;
-  pool.query(
-    `SELECT codigo FROM vagas WHERE disponivel = true ORDER BY codigo;
-     SELECT * FROM unidades WHERE user_id = '${user_id}';
-     SELECT unidade FROM unidades WHERE user_id IS NULL ORDER BY unidade;`,
-    (error, results) => {
-      if (error) {
-        console.log(error.message);
-      } else {
-        //console.log('results[2].rows[0] '+results[2].rows[0].unidade)
-        if (results[1].rows[0] == undefined) {
-          response.render("meusdados.ejs", {
-            user_id: user_id,
-            email: request.oidc.user.email,
-            name: request.oidc.user.name,
-            unidade: null,
-            vagas_escolhidas: null,
-            mensagem: null,
-            lista_vagas: results[0].rows,
-            lista_unidades: results[2].rows,
-            vaga_sorteada: null,
-            usuario_admin: request.session.usuario_admin,
-          });
+const get_meusdados = (request, response) => {
+  return new Promise((resolve, reject) => {
+    // mensagem preenchida quando é realizada a atualização dos dados
+    // na sequencia é retirada da sessão para evitar apresentá-la sem atualização nos dados
+    var mensagem = request.session.meusdados_mensagem;
+    request.session.meusdados_mensagem = "";
+    let user_id = request.oidc.user.sub;
+    pool.query(
+      `SELECT codigo FROM vagas WHERE disponivel = true ORDER BY codigo;
+       SELECT * FROM unidades WHERE user_id = '${user_id}';
+       SELECT unidade FROM unidades WHERE user_id IS NULL ORDER BY unidade;`,
+      (error, results) => {
+        if (error) {
+          console.log(error.message);
+          reject(error.message);
+          return;
         } else {
-          // converte de '[{"vaga": "S1G27"},{"vaga": "S1G28"}]' -> ['S1G27, S1G28']
-          let vagas_escolhidas_array = results[1].rows[0].vagas_escolhidas;
-          let vagas_escolhidas = [];
-          // console.log('vagas_escolhidas_array '+vagas_escolhidas_array)
-          if (vagas_escolhidas_array != null) {
-            vagas_escolhidas_array.forEach((item) => {
-              vagas_escolhidas.push(item.vaga);
+          //console.log('results[2].rows[0] '+results[2].rows[0].unidade)
+          if (results[1].rows[0] == undefined) {
+            response.render("meusdados.ejs", {
+              user_id: user_id,
+              email: request.oidc.user.email,
+              name: request.oidc.user.name,
+              unidade: null,
+              vagas_escolhidas: null,
+              mensagem: null,
+              lista_vagas: results[0].rows,
+              lista_unidades: results[2].rows,
+              vaga_sorteada: null,
+              usuario_admin: request.session.usuario_admin,
+            });
+          } else {
+            // converte de '[{"vaga": "S1G27"},{"vaga": "S1G28"}]' -> ['S1G27, S1G28']
+            let vagas_escolhidas_array = results[1].rows[0].vagas_escolhidas;
+            let vagas_escolhidas = [];
+            // console.log('vagas_escolhidas_array '+vagas_escolhidas_array)
+            if (vagas_escolhidas_array != null) {
+              vagas_escolhidas_array.forEach((item) => {
+                vagas_escolhidas.push(item.vaga);
+              });
+            }
+            response.render("meusdados.ejs", {
+              user_id: user_id,
+              email: request.oidc.user.email,
+              name: request.oidc.user.name,
+              unidade: results[1].rows[0].unidade,
+              vagas_escolhidas: vagas_escolhidas,
+              mensagem: ["success", "Informação!", mensagem],
+              lista_vagas: results[0].rows,
+              lista_unidades: results[2].rows,
+              vaga_sorteada: results[1].rows[0].vaga_sorteada,
+              usuario_admin: request.session.usuario_admin,
             });
           }
-          response.render("meusdados.ejs", {
-            user_id: user_id,
-            email: request.oidc.user.email,
-            name: request.oidc.user.name,
-            unidade: results[1].rows[0].unidade,
-            vagas_escolhidas: vagas_escolhidas,
-            mensagem: ["success", "Informação!", mensagem],
-            lista_vagas: results[0].rows,
-            lista_unidades: results[2].rows,
-            vaga_sorteada: results[1].rows[0].vaga_sorteada,
-            usuario_admin: request.session.usuario_admin,
-          });
+          resolve('ok')
         }
       }
-    }
-  );
+    );
+  });
+};
+
+router.get("/meusdados", requiresAuth(), (request, response) => {
+  get_meusdados(request, response);
 });
 
 router.post("/meusdados", requiresAuth(), (request, response) => {
@@ -160,7 +169,8 @@ router.post("/meusdados", requiresAuth(), (request, response) => {
           } else {
             request.session.unidade_usuario = unidade;
             request.session.meusdados_mensagem = "Dados atualizados com sucesso!";
-            response.redirect("/meusdados");
+            //response.redirect("/meusdados");
+            get_meusdados(request, response);
           }
         }
       });
