@@ -17,6 +17,26 @@ module.exports.enviarEmail = function (email, subject, content) {
     });
 }
 
+module.exports.enviarEmailHTML = function (email, subject, content) {
+  const sgMail = require("@sendgrid/mail");
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+  const msg = {
+    to: email,
+    from: process.env.SENDGRID_FROM,
+    subject: subject,
+    html: content,
+  };
+  sgMail
+    .send(msg)
+    .then(() => {
+      console.log("Email sent to " + email);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
+
 function padTo2Digits(num) {
   return num.toString().padStart(2, "0");
 }

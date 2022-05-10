@@ -60,14 +60,14 @@
     <p class="w3-center w3-large">Envie sua mensagem com comentários, críticas ou sugestões:</p>
     <div style="margin-top:48px; width: 70%; margin: auto;">
       <div>
-          <form action="#" target="_blank">
-            <p><input class="w3-input w3-border" type="text" placeholder="Nome" required name="Name"></p>
-            <p><input class="w3-input w3-border" type="text" placeholder="Email" required name="Email"></p>
-            <p><input class="w3-input w3-border" type="text" placeholder="Assunto" required name="Subject"></p>
-            <p><textarea class="w3-input w3-border" type="areatext" placeholder="Mensagem" required name="Message" rows="3"></textarea></p>
+          <form>
+            <p><input class="w3-input w3-border" type="text" placeholder="Nome" required id="nome" name="nome"></p>
+            <p><input class="w3-input w3-border" type="email" placeholder="Email" required id="email" name="email"></p>
+            <p><input class="w3-input w3-border" type="text" placeholder="Assunto" required id="assunto" name="assunto"></p>
+            <p><textarea class="w3-input w3-border" type="areatext" placeholder="Mensagem" required id="mensagem" name="mensagem" rows="3"></textarea></p>
             <p>
-              <button class="w3-button w3-black" type="submit">
-              <i class="fa fa-paper-plane"></i> ENVIAR MENSAGEM
+              <button id="btnEnviarMensagem" class="w3-button w3-black" type="button">
+                <i class="fa fa-paper-plane"></i> ENVIAR MENSAGEM
               </button>
             </p>
           </form>
@@ -81,6 +81,7 @@
   <a href="#home" class="w3-button w3-light-grey"><i class="fa fa-arrow-up w3-margin-right"></i>Vai para o início</a>
   <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank" class="w3-hover-text-green">w3.css</a></p>
 </footer>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="./js/notify.js"></script>
 <script>  
   const notify = new Notify();
@@ -94,7 +95,67 @@
       content: mensagem
     });
   }
-</script>
+
+  document.getElementById("btnEnviarMensagem").addEventListener('click', function() { enviarMensagem() })
+
+  function enviarMensagem() {
+    var nome = document.getElementById("nome").value;
+    var email = document.getElementById("email").value;
+    var assunto = document.getElementById("assunto").value;
+    var mensagem = document.getElementById("mensagem").value;
+    if (nome == "" || email == "" || assunto == "" || mensagem == "") {
+      notify.render({
+        head: "Atenção!",
+        style: "warning",
+        content: "Todos os campos são obrigatórios!"
+      });
+      return;
+    }
+    var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+    if (!filter.test(email)) {
+      notify.render({
+        head: "Atenção!",
+        style: "warning",
+        content: "O email informado não apresenta um formato desconhecido!"
+      });
+      return;
+    }
+    $(document).ready(function(){
+      $(document).ajaxError(function(e, xhr, opt) {
+        notify.render({
+          head: 'Atenção!',
+          style: 'error',
+          content: xhr.responseJSON.message
+        })
+      });
+      $.post("/faleconosco", 
+      {
+        "nome": nome,
+        "email": email,
+        "assunto": assunto,
+        "mensagem": mensagem
+      },function(data,status){
+        if( data.status == 'success') {
+          notify.render({
+            head: 'Informação',
+            style: 'success',
+            content: 'Mensagem enviada com sucesso!'
+          });
+          document.getElementById("nome").value = null;
+          document.getElementById("email").value = null;
+          document.getElementById("assunto").value = null;
+          document.getElementById("mensagem").value = null;
+        } else {
+          notify.render({
+            head: 'Atenção',
+            style: 'error',
+            content: 'Erro no envio da mensagem. Erro: '+data.message
+          });
+        }
+      })
+    });
+  }
+</script> 
 <script src="./js/script.js"></script>
 </body>
 </html>

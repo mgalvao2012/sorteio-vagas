@@ -5,7 +5,7 @@ const express = require("express");
 // const bcrypt = require('bcrypt')
 // const cors = require('cors')
 const fs = require("fs");
-const util = require("./util");
+//var authRouter = require('./routes/auth');
 
 const helmet = require("helmet");
 const compression = require("compression");
@@ -40,13 +40,6 @@ const flash = require("connect-flash");
 const session = require("express-session");
 const methodOverride = require("method-override");
 const { auth } = require("express-openid-connect");
-
-const isProduction = process.env.NODE_ENV === "production";
-const origin = {
-  origin: isProduction ? process.env.URL_PRODUCTION : process.env.baseURL,
-  optionsSuccessStatus: 200, // For legacy browser support
-  methods: "GET, POST",
-};
 
 const config = {
   authRequired: false,
@@ -248,18 +241,21 @@ app.get("/", async (request, response) => {
     });
   }
 });
+// app.use('/', authRouter);
 
 const unidadesRoutes = require("./routes/unidades");
 const vagasRoutes = require("./routes/vagas");
 const sorteioRoutes = require("./routes/sorteio");
 const meusdadosRoutes = require("./routes/meusdados");
 const setupRoutes = require("./routes/setup");
+const faleconoscoRoutes = require("./routes/faleconosco");
 
 app.use(unidadesRoutes);
 app.use(vagasRoutes);
 app.use(sorteioRoutes);
 app.use(meusdadosRoutes);
 app.use(setupRoutes);
+app.use(faleconoscoRoutes);
 
 // Start server
 const PORT = process.env.PORT || 3000;
