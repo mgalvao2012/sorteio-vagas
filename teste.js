@@ -1,22 +1,26 @@
 const util = require('./util');
 
-async function teste() {
+async function teste(x) {
     try {
         await new Promise((resolve, reject) => {
-            console.log('1')
-            resolve('1')
+            x++
+            console.log(x)
+            resolve(x)
         });
         await new Promise((resolve, reject) => {
-            console.log('2')
-            resolve('2')
+            x++
+            console.log(x)
+            resolve(x)
         });
+        return x 
     } catch (err) {
         console.log(err)
     }
 }
 
-teste()
-    .then(() => { teste() })
+var x = 0;
+teste(x)
+    .then((retorno) => { teste(retorno) })
     .then(() => {
         let data_atual = util.formatDate(new Date(), 2)
         console.log(data_atual)

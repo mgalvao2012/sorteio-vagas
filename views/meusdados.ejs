@@ -55,7 +55,8 @@
                   <label class="w3-label">Unidade: exemplo <span>T1041</span>, T + (torre 1 ou 2) + (número do apartamento)</label>
                   -->
                   <label class="w3-label">Unidade:</label>
-                  <input class="w3-input w3-border" type="text" disabled name="unidade" value="<%= unidade %>">
+                  <input class="w3-input w3-border" type="text" disabled name="unidade_desabilitada" value="<%= unidade %>">
+                  <input type="text" name="unidade" style="display: none;" value="<%= unidade %>">
                 <% } %>
               </p>
               <div class="w3-bar" >
