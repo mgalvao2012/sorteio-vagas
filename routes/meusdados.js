@@ -5,7 +5,9 @@ const { pool } = require("../config");
 
 router.get("/meusdados", requiresAuth(), (request, response) => {
   // mensagem preenchida quando é realizada a atualização dos dados
-  var mensagem = request.flash("success");
+  // na sequencia é retirada da sessão para evitar apresentá-la sem atualização nos dados
+  var mensagem = request.session.meusdados_mensagem;
+  request.session.meusdados_mensagem = "";
   let user_id = request.oidc.user.sub;
   pool.query(
     `SELECT codigo FROM vagas WHERE disponivel = true ORDER BY codigo;
@@ -157,7 +159,7 @@ router.post("/meusdados", requiresAuth(), (request, response) => {
             });
           } else {
             request.session.unidade_usuario = unidade;
-            request.flash("success", "Dados atualizados com sucesso!");
+            request.session.meusdados_mensagem = "Dados atualizados com sucesso!";
             response.redirect("/meusdados");
           }
         }
