@@ -32,10 +32,10 @@
                     document.getElementById('S2b').addEventListener('click', function() { abreSubsolo('S2') })                      
                   </script>
                 </div> 
-                <div id="S1" class="cards-sorteio subsolo w3-border">  
+                <div id="S1" class="cards-unidades subsolo w3-border">  
                     <% lista_unidades.forEach(function(row) { %>                          
                         <% if (row.unidade.substring(0,2) == 'T1' ) { %>
-                          <div class="card-sorteio">
+                          <div>
                             <span style="font-weight: bold;">
                               <%- row.unidade.substring(2) %>
                             </span>-
@@ -50,6 +50,13 @@
                             <% } else { %>
                               <img id="<%- row.unidade %>-adimplente-icon" src="../images/icon-adimplente-no-ok.png" class="icon-hand-pointer"></img>
                             <% } %>
+                            -
+                            <% if (row.user_id != undefined) { %>
+                              <span id="<%- row.unidade %>-icon" class="fa fa-user icon-color-ok"></span>
+                            <% } else { %>
+                              <span id="<%- row.unidade %>-icon" class="fa fa-user icon-color-no-ok"></span>
+                            <% } %>                            
+                            <input id="<%- row.unidade %>-userid" type="hidden" value="<%- row.user_id %>" />
                           </div>
                         <% } %>
                     <% }) %>
@@ -72,6 +79,13 @@
                           <% } else { %>
                             <img id="<%- row.unidade %>-adimplente-icon" src="../images/icon-adimplente-no-ok.png" class="icon-hand-pointer"></img>
                           <% } %>
+                          -
+                            <% if (row.user_id != undefined) { %>
+                              <span id="<%- row.unidade %>-icon" class="fa fa-user icon-color-ok"></span>
+                            <% } else { %>
+                              <span id="<%- row.unidade %>-icon" class="fa fa-user icon-color-no-ok"></span>
+                            <% } %>                            
+                            <input id="<%- row.unidade %>-userid" type="hidden" value="<%- row.user_id %>" />
                         </div>
                   <% } %>
                   <% }) %>
@@ -93,8 +107,7 @@
         </div>
       </div>
     </div>
-  </div>
-  
+  </div>  
   <!-- Footer -->
   <footer class="w3-center w3-black w3-padding-24">
     <a href="#sorteio" class="w3-button w3-light-grey"><i class="fa fa-arrow-up w3-margin-right"></i>Vai para o início</a>
@@ -102,6 +115,82 @@
   </footer>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="./js/notify.js"></script>  
+  <style>  
+    /* The Modal (background) */
+    .modal {
+      display: none; /* Hidden by default */
+      position: fixed; /* Stay in place */
+      z-index: 1; /* Sit on top */
+      padding-top: 100px; /* Location of the box */
+      left: 0;
+      top: 0;
+      width: 100%; /* Full width */
+      height: 100%; /* Full height */
+      overflow: auto; /* Enable scroll if needed */
+      background-color: rgb(0,0,0); /* Fallback color */
+      background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+  
+    /* Modal Content */
+    .modal-content {
+      background-color: #fefefe;
+      margin: auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+    }
+  
+    /* The Close Button */
+    .close {
+      color: #aaaaaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+  
+    .close:hover,
+    .close:focus {
+      color: #000;
+      text-decoration: none;
+      cursor: pointer;
+    }
+  </style>
+  <!-- The Modal -->
+  <div id="myModal" class="modal">
+    <!-- Modal content -->
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <p id="myModalMensagem"></p>
+      <p>
+        <button id="btnConfirmar" class="w3-button w3-black" type="button">
+            <i class="fa fa-paper-plane"></i> CONFIRMAR
+        </button>
+        <button id="btnCancelar" class="w3-button w3-black" type="button">
+          <i class="fa fa-times-circle"></i> CANCELAR
+        </button>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // Get the modal
+    var modal = document.getElementById("myModal");
+
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+      modal.style.display = "none";
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+  </script>
   <script> 
     var lista_unidades = '<%= lista_unidades %>'
     var lista_ajustada_unidades = '<%= lista_ajustada_unidades %>'.split(',')
@@ -138,10 +227,62 @@
             function() { unidadeClicadaPNE(unidade) })
           document.getElementById(unidade+'-adimplente-icon').addEventListener('click', 
             function() { unidadeClicadaAdimplente(unidade) })
+          document.getElementById(unidade+'-icon').addEventListener('click', 
+            function() { unidadeClicada(unidade) })
         }  
       }
     }
     window.onload = loadFunction();
+
+    function unidadeClicada(valor) {  
+      let user_id = document.getElementById(valor+'-userid').value;
+      if (user_id != '') {
+        document.getElementById('myModal').style.display='block';
+        document.getElementById('btnConfirmar').addEventListener('click',
+          function() { liberarUnidade(valor) });
+        document.getElementById('btnCancelar').addEventListener('click',
+          function() { document.getElementById('myModal').style.display='none' });
+        document.getElementById('myModalMensagem').innerHTML = 
+          'Você tem certeza que deseja cancelar o registro da unidade '+valor+' ? '+
+          'Os grupos de vagas escolhidos serão perdidos!';
+      }
+    }
+
+    function liberarUnidade(valor) {
+      document.getElementById('myModal').style.display='none';
+      $(document).ready(function(){
+        $(document).ajaxError(function(e, xhr, opt) {
+          notify.render({
+            head: 'Atenção!',
+            style: 'error',
+            content: xhr.responseJSON.message
+          })
+        });
+        $.post("/unidades/liberarUnidade",
+          {
+            "unidade": valor
+          },
+          function(data,status){
+            let element = document.getElementById(valor+'-icon');
+            element.classList.remove('icon-color-ok');
+            element.classList.add('icon-color-no-ok');
+            if( data.status == 'success') {
+              notify.render({
+                head: 'Informação',
+                style: 'success',
+                content: 'Unidade '+valor+' foi liberada com sucesso!'
+              });
+            } else {
+              notify.render({
+                head: 'Atenção',
+                style: 'error',
+                content: 'Unidade '+valor+'. Erro: '+data.message
+              });
+            }
+          }
+        );
+      });  
+    }
 
     function unidadeClicadaPNE(valor) {  
       var posicao = lista_pne.indexOf(valor);
@@ -154,7 +295,7 @@
               content: xhr.responseJSON.message
             })
           });
-          $.post("/unidades/atualiza_pne",
+          $.post("/unidades/atualizarPNE",
             {
               "unidade": valor,
               "pne": "false"
@@ -188,7 +329,7 @@
               content: xhr.responseJSON.message
             })
           });
-          $.post("/unidades/atualiza_pne",
+          $.post("/unidades/atualizarPNE",
             {
               "unidade": valor,
               "pne": "true"
@@ -227,7 +368,7 @@
               content: xhr.responseJSON.message
             })
           });
-          $.post("/unidades/atualiza_adimplente",
+          $.post("/unidades/atualizarAdimplente",
             {
               "unidade": valor,
               "adimplente": "false"
@@ -261,7 +402,7 @@
               content: xhr.responseJSON.message
             })
           });
-          $.post("/unidades/atualiza_adimplente",
+          $.post("/unidades/atualizarAdimplente",
             {
               "unidade": valor,
               "adimplente": "true"
@@ -306,6 +447,16 @@
       } else {
         document.getElementById(subsolo).style.display = "block";  
       }   
+    }
+
+    // Get the modal
+    var modal = document.getElementById('id01');
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
     }
   </script>
   <script src="./js/script.js"></script>

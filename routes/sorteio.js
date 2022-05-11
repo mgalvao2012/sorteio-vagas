@@ -74,9 +74,9 @@ router.get("/sorteio", requiresAuth(), (request, response) => {
     var mensagem = request.flash("success");
     let user_id = request.oidc.user.sub;
     pool.query(
-      `SELECT * FROM configuracao;
-                  SELECT unidade, vaga_sorteada, vagas_escolhidas, presente, user_id FROM unidades ORDER BY unidade;
-                  SELECT codigo FROM vagas WHERE disponivel = true;`,
+      "SELECT * FROM configuracao;" +
+        "SELECT unidade, vaga_sorteada, vagas_escolhidas, presente, user_id FROM unidades ORDER BY unidade;" +
+        "SELECT codigo FROM vagas WHERE disponivel = true;",
       (error, results) => {
         if (error) {
           console.log(error.message);
@@ -129,12 +129,10 @@ router.get("/sorteio", requiresAuth(), (request, response) => {
     );
   } else {
     console.log("Você não está autorizado a acessar este recurso!");
-    response
-      .status(403)
-      .json({
-        status: "error",
-        message: "Você não está autorizado a acessar este recurso!",
-      });
+    response.status(403).json({
+      status: "error",
+      message: "Você não está autorizado a acessar este recurso!",
+    });
   }
 });
 
@@ -324,12 +322,10 @@ router.post("/sorteio", (request, response) => {
     );
   } else {
     console.log("Você não está autorizado a acessar este recurso!");
-    response
-      .status(403)
-      .json({
-        status: "error",
-        message: "Você não está autorizado a acessar este recurso!",
-      });
+    response.status(403).json({
+      status: "error",
+      message: "Você não está autorizado a acessar este recurso!",
+    });
   }
 });
 
@@ -348,25 +344,21 @@ router.get("/sorteio/reiniciar", requiresAuth(), (request, response) => {
             request.flash("success", "Sorteio reiniciado com sucesso!");
             response.redirect("/sorteio");
           } else {
-            response
-              .status(500)
-              .json({
-                status: "error",
-                message:
-                  "Falha no processo de reinicio. Procure o administrador.",
-              });
+            response.status(500).json({
+              status: "error",
+              message:
+                "Falha no processo de reinicio. Procure o administrador.",
+            });
           }
         }
       }
     );
   } else {
     console.log("Você não está autorizado a acessar este recurso!");
-    response
-      .status(403)
-      .json({
-        status: "error",
-        message: "Você não está autorizado a acessar este recurso!",
-      });
+    response.status(403).json({
+      status: "error",
+      message: "Você não está autorizado a acessar este recurso!",
+    });
   }
 });
 

@@ -3,43 +3,14 @@ const router = express.Router();
 const { requiresAuth } = require("express-openid-connect");
 const { pool } = require("../config");
 
-router.post(
-  "/unidades/atualiza_presenca",
-  requiresAuth(),
-  (request, response) => {
-    if (request.session.usuario_admin) {
-      const unidade = request.body.unidade;
-      const presente = request.body.presente;
-      const query = `UPDATE unidades SET presente = '${presente}' WHERE unidade = '${unidade}';`;
-      console.log(query);
-      pool.query(query, (error, results) => {
-        if (error) {
-          response.status(500).json({ status: "error", message: error });
-        } else {
-          response.status(200).json({
-            status: "success",
-            message: "registro atualizado com sucesso!",
-          });
-        }
-      });
-    } else {
-      console.log("Você não está autorizado a acessar este recurso!");
-      response.status(403).json({
-        status: "error",
-        message: "Você não está autorizado a acessar este recurso!",
-      });
-    }
-  }
-);
-
 router.get("/unidades", requiresAuth(), (request, response) => {
   // verifica se o usuario já definiu sua unidade para liberar o acesso a outras funcionalidades
   if (request.session.unidade_usuario == undefined) {
     let user_id = request.oidc.user.sub;
     pool.query(
-      `SELECT codigo FROM vagas WHERE disponivel = true ORDER BY codigo;
-       SELECT * FROM unidades WHERE user_id = '${user_id}';
-       SELECT unidade FROM unidades WHERE user_id IS NULL ORDER BY unidade;`,
+      "SELECT codigo FROM vagas WHERE disponivel = true ORDER BY codigo;" +
+        `SELECT * FROM unidades WHERE user_id = '${user_id}';` +
+        "SELECT unidade FROM unidades WHERE user_id IS NULL ORDER BY unidade;",
       (error, results) => {
         if (error) {
           console.log(error.message);
@@ -73,8 +44,8 @@ router.get("/unidades", requiresAuth(), (request, response) => {
   }
   if (request.session.usuario_admin) {
     pool.query(
-      `SELECT * FROM configuracao;
-       SELECT unidade, pne, adimplente FROM unidades ORDER BY unidade;`,
+      "SELECT * FROM configuracao;" +
+        "SELECT unidade, pne, adimplente, user_id FROM unidades ORDER BY unidade;",
       (error, results) => {
         if (error) {
           console.log(error.message);
@@ -132,7 +103,36 @@ router.get("/unidades", requiresAuth(), (request, response) => {
   }
 });
 
-router.post("/unidades/atualiza_pne", requiresAuth(), (request, response) => {
+router.post(
+  "/unidades/atualizarPresenca",
+  requiresAuth(),
+  (request, response) => {
+    if (request.session.usuario_admin) {
+      const unidade = request.body.unidade;
+      const presente = request.body.presente;
+      const query = `UPDATE unidades SET presente = '${presente}' WHERE unidade = '${unidade}';`;
+      console.log(query);
+      pool.query(query, (error, results) => {
+        if (error) {
+          response.status(500).json({ status: "error", message: error });
+        } else {
+          response.status(200).json({
+            status: "success",
+            message: "registro atualizado com sucesso!",
+          });
+        }
+      });
+    } else {
+      console.log("Você não está autorizado a acessar este recurso!");
+      response.status(403).json({
+        status: "error",
+        message: "Você não está autorizado a acessar este recurso!",
+      });
+    }
+  }
+);
+
+router.post("/unidades/atualizarPNE", requiresAuth(), (request, response) => {
   if (request.session.usuario_admin) {
     const unidade = request.body.unidade;
     const pne = request.body.pne;
@@ -158,7 +158,7 @@ router.post("/unidades/atualiza_pne", requiresAuth(), (request, response) => {
 });
 
 router.post(
-  "/unidades/atualiza_adimplente",
+  "/unidades/atualizarAdimplente",
   requiresAuth(),
   (request, response) => {
     if (request.session.usuario_admin) {
@@ -185,5 +185,29 @@ router.post(
     }
   }
 );
+
+router.post("/unidades/liberarUnidade", requiresAuth(), (request, response) => {
+  if (request.session.usuario_admin) {
+    const unidade = request.body.unidade;
+    const query = `UPDATE unidades SET user_id = NULL, vagas_escolhidas = NULL WHERE unidade = '${unidade}';`;
+    console.log(query);
+    pool.query(query, (error, results) => {
+      if (error) {
+        response.status(500).json({ status: "error", message: error });
+      } else {
+        response.status(200).json({
+          status: "success",
+          message: "registro atualizado com sucesso!",
+        });
+      }
+    });
+  } else {
+    console.log("Você não está autorizado a acessar este recurso!");
+    response.status(403).json({
+      status: "error",
+      message: "Você não está autorizado a acessar este recurso!",
+    });
+  }
+});
 
 module.exports = router;

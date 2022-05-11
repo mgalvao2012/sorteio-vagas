@@ -229,7 +229,7 @@
               content: xhr.responseJSON.message
             })
           });
-          $.post("/unidades/atualiza_presenca",
+          $.post("/unidades/atualizarPresenca",
             {
               "unidade": valor,
               "presente": "false"
@@ -269,7 +269,7 @@
                 content: xhr.responseJSON.message
               })
             });
-            $.post("/unidades/atualiza_presenca",
+            $.post("/unidades/atualizarPresenca",
               {
                 "unidade": valor,
                 "presente": "true"
