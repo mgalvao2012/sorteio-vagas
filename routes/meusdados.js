@@ -8,8 +8,8 @@ const getMeusdados = (request, response) => {
   return new Promise((resolve, reject) => {
     // mensagem preenchida quando é realizada a atualização dos dados
     // na sequencia é retirada da sessão para evitar apresentá-la sem atualização nos dados
-    var mensagem = request.session.meusdados_mensagem;
-    request.session.meusdados_mensagem = "";
+    var mensagem = request.session.meusdadosMensagem;
+    request.session.meusdadosMensagem = "";
     let user_id = request.oidc.user.sub;
     pool.query(
       `SELECT codigo FROM vagas WHERE disponivel = true ORDER BY codigo;
@@ -179,7 +179,7 @@ router.post(
                 });
               } else {
                 request.session.unidade_usuario = unidade;
-                request.session.meusdados_mensagem =
+                request.session.meusdadosMensagem =
                   "Dados atualizados com sucesso!";
                 getMeusdados(request, response);
               }

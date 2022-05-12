@@ -71,7 +71,7 @@ const sorteia_vagas = (objetivo, vagas_disponiveis, query) => {
 router.get("/sorteio", requiresAuth(), (request, response) => {
   if (request.session.usuario_admin) {
     // mensagem preenchida quando é realizada o sorteio
-    var mensagem = request.flash("success");
+    var mensagem = request.session.sorteioMensagem;
     let user_id = request.oidc.user.sub;
     pool.query(
       "SELECT * FROM configuracao;" +
@@ -281,7 +281,7 @@ router.post("/sorteio", (request, response) => {
                                   // response.status(500).json({ status: 'warning', message: error.message })
                                 } else {
                                   // response.status(200).json({ status: 'success', message: mensagem })
-                                  request.flash("success", mensagem);
+                                  request.session.sorteioMensagem = mensagem;
                                   response.redirect("/sorteio");
                                 }
                               });
@@ -333,7 +333,7 @@ router.get("/sorteio/reiniciar", requiresAuth(), (request, response) => {
   if (request.session.usuario_admin) {
     pool.query(
       `UPDATE unidades SET vaga_sorteada = null;
-                  UPDATE configuracao SET resultado_sorteio = 'Sorteio não realizado' RETURNING *;`,
+       UPDATE configuracao SET resultado_sorteio = 'Sorteio não realizado' RETURNING *;`,
       (error, results) => {
         if (error) {
           console.log(error.message);
@@ -341,7 +341,7 @@ router.get("/sorteio/reiniciar", requiresAuth(), (request, response) => {
         } else {
           if (results[1].rows[0].resultado_sorteio == "Sorteio não realizado") {
             console.log("Sorteio reiniciado com sucesso!");
-            request.flash("success", "Sorteio reiniciado com sucesso!");
+            request.session.sorteioMensagem = "Sorteio reiniciado com sucesso!";
             response.redirect("/sorteio");
           } else {
             response.status(500).json({
