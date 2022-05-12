@@ -1,4 +1,5 @@
 const express = require("express");
+const { check, validationResult } = require("express-validator");
 const router = express.Router();
 const { requiresAuth } = require("express-openid-connect");
 const { pool } = require("../config");
@@ -43,12 +44,10 @@ router.get("/vagas", requiresAuth(), (request, response) => {
       }
     );
   }
-  // verifica se a unidade foi prenchida pela leitura no banco de dados no passo anterior
-  var mensagem = request.flash("success");
   let user_id = request.oidc.user.sub;
   pool.query(
     `SELECT * FROM configuracao;
-                SELECT codigo, disponivel FROM vagas ORDER BY codigo;`,
+     SELECT codigo, disponivel FROM vagas ORDER BY codigo;`,
     (error, results) => {
       if (error) {
         console.log(error.message);
@@ -99,29 +98,43 @@ router.get("/vagas", requiresAuth(), (request, response) => {
 
 router.post(
   "/vagas/atualiza_disponibilidade",
+  [
+    check("codigo")
+      .isLength({ min: 5, max: 5 })
+      .withMessage("O parâmetro código não está corretamente preenchido (tamanho)")      
+      .matches(/S[1|2]G[0-9][0-9]/)
+      .withMessage("O parâmetro código não está corretamente preenchido (formato)")      
+      .trim()
+  ],
   requiresAuth(),
   (request, response) => {
-    if (request.session.usuario_admin) {
-      const codigo = request.body.codigo;
-      const disponivel = request.body.disponivel;
-      const query = `UPDATE vagas SET disponivel = '${disponivel}' WHERE codigo = '${codigo}';`;
-      console.log(query);
-      pool.query(query, (error, results) => {
-        if (error) {
-          response.status(500).json({ status: "error", message: error });
-        } else {
-          response.status(200).json({
-            status: "success",
-            message: "registro atualizado com sucesso!",
-          });
-        }
-      });
+    const error = validationResult(request).formatWith(({ msg }) => msg);
+    const hasError = !error.isEmpty();
+    if (hasError) {
+      response.status(422).json({ error: error.array() });
     } else {
-      console.log("Você não está autorizado a acessar este recurso!");
-      response.status(403).json({
-        status: "error",
-        message: "Você não está autorizado a acessar este recurso!",
-      });
+      if (request.session.usuario_admin) {
+        const codigo = request.body.codigo;
+        const disponivel = request.body.disponivel;
+        const query = `UPDATE vagas SET disponivel = '${disponivel}' WHERE codigo = '${codigo}';`;
+        console.log(query);
+        pool.query(query, (error, results) => {
+          if (error) {
+            response.status(500).json({ status: "error", message: error });
+          } else {
+            response.status(200).json({
+              status: "success",
+              message: "registro atualizado com sucesso!",
+            });
+          }
+        });
+      } else {
+        console.log("Você não está autorizado a acessar este recurso!");
+        response.status(403).json({
+          status: "error",
+          message: "Você não está autorizado a acessar este recurso!",
+        });
+      }
     }
   }
 );
