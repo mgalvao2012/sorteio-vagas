@@ -1,18 +1,13 @@
 require("dotenv").config();
 const development_env = process.env.ENV == "development" ? true : false;
 const express = require("express");
-// const request = require('request-promise-native');
-// const bcrypt = require('bcrypt')
-// const cors = require('cors')
 const fs = require("fs");
-//var authRouter = require('./routes/auth');
 
 const helmet = require("helmet");
 const compression = require("compression");
 const rateLimit = require("express-rate-limit");
 // const { body, check } = require('express-validator')
 const { pool } = require("./config");
-// const { query_timeout } = require('pg/lib/defaults')
 
 const app = express();
 var bodyParser = require("body-parser");
@@ -36,7 +31,6 @@ app.use(
 );
 
 const passport = require("passport");
-const flash = require("connect-flash");
 const session = require("express-session");
 const methodOverride = require("method-override");
 const { auth } = require("express-openid-connect");
@@ -67,9 +61,7 @@ initializePassport(
 const users = [];
 const usuarios_admin = process.env.USUARIOS_ADMIN;
 
-app.use(flash());
-
-// Redis
+// Redis configuration
 const { v4: uuidv4 } = require("uuid");
 // uuidv4(); // ⇨ '1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed'
 const redis = require("redis");
@@ -136,6 +128,7 @@ app.use(limiter, (request, response, next) => {
     }
   }
   if (request.oidc.user != null) {
+    console.log('request.oidc.user.user_metadata '+request.oidc.user.user_metadata);
     request.session.usuario_admin = usuarios_admin.includes(
       request.oidc.user.email
     );
@@ -241,7 +234,7 @@ app.get("/", async (request, response) => {
     });
   }
 });
-// app.use('/', authRouter);
+//app.use('/', authRouter);
 
 const unidadesRoutes = require("./routes/unidades");
 const vagasRoutes = require("./routes/vagas");
