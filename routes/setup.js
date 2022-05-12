@@ -1,4 +1,5 @@
 const express = require("express");
+const { check, validationResult } = require("express-validator");
 const router = express.Router();
 const { requiresAuth } = require("express-openid-connect");
 const { pool } = require("../config");
@@ -64,64 +65,79 @@ router.get("/setup/gerarToken", requiresAuth(), (request, response) => {
   }
 });
 
-router.post("/setup", requiresAuth(), (request, response) => {
-  if (request.session.usuario_admin == true) {
-    var chave = request.body.chave;
-    var tokenValidates = speakeasy.totp.verify({
-      secret: secretTOTP.base32,
-      encoding: "base32",
-      token: chave,
-      step: 60,
-      window: 3,
-    });
-    if (tokenValidates) {
-      fs.readFile("init.sql", "utf8", function (error, data) {
-        if (error) {
-          response
-            .status(500)
-            .json({ status: "error", message: error.message });
-        } else {
-          const query = data;
-          pool.query(query, (error, results) => {
+router.post("/setup", 
+  [
+    check("chave")
+      .isLength({ min: 6, max: 6 })
+      .withMessage("O parâmetro chave não está corretamente preenchido (tamanho)")      
+      .matches(/\d{6}/)
+      .withMessage("O parâmetro unidade não está corretamente preenchido (formato)")      
+      .trim()
+  ],
+  requiresAuth(), (request, response) => {
+    const error = validationResult(request).formatWith(({ msg }) => msg);
+    const hasError = !error.isEmpty();
+    if (hasError) {
+      response.status(422).json({ error: error.array() });
+    } else {
+      if (request.session.usuario_admin == true) {
+        var chave = request.body.chave;
+        var tokenValidates = speakeasy.totp.verify({
+          secret: secretTOTP.base32,
+          encoding: "base32",
+          token: chave,
+          step: 60,
+          window: 3,
+        });
+        if (tokenValidates) {
+          fs.readFile("init.sql", "utf8", function (error, data) {
             if (error) {
               response
                 .status(500)
                 .json({ status: "error", message: error.message });
             } else {
-              console.log("Setup finalizado com sucesso!");
-              response.render("setup.ejs", {
-                email: request.oidc.user.email,
-                name: request.oidc.user.name,
-                usuario_admin: request.session.usuario_admin,
-                mensagem: [
-                  "success",
-                  "Sucesso!",
-                  "Setup finalizado com sucesso!",
-                ],
+              const query = data;
+              pool.query(query, (error, results) => {
+                if (error) {
+                  response
+                    .status(500)
+                    .json({ status: "error", message: error.message });
+                } else {
+                  console.log("Setup finalizado com sucesso!");
+                  response.render("setup.ejs", {
+                    email: request.oidc.user.email,
+                    name: request.oidc.user.name,
+                    usuario_admin: request.session.usuario_admin,
+                    mensagem: [
+                      "success",
+                      "Sucesso!",
+                      "Setup finalizado com sucesso!",
+                    ],
+                  });
+                }
               });
             }
           });
+        } else {
+          response.render("setup.ejs", {
+            email: request.oidc.user.email,
+            name: request.oidc.user.name,
+            usuario_admin: request.session.usuario_admin,
+            mensagem: [
+              "warning",
+              "Atenção",
+              "A chave informada não é válida ou está expirada!",
+            ],
+          });
         }
-      });
-    } else {
-      response.render("setup.ejs", {
-        email: request.oidc.user.email,
-        name: request.oidc.user.name,
-        usuario_admin: request.session.usuario_admin,
-        mensagem: [
-          "warning",
-          "Atenção",
-          "A chave informada não é válida ou está expirada!",
-        ],
-      });
+      } else {
+        console.log("Você não está autorizado a acessar este recurso!");
+        response.status(403).json({
+          status: "error",
+          message: "Você não está autorizado a acessar este recurso!",
+        });
+      }
     }
-  } else {
-    console.log("Você não está autorizado a acessar este recurso!");
-    response.status(403).json({
-      status: "error",
-      message: "Você não está autorizado a acessar este recurso!",
-    });
-  }
 });
 
 module.exports = router;

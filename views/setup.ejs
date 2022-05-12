@@ -24,7 +24,7 @@
           <form action="/setup" method="POST">
             <p>
               <label class="w3-label">Clique no botão [GERAR CÓDIGO] para receber um código no seu email. Digite o código enviado para confirmar a operação.</label>
-              <input class="w3-input w3-border" type="text" required name="chave">
+              <input class="w3-input w3-border" type="text" required name="chave" pattern="[0-9]{6}" maxlength="6" title="O código é composto de por 6 dígitos numéricos!">
             </p>
             <p>
               <button id="btnReiniciar" class="w3-button w3-black" type="submit">

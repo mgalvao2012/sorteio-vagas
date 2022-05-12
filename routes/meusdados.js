@@ -73,9 +73,11 @@ router.post(
   "/meusdados",
   [
     check("unidade")
+      .isLength({ min: 5, max: 5 })
+      .withMessage("O parâmetro unidade não está corretamente preenchido (tamanho)")      
       .matches(/T[1|2][0-2][0-9][1-4]/)
-      .withMessage("O parâmetro unidade não está corretamente preenchido")      
-      .trim(),
+      .withMessage("O parâmetro unidade não está corretamente preenchido (formato)")      
+      .trim()
   ],
   requiresAuth(),
   (request, response) => {
