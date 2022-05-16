@@ -4,7 +4,7 @@ const { requiresAuth } = require("express-openid-connect");
 const { pool } = require("../config");
 const util = require("../util");
 
-const sorteia_vagas = (objetivo, vagas_disponiveis, query) => {
+const sorteiaVagas = (objetivo, vagas_disponiveis, query) => {
   return new Promise((resolve, reject) => {
     var unidades_e_vagas_sorteadas = [];
     pool.query(query, (error, results) => {
@@ -68,76 +68,83 @@ const sorteia_vagas = (objetivo, vagas_disponiveis, query) => {
   });
 };
 
-router.get("/sorteio", requiresAuth(), (request, response) => {
-  if (request.session.usuario_admin) {
-    // mensagem preenchida quando é realizada o sorteio
-    var mensagem = request.session.sorteioMensagem;
-    request.session.sorteioMensagem = '';
-    let user_id = request.oidc.user.sub;
-    pool.query(
-      "SELECT * FROM configuracao;" +
-        "SELECT unidade, vaga_sorteada, vagas_escolhidas, presente, user_id FROM unidades ORDER BY unidade;" +
-        "SELECT codigo FROM vagas WHERE disponivel = true;",
-      (error, results) => {
-        if (error) {
-          console.log(error.message);
-        } else {
-          if (results[0].rows[0] == undefined) {
-            response.render("sorteio.ejs", {
-              email: request.oidc.user.email,
-              name: request.oidc.user.name,
-              ultimo_sorteio: null,
-              resultado_sorteio: null,
-              lista_vagas_sorteadas: null,
-              lista_presenca: null,
-              mensagem: null,
-              usuario_admin: request.session.usuario_admin,
-            });
+const getSorteio = (request, response) => {
+  return new Promise((resolve, reject) => {
+    if (request.session.usuario_admin) {
+      // mensagem preenchida quando é realizada o sorteio
+      var mensagem = request.session.sorteioMensagem;
+      request.session.sorteioMensagem = '';
+      let user_id = request.oidc.user.sub;
+      pool.query(
+        "SELECT * FROM configuracao;" +
+          "SELECT unidade, vaga_sorteada, vagas_escolhidas, presente, user_id FROM unidades ORDER BY unidade;" +
+          "SELECT codigo FROM vagas WHERE disponivel = true;",
+        (error, results) => {
+          if (error) {
+            console.log(error.message);
           } else {
-            let ultimo_sorteio = util.formatDate(
-              results[0].rows[0].ultimo_sorteio,
-              1
-            );
-            let lista_presenca = []; // lista criada para facilitar o tratamento de presenca
-            results[1].rows.forEach((row) => {
-              lista_presenca.push(row.unidade + "-" + row.presente.toString());
-            });
-            let estilo, titulo;
-            if (
-              results[2].rows.length != results[1].rows.length &&
-              mensagem.length == 0
-            ) {
-              mensagem = `A quantidade de vagas (${results[2].rows.length}) é insuficiente para atender todas as unidades (${results[1].rows.length}).`;
-              estilo = "warning";
-              titulo = "Atenção!";
+            if (results[0].rows[0] == undefined) {
+              response.render("sorteio.ejs", {
+                email: request.oidc.user.email,
+                name: request.oidc.user.name,
+                ultimo_sorteio: null,
+                resultado_sorteio: null,
+                lista_vagas_sorteadas: null,
+                lista_presenca: null,
+                mensagem: null,
+                usuario_admin: request.session.usuario_admin,
+              });
             } else {
-              estilo = "info";
-              titulo = "Informação!";
+              let ultimo_sorteio = util.formatDate(
+                results[0].rows[0].ultimo_sorteio,
+                1
+              );
+              let lista_presenca = []; // lista criada para facilitar o tratamento de presenca
+              results[1].rows.forEach((row) => {
+                lista_presenca.push(row.unidade + "-" + row.presente.toString());
+              });
+              let estilo, titulo;
+              if (
+                results[2].rows.length != results[1].rows.length &&
+                mensagem.length == 0
+              ) {
+                mensagem = `A quantidade de vagas (${results[2].rows.length}) é insuficiente para atender todas as unidades (${results[1].rows.length}).`;
+                estilo = "warning";
+                titulo = "Atenção!";
+              } else {
+                estilo = "info";
+                titulo = "Informação!";
+              }
+              response.render("sorteio.ejs", {
+                email: request.oidc.user.email,
+                name: request.oidc.user.name,
+                ultimo_sorteio: ultimo_sorteio,
+                resultado_sorteio: results[0].rows[0].resultado_sorteio,
+                lista_vagas_sorteadas: results[1].rows,
+                lista_presenca: lista_presenca,
+                mensagem: [estilo, titulo, mensagem],
+                usuario_admin: request.session.usuario_admin,
+              });
             }
-            response.render("sorteio.ejs", {
-              email: request.oidc.user.email,
-              name: request.oidc.user.name,
-              ultimo_sorteio: ultimo_sorteio,
-              resultado_sorteio: results[0].rows[0].resultado_sorteio,
-              lista_vagas_sorteadas: results[1].rows,
-              lista_presenca: lista_presenca,
-              mensagem: [estilo, titulo, mensagem],
-              usuario_admin: request.session.usuario_admin,
-            });
           }
         }
-      }
-    );
-  } else {
-    console.log("Você não está autorizado a acessar este recurso!");
-    response.status(403).json({
-      status: "error",
-      message: "Você não está autorizado a acessar este recurso!",
-    });
-  }
+      );
+    } else {
+      console.log("Você não está autorizado a acessar este recurso!");
+      response.status(403).json({
+        status: "error",
+        message: "Você não está autorizado a acessar este recurso!",
+      });
+    }
+    resolve();
+  });
+};
+
+router.get("/sorteio", requiresAuth(), (request, response) => {
+  getSorteio(request, response);
 });
 
-router.post("/sorteio", (request, response) => {
+router.post("/sorteio", requiresAuth(), (request, response) => {
   if (request.session.usuario_admin) {
     pool.query(
       "SELECT codigo FROM vagas WHERE disponivel = true;",
@@ -166,7 +173,7 @@ router.post("/sorteio", (request, response) => {
             var unidades_e_vagas_sorteadas = [];
             var query_gravacao = "";
 
-            sorteia_vagas(
+            sorteiaVagas(
               "sorteio de unidades COM portadores de necessidade especiais",
               vagas_disponiveis,
               `SELECT unidade, vaga_sorteada, vagas_escolhidas FROM unidades 
@@ -184,7 +191,7 @@ router.post("/sorteio", (request, response) => {
                 });
                 //console.log('terminou sorteio de unidades COM portadores de necessidade especiais')
 
-                sorteia_vagas(
+                sorteiaVagas(
                   "sorteio de unidades SEM portadores de necessidade especiais, PRESENTES e  ADIMPLENTES",
                   vagas_disponiveis,
                   `SELECT unidade, vaga_sorteada, vagas_escolhidas FROM unidades 
@@ -200,7 +207,7 @@ router.post("/sorteio", (request, response) => {
                       }
                     });
 
-                    sorteia_vagas(
+                    sorteiaVagas(
                       "sorteio de unidades SEM portadores de necessidade especiais, PRESENTES e INADIMPLENTES",
                       vagas_disponiveis,
                       `SELECT unidade, vaga_sorteada, vagas_escolhidas FROM unidades 
@@ -216,7 +223,7 @@ router.post("/sorteio", (request, response) => {
                           }
                         });
 
-                        sorteia_vagas(
+                        sorteiaVagas(
                           "sorteio de unidades SEM portadores de necessidade especiais e AUSENTES",
                           vagas_disponiveis,
                           `SELECT unidade, vaga_sorteada, vagas_escolhidas FROM unidades 
@@ -283,7 +290,8 @@ router.post("/sorteio", (request, response) => {
                                 } else {
                                   // response.status(200).json({ status: 'success', message: mensagem })
                                   request.session.sorteioMensagem = mensagem;
-                                  response.redirect("/sorteio");
+                                  // response.redirect("/sorteio");
+                                  getSorteio(request, response);
                                 }
                               });
                             }
@@ -330,7 +338,7 @@ router.post("/sorteio", (request, response) => {
   }
 });
 
-router.get("/sorteio/reiniciar", requiresAuth(), (request, response) => {
+router.post("/sorteio/reiniciar", requiresAuth(), (request, response) => {
   if (request.session.usuario_admin) {
     pool.query(
       `UPDATE unidades SET vaga_sorteada = null;
@@ -343,7 +351,8 @@ router.get("/sorteio/reiniciar", requiresAuth(), (request, response) => {
           if (results[1].rows[0].resultado_sorteio == "Sorteio não realizado") {
             console.log("Sorteio reiniciado com sucesso!");
             request.session.sorteioMensagem = "Sorteio reiniciado com sucesso!";
-            response.redirect("/sorteio");
+            // response.redirect("/sorteio");
+            getSorteio(request, response);
           } else {
             response.status(500).json({
               status: "error",
