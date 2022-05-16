@@ -72,6 +72,7 @@ router.get("/sorteio", requiresAuth(), (request, response) => {
   if (request.session.usuario_admin) {
     // mensagem preenchida quando é realizada o sorteio
     var mensagem = request.session.sorteioMensagem;
+    request.session.sorteioMensagem = '';
     let user_id = request.oidc.user.sub;
     pool.query(
       "SELECT * FROM configuracao;" +
