@@ -1,5 +1,5 @@
 ### local - /
-GET http://localhost:3000/ HTTP/1.1
+GET https://localhost:3000/ HTTP/1.1
 
 ### local - /setup
 GET http://localhost:3002/setup HTTP/1.1
