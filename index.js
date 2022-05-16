@@ -27,7 +27,16 @@ app.use(
       "script-src": ["https:", "'unsafe-inline'"],
       "font-src": ["https:", "'unsafe-inline'"],
     },
-  })
+  }),
+  helmet.hsts({
+    maxAge: 15552000,
+    includeSubDomains: false,
+  }),
+  helmet.noSniff(),
+  helmet.frameguard({
+    action: "deny",
+  }),
+  helmet.xssFilter()
 );
 
 const passport = require("passport");
