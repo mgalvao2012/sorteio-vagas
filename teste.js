@@ -20,7 +20,7 @@ async function teste(x) {
             console.log(x)
             resolve(x)
         });
-        return x 
+        return x;
     } catch (err) {
         console.log(err)
     }
