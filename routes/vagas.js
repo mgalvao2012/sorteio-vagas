@@ -5,95 +5,61 @@ const { requiresAuth } = require("express-openid-connect");
 const { pool } = require("../config");
 const util = require("../util");
 
-router.get("/vagas", requiresAuth(), (request, response) => {
-  // verifica se o usuario já definiu sua unidade para liberar o acesso a outras funcionalidades
-  if (request.session.unidade_usuario == undefined) {
-    let user_id = request.oidc.user.sub;
-    pool.query(
-      `SELECT codigo FROM vagas WHERE disponivel = true ORDER BY codigo;
-       SELECT * FROM unidades WHERE user_id = '${user_id}';
-       SELECT unidade FROM unidades WHERE user_id IS NULL ORDER BY unidade;`,
-      (error, results) => {
-        if (error) {
-          console.log(error.message);
-        } else {
-          if (
-            results[1].rows[0] == undefined ||
-            results[1].rows[0].unidade == null
-          ) {
-            response.render("meusdados.ejs", {
-              user_id: user_id,
-              email: request.oidc.user.email,
-              name: request.oidc.user.name,
-              unidade: null,
-              vagas_escolhidas: null,
-              mensagem: [
-                "warning",
-                "Atenção!",
-                "Você precisa definir a sua unidade para ter acesso a outras funcionalidades!",
-              ],
-              lista_vagas: results[0].rows,
-              lista_unidades: results[2].rows,
-              vaga_sorteada: null,
-              usuario_admin: request.session.usuario_admin,
-            });
-          } else {
-            request.session.unidade_usuario = results[1].rows[0].unidade;
+router.get( "/vagas", requiresAuth(), async (request, response) => {
+  util.usuarioDefiniuUnidade(request, response)
+    .then((retorno) => {
+      if (retorno == 'OK') {
+        pool.query(
+          `SELECT * FROM configuracao;
+          SELECT codigo, disponivel FROM vagas ORDER BY codigo;`,
+          (error, results) => {
+            if (error) {
+              console.log(error.message);
+            } else {
+              if (results[0].rows[0] == undefined) {
+                response.render("vagas.ejs", {
+                  email: request.oidc.user.email,
+                  name: request.oidc.user.name,
+                  ultimo_sorteio: null,
+                  resultado_sorteio: null,
+                  lista_vagas: null,
+                  lista_ajustada_vagas: null,
+                  mensagem: null,
+                  usuario_admin: request.session.usuario_admin,
+                });
+              } else {
+                let ultimo_sorteio = util.formatDate(
+                  results[0].rows[0].ultimo_sorteio,
+                  1
+                );
+                var mensagem;
+                if (results[0].rows[0].resultado_sorteio != "Sorteio não realizado") {
+                  ultimo_sorteio = util.formatDate(
+                    results[0].rows[0].ultimo_sorteio,
+                    1
+                  );
+                  mensagem = `As condições não podem ser alteradas porque o sorteio foi realizado em ${ultimo_sorteio}. É preciso reiniciar o processo!`;
+                }
+                let lista_vagas = []; // lista criada para facilitar o tratamento da vaga
+                results[1].rows.forEach((row) => {
+                  lista_vagas.push(row.codigo + "-" + row.disponivel.toString());
+                });
+                response.render("vagas.ejs", {
+                  email: request.oidc.user.email,
+                  name: request.oidc.user.name,
+                  ultimo_sorteio: ultimo_sorteio,
+                  resultado_sorteio: results[0].rows[0].resultado_sorteio,
+                  lista_vagas: results[1].rows,
+                  lista_ajustada_vagas: lista_vagas,
+                  mensagem: ["warning", "Atenção!", mensagem],
+                  usuario_admin: request.session.usuario_admin,
+                });
+              }
+            }
           }
-        }
+        );    
       }
-    );
-  }
-  let user_id = request.oidc.user.sub;
-  pool.query(
-    `SELECT * FROM configuracao;
-     SELECT codigo, disponivel FROM vagas ORDER BY codigo;`,
-    (error, results) => {
-      if (error) {
-        console.log(error.message);
-      } else {
-        if (results[0].rows[0] == undefined) {
-          response.render("vagas.ejs", {
-            email: request.oidc.user.email,
-            name: request.oidc.user.name,
-            ultimo_sorteio: null,
-            resultado_sorteio: null,
-            lista_vagas: null,
-            lista_ajustada_vagas: null,
-            mensagem: null,
-            usuario_admin: request.session.usuario_admin,
-          });
-        } else {
-          let ultimo_sorteio = util.formatDate(
-            results[0].rows[0].ultimo_sorteio,
-            1
-          );
-          var mensagem;
-          if (results[0].rows[0].resultado_sorteio != "Sorteio não realizado") {
-            let ultimo_sorteio = util.formatDate(
-              results[0].rows[0].ultimo_sorteio,
-              1
-            );
-            mensagem = `As condições não podem ser alteradas porque o sorteio foi realizado em ${ultimo_sorteio}. É preciso reiniciar o processo!`;
-          }
-          let lista_vagas = []; // lista criada para facilitar o tratamento da vaga
-          results[1].rows.forEach((row) => {
-            lista_vagas.push(row.codigo + "-" + row.disponivel.toString());
-          });
-          response.render("vagas.ejs", {
-            email: request.oidc.user.email,
-            name: request.oidc.user.name,
-            ultimo_sorteio: ultimo_sorteio,
-            resultado_sorteio: results[0].rows[0].resultado_sorteio,
-            lista_vagas: results[1].rows,
-            lista_ajustada_vagas: lista_vagas,
-            mensagem: ["warning", "Atenção!", mensagem],
-            usuario_admin: request.session.usuario_admin,
-          });
-        }
-      }
-    }
-  );
+    })
 });
 
 router.post(
@@ -102,24 +68,28 @@ router.post(
     check("codigo")
       .isLength({ min: 5, max: 5 })
       .withMessage("O parâmetro código não está corretamente preenchido (tamanho)")      
-      .matches(/S[1|2]G[0-9][0-9]/)
+      .matches(/S[1|2]G\d{2}/)
       .withMessage("O parâmetro código não está corretamente preenchido (formato)")      
+      .trim(),
+    check("disponivel")
+      .matches(/true|false/)
+      .withMessage("O parâmetro disponível não está corretamente preenchido (formato)")      
       .trim()
   ],
   requiresAuth(),
   (request, response) => {
-    const error = validationResult(request).formatWith(({ msg }) => msg);
-    const hasError = !error.isEmpty();
+    const _error = validationResult(request).formatWith(({ msg }) => msg);
+    const hasError = !_error.isEmpty();
     if (hasError) {
-      response.status(422).json({ error: error.array() });
+      response.status(422).json({ error: _error.array() });
     } else {
       if (request.session.usuario_admin) {
         const codigo = request.body.codigo;
         const disponivel = request.body.disponivel;
-        const query = `UPDATE vagas SET disponivel = '${disponivel}' WHERE codigo = '${codigo}';`;
-        console.log(query);
-        pool.query(query, (error, results) => {
+        pool.query('UPDATE vagas SET disponivel = $1 WHERE codigo = $2;', 
+          [disponivel, codigo], function(error, _results) {
           if (error) {
+            console.log(error);
             response.status(500).json({ status: "error", message: error });
           } else {
             response.status(200).json({
