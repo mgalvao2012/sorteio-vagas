@@ -1,3 +1,5 @@
+const { pool } = require("./config");
+
 module.exports.enviarEmail = function (email, subject, content) {
   const sgMail = require("@sendgrid/mail");
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
