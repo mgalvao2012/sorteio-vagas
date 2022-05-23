@@ -108,9 +108,9 @@ module.exports.usuarioDefiniuUnidade = async function(request, response) {
                 usuario_admin: request.session.usuario_admin,
               });
               resolve('meusdados');
-              return('meusdados');
             } else {
               request.session.unidade_usuario = results[1].rows[0].unidade;
+              resolve('OK');
             }
           }
         }
