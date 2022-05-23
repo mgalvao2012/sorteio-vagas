@@ -233,7 +233,7 @@ router.post(
           "UPDATE unidades SET adimplente = $1 WHERE unidade = $2;",
           [adimplente, unidade],
           (_error, _results) => {
-            if (error) {
+            if (_error) {
               response.status(500).json({ status: "error", message: _error });
             } else {
               response.status(200).json({
