@@ -112,9 +112,9 @@ router.post(
         pool.query(
           "UPDATE unidades SET presente = $1 WHERE unidade = $2;",
           [presente, unidade],
-          (error, results) => {
-            if (error) {
-              response.status(500).json({ status: "error", message: error });
+          (_error, _results) => {
+            if (_error) {
+              response.status(500).json({ status: "error", message: _error });
             } else {
               response.status(200).json({
                 status: "success",
@@ -172,9 +172,9 @@ router.post(
         pool.query(
           "UPDATE unidades SET pne = $1 WHERE unidade = $2;",
           [pne, unidade],
-          (error, results) => {
-            if (error) {
-              response.status(500).json({ status: "error", message: error });
+          (_error, _results) => {
+            if (_error) {
+              response.status(500).json({ status: "error", message: _error });
             } else {
               response.status(200).json({
                 status: "success",
@@ -232,9 +232,9 @@ router.post(
         pool.query(
           "UPDATE unidades SET adimplente = $1 WHERE unidade = $2;",
           [adimplente, unidade],
-          (error, results) => {
+          (_error, _results) => {
             if (error) {
-              response.status(500).json({ status: "error", message: error });
+              response.status(500).json({ status: "error", message: _error });
             } else {
               response.status(200).json({
                 status: "success",
@@ -283,9 +283,9 @@ router.post(
         pool.query(
           "UPDATE unidades SET user_id = NULL, vagas_escolhidas = NULL WHERE unidade = $1;",
           [unidade],
-          (error, results) => {
-            if (error) {
-              response.status(500).json({ status: "error", message: error });
+          (_error, _results) => {
+            if (_error) {
+              response.status(500).json({ status: "error", message: _error });
             } else {
               response.status(200).json({
                 status: "success",
