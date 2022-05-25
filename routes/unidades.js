@@ -16,48 +16,36 @@ router.get("/unidades", requiresAuth(), (request, response) => {
             if (error) {
               console.log(error.message);
             } else {
-              if (results[0].rows[0] == undefined) {
-                response.render("unidades.ejs", {
-                  email: request.oidc.user.email,
-                  name: request.oidc.user.name,
-                  lista_unidades: null,
-                  lista_ajustada_unidades: null,
-                  resultado_sorteio: null,
-                  mensagem: null,
-                  usuario_admin: request.session.usuario_admin,
-                });
-              } else {
-                var mensagem;
-                if (
-                  results[0].rows[0].resultado_sorteio !=
-                  "Sorteio não realizado"
-                ) {
-                  let ultimo_sorteio = util.formatDate(
-                    results[0].rows[0].ultimo_sorteio,
-                    1
-                  );
-                  mensagem = `As condições não podem ser alteradas porque o sorteio foi realizado em ${ultimo_sorteio}. É preciso reiniciar o processo!`;
-                }
-                let lista_unidades = []; // lista criada para facilitar o tratamento de presenca
-                results[1].rows.forEach((row) => {
-                  lista_unidades.push(
-                    row.unidade +
-                      "-" +
-                      row.pne.toString() +
-                      "-" +
-                      row.adimplente.toString()
-                  );
-                });
-                response.render("unidades.ejs", {
-                  email: request.oidc.user.email,
-                  name: request.oidc.user.name,
-                  lista_unidades: results[1].rows,
-                  lista_ajustada_unidades: lista_unidades,
-                  resultado_sorteio: results[0].rows[0].resultado_sorteio,
-                  mensagem: mensagem,
-                  usuario_admin: request.session.usuario_admin,
-                });
+              var mensagem;
+              if (
+                results[0].rows[0].resultado_sorteio !=
+                "Sorteio não realizado"
+              ) {
+                let ultimo_sorteio = util.formatDate(
+                  results[0].rows[0].ultimo_sorteio,
+                  1
+                );
+                mensagem = `As condições não podem ser alteradas porque o sorteio foi realizado em ${ultimo_sorteio}. É preciso reiniciar o processo!`;
               }
+              let lista_unidades = []; // lista criada para facilitar o tratamento de presenca
+              results[1].rows.forEach((row) => {
+                lista_unidades.push(
+                  row.unidade +
+                    "-" +
+                    row.pne.toString() +
+                    "-" +
+                    row.adimplente.toString()
+                );
+              });
+              response.render("unidades.ejs", {
+                email: request.oidc.user.email,
+                name: request.oidc.user.name,
+                lista_unidades: results[1].rows,
+                lista_ajustada_unidades: lista_unidades,
+                resultado_sorteio: results[0].rows[0].resultado_sorteio,
+                mensagem: mensagem,
+                usuario_admin: request.session.usuario_admin,
+              });
             }
           }
         );
