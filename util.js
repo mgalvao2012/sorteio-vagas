@@ -75,7 +75,7 @@ module.exports.formatDate = function(date, format) {
 }
 
 module.exports.usuarioDefiniuUnidade = async function(request, response) {
-  return(await new Promise((resolve, _reject) => {
+  return(new Promise((resolve, _reject) => {
     // verifica se o usuario já definiu sua unidade para liberar o acesso a outras funcionalidades
     if (request.session.unidade_usuario == undefined) {
       const user_id = request.oidc.user.sub;
