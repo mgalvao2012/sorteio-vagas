@@ -78,7 +78,7 @@ module.exports.usuarioDefiniuUnidade = async function(request, response) {
   const retorno = await new Promise((resolve, _reject) => {
     // verifica se o usuario já definiu sua unidade para liberar o acesso a outras funcionalidades
     if (request.session.unidade_usuario == undefined) {
-      user_id = request.oidc.user.sub;
+      const user_id = request.oidc.user.sub;
       pool.query(
         `SELECT codigo FROM vagas WHERE disponivel = true ORDER BY codigo;
         SELECT * FROM unidades WHERE user_id = '${user_id}';
