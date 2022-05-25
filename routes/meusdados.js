@@ -4,6 +4,49 @@ const router = express.Router();
 const { requiresAuth } = require("express-openid-connect");
 const { pool } = require("../config");
 
+async function consultarDados(unidade) {
+  try {
+    // query1: verifica se o usuário já definiu sua unidade
+    let myPromiseUnidadesResult,
+      myPromiseVagasResult,
+      myPromiseUnidadesSemUsuarioResult;
+    let myPromiseUnidades = new Promise(function (resolve) {
+      resolve(
+        pool.query("SELECT user_id FROM unidades WHERE unidade = $1", [unidade])
+      );
+    });
+    myPromiseUnidadesResult = await myPromiseUnidades;
+
+    // query2: consulta todas as vagas disponiveis
+    let myPromiseVagas = new Promise(function (resolve) {
+      resolve(
+        pool.query(
+          "SELECT codigo FROM vagas WHERE disponivel = true ORDER BY codigo"
+        )
+      );
+    });
+    myPromiseVagasResult = await myPromiseVagas;
+
+    // query3: consulta todas as unidades que ainda não foram selecionadas por usuários
+    let myPromiseUnidadesSemUsuario = new Promise(function (resolve) {
+      resolve(
+        pool.query(
+          "SELECT unidade FROM unidades WHERE user_id IS NULL ORDER BY unidade"
+        )
+      );
+    });
+    myPromiseUnidadesSemUsuarioResult = await myPromiseUnidadesSemUsuario;
+
+    return [
+      myPromiseUnidadesResult,
+      myPromiseVagasResult,
+      myPromiseUnidadesSemUsuarioResult,
+    ];
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 const getMeusdados = (request, response) => {
   return new Promise((resolve, reject) => {
     // mensagem preenchida quando é realizada a atualização dos dados
@@ -74,13 +117,17 @@ router.post(
   [
     check("unidade")
       .isLength({ min: 5, max: 5 })
-      .withMessage("O parâmetro unidade não está corretamente preenchido (tamanho)")      
-      .matches(/T[1|2][0-2][0-9][1-4]/)
-      .withMessage("O parâmetro unidade não está corretamente preenchido (formato)")      
-      .trim()
+      .withMessage(
+        "O parâmetro unidade não está corretamente preenchido (tamanho)"
+      )
+      .matches(/T[1|2][0-2]\d[1-4]/)
+      .withMessage(
+        "O parâmetro unidade não está corretamente preenchido (formato)"
+      )
+      .trim(),
   ],
   requiresAuth(),
-  (request, response) => {
+  async function (request, response) {
     const error = validationResult(request).formatWith(({ msg }) => msg);
     const hasError = !error.isEmpty();
     if (hasError) {
@@ -95,98 +142,69 @@ router.post(
       console.log(
         `Vagas escolhidas pela unidade ${unidade} [${request.body.vagas_escolhidas}]`
       );
-      var vagas_escolhidas_array = [],
-        vagas_escolhidas;
+      var vagas_escolhidas_array = [];
+      var vagas_escolhidas = null;
       if (request.body.vagas_escolhidas.length > 0) {
-        //console.log(request.body.vagas_escolhidas)
         let vagas_escolhidas_preenchida =
           request.body.vagas_escolhidas.split(",");
-        //console.log('vagas_escolhidas_preenchida '+vagas_escolhidas_preenchida.length)
         if (vagas_escolhidas_preenchida.length > 0) {
           vagas_escolhidas_preenchida.forEach((vaga) => {
             vagas_escolhidas_array.push({ vaga: vaga });
           });
-          //console.log(vagas_escolhidas_array);
           vagas_escolhidas = JSON.stringify(vagas_escolhidas_array);
         }
       }
-      // query1: verifica se o usuário já definiu sua unidade
-      // query2: consulta todas as vagas disponiveis
-      // query3: consulta todas as unidades que ainda não foram selecionadas por usuários
-      var query = `SELECT user_id FROM unidades WHERE unidade = '${unidade}';`;
-      query += `SELECT codigo FROM vagas WHERE disponivel = true ORDER BY codigo;`;
-      query += `SELECT unidade FROM unidades WHERE user_id IS NULL ORDER BY unidade;`;
-      pool.query(query, (error, results) => {
-        if (error) {
-          console.log("erro: " + error.message);
-        } else {
-          var results_vagas_disponiveis = results[1].rows;
-          var results_unidades_disponiveis = results[2].rows;
-          query = `UPDATE unidades SET user_id = '${user_id}'`;
-          if (vagas_escolhidas == undefined) {
-            query += `, vagas_escolhidas = NULL WHERE unidade = '${unidade}'`;
+
+      var results_unidade;
+      var results_vagas_disponiveis;
+      var results_unidades_disponiveis;
+
+      consultarDados(unidade).then((retorno) => {
+        results_unidade = retorno[0];
+        results_vagas_disponiveis = retorno[1].rows;
+        results_unidades_disponiveis = retorno[2].rows;
+      });
+
+      console.log(
+        `query UPDATE unidades SET user_id = '${user_id}', vagas_escolhidas = ${vagas_escolhidas} `+
+        `WHERE unidade = '${unidade}' RETURNING *;`
+      );
+      pool.query(
+        "UPDATE unidades SET user_id = $1, vagas_escolhidas = $2 WHERE unidade = $3 RETURNING *;",
+        [user_id, vagas_escolhidas, unidade],
+        (error, results) => {
+          if (error) {
+            console.log("erro: " + error.message);
           } else {
-            query += `, vagas_escolhidas = '${vagas_escolhidas}' WHERE unidade = '${unidade}'`;
-          }
-          if (results[0].rowCount == 0) {
-            query += ` AND user_id IS NULL RETURNING *;`;
-          } else if (
-            results[0].rows[0].user_id != null &&
-            results[0].rows[0].user_id != undefined
-          ) {
-            query += ` AND user_id = '${user_id}' RETURNING *;`;
-          }
-          console.log("query " + query);
-          pool.query(query, (error, results2) => {
-            if (error) {
-              console.log("erro: " + error.message);
+            if (results.rowCount == 0) {
+              response.render("meusdados.ejs", {
+                user_id: user_id,
+                email: request.oidc.user.email,
+                name: request.oidc.user.name,
+                unidade: unidade,
+                mensagem: [
+                  "warning",
+                  "Atenção!",
+                  "Não foi possível atualizar os dados!",
+                ],
+                vagas_escolhidas:
+                  vagas_escolhidas == undefined || vagas_escolhidas == []
+                    ? null
+                    : vagas_escolhidas,
+                lista_vagas: results_vagas_disponiveis,
+                lista_unidades: results_unidades_disponiveis,
+                vaga_sorteada: null,
+                usuario_admin: request.session.usuario_admin,
+              });
             } else {
-              if (results[0].rowCount == 0) {
-                response.render("meusdados.ejs", {
-                  user_id: user_id,
-                  email: request.oidc.user.email,
-                  name: request.oidc.user.name,
-                  unidade: null,
-                  mensagem: ["warning", "Atenção!", "Unidade não encontrada!"],
-                  vagas_escolhidas:
-                    vagas_escolhidas == undefined || vagas_escolhidas == []
-                      ? null
-                      : vagas_escolhidas,
-                  lista_vagas: results_vagas_disponiveis,
-                  lista_unidades: results_unidades_disponiveis,
-                  vaga_sorteada: null,
-                  usuario_admin: request.session.usuario_admin,
-                });
-              } else if (results2.rowCount == 0) {
-                response.render("meusdados.ejs", {
-                  user_id: user_id,
-                  email: request.oidc.user.email,
-                  name: request.oidc.user.name,
-                  unidade: unidade,
-                  mensagem: [
-                    "warning",
-                    "Atenção!",
-                    "Não foi possível atualizar os dados!",
-                  ],
-                  vagas_escolhidas:
-                    vagas_escolhidas == undefined || vagas_escolhidas == []
-                      ? null
-                      : vagas_escolhidas,
-                  lista_vagas: results_vagas_disponiveis,
-                  lista_unidades: results_unidades_disponiveis,
-                  vaga_sorteada: null,
-                  usuario_admin: request.session.usuario_admin,
-                });
-              } else {
-                request.session.unidade_usuario = unidade;
-                request.session.meusdadosMensagem =
-                  "Dados atualizados com sucesso!";
-                getMeusdados(request, response);
-              }
+              request.session.unidade_usuario = unidade;
+              request.session.meusdadosMensagem =
+                "Dados atualizados com sucesso!";
+              getMeusdados(request, response);
             }
-          });
+          }
         }
-      });  
+      );
     }
   }
 );

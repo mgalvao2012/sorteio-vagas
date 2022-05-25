@@ -9,6 +9,7 @@ build/Release
 # Dependency directories
 node_modules/
 jspm_packages/
+target/
 
 # Optional npm cache directory
 .npm
@@ -22,3 +23,5 @@ jspm_packages/
 
 # local certificates
 *.pem
+
+dump.rdb
