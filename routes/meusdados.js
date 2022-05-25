@@ -4,20 +4,9 @@ const router = express.Router();
 const { requiresAuth } = require("express-openid-connect");
 const { pool } = require("../config");
 
-async function consultarDados(unidade) {
+async function consultarDados() {
   try {
-    // query1: verifica se o usuário já definiu sua unidade
-    let myPromiseUnidadesResult,
-      myPromiseVagasResult,
-      myPromiseUnidadesSemUsuarioResult;
-    let myPromiseUnidades = new Promise(function (resolve) {
-      resolve(
-        pool.query("SELECT user_id FROM unidades WHERE unidade = $1", [unidade])
-      );
-    });
-    myPromiseUnidadesResult = await myPromiseUnidades;
-
-    // query2: consulta todas as vagas disponiveis
+    // query1: consulta todas as vagas disponiveis
     let myPromiseVagas = new Promise(function (resolve) {
       resolve(
         pool.query(
@@ -27,7 +16,7 @@ async function consultarDados(unidade) {
     });
     myPromiseVagasResult = await myPromiseVagas;
 
-    // query3: consulta todas as unidades que ainda não foram selecionadas por usuários
+    // query2: consulta todas as unidades que ainda não foram selecionadas por usuários
     let myPromiseUnidadesSemUsuario = new Promise(function (resolve) {
       resolve(
         pool.query(
@@ -38,7 +27,6 @@ async function consultarDados(unidade) {
     myPromiseUnidadesSemUsuarioResult = await myPromiseUnidadesSemUsuario;
 
     return [
-      myPromiseUnidadesResult,
       myPromiseVagasResult,
       myPromiseUnidadesSemUsuarioResult,
     ];
@@ -155,14 +143,12 @@ router.post(
         }
       }
 
-      var results_unidade;
       var results_vagas_disponiveis;
       var results_unidades_disponiveis;
 
       consultarDados(unidade).then((retorno) => {
-        results_unidade = retorno[0];
-        results_vagas_disponiveis = retorno[1].rows;
-        results_unidades_disponiveis = retorno[2].rows;
+        results_vagas_disponiveis = retorno[0].rows;
+        results_unidades_disponiveis = retorno[1].rows;
       });
 
       console.log(
@@ -172,11 +158,16 @@ router.post(
       pool.query(
         "UPDATE unidades SET user_id = $1, vagas_escolhidas = $2 WHERE unidade = $3 RETURNING *;",
         [user_id, vagas_escolhidas, unidade],
-        (error, results) => {
-          if (error) {
-            console.log("erro: " + error.message);
+        (_error, results) => {
+          if (_error) {
+            console.log("erro: " + _error.message);
+            request.session.meusdadosMensagem = "Erro na atualização dos dados!";
           } else {
+            request.session.meusdadosMensagem = "Dados atualizados com sucesso!";
+          }
+          /*
             if (results.rowCount == 0) {
+              
               response.render("meusdados.ejs", {
                 user_id: user_id,
                 email: request.oidc.user.email,
@@ -196,13 +187,11 @@ router.post(
                 vaga_sorteada: null,
                 usuario_admin: request.session.usuario_admin,
               });
-            } else {
-              request.session.unidade_usuario = unidade;
-              request.session.meusdadosMensagem =
-                "Dados atualizados com sucesso!";
-              getMeusdados(request, response);
+            } else {              
             }
-          }
+            */
+            request.session.unidade_usuario = unidade;
+            getMeusdados(request, response);
         }
       );
     }
