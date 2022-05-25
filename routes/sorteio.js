@@ -15,7 +15,7 @@ const sorteiaVagas = (objetivo, vagas_disponiveis, query) => {
       }
       var unidades = results.rows;
       // sorteia aleatoriamente a lista de unidades
-      unidades.sort(function (a, b) {
+      unidades.sort(() => {
         return 0.5 - Math.random();
       });
       unidades.forEach((unidades_element) => {
@@ -69,12 +69,11 @@ const sorteiaVagas = (objetivo, vagas_disponiveis, query) => {
 };
 
 const getSorteio = (request, response) => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve, _reject) => {
     if (request.session.usuario_admin) {
       // mensagem preenchida quando é realizada o sorteio
       var mensagem = request.session.sorteioMensagem;
       request.session.sorteioMensagem = '';
-      let user_id = request.oidc.user.sub;
       pool.query(
         "SELECT * FROM configuracao;" +
           "SELECT unidade, vaga_sorteada, vagas_escolhidas, presente, user_id FROM unidades ORDER BY unidade;" +
@@ -160,7 +159,7 @@ router.post("/sorteio", requiresAuth(), (request, response) => {
             vagas_disponiveis.push(element.codigo);
           });
           // sorteia lista de vagas disponiveis para não favorecer quem não fez nenhuma escolha
-          vagas_disponiveis.sort(function (a, b) {
+          vagas_disponiveis.sort(() => {
             return 0.5 - Math.random();
           });
           //console.log('vagas_disponiveis (0) = '+vagas_disponiveis)
@@ -179,10 +178,10 @@ router.post("/sorteio", requiresAuth(), (request, response) => {
               `SELECT unidade, vaga_sorteada, vagas_escolhidas FROM unidades 
                 WHERE pne = true AND vaga_sorteada IS NULL`
             )
-              .then((retorno) => {
-                vagas_disponiveis = retorno[0];
+              .then((retorno1) => {
+                vagas_disponiveis = retorno1[0];
                 //console.log('vagas_disponiveis (1) = '+vagas_disponiveis)
-                retorno[1].forEach((element) => {
+                retorno1[1].forEach((element) => {
                   unidades_e_vagas_sorteadas.push(element);
                   // verifica se a unidade recebeu alguma vaga
                   if (element[1] != undefined) {
@@ -197,9 +196,9 @@ router.post("/sorteio", requiresAuth(), (request, response) => {
                   `SELECT unidade, vaga_sorteada, vagas_escolhidas FROM unidades 
                 WHERE pne = false AND adimplente = true AND presente = true AND vaga_sorteada IS NULL`
                 )
-                  .then((retorno) => {
-                    vagas_disponiveis = retorno[0];
-                    retorno[1].forEach((element) => {
+                  .then((retorno2) => {
+                    vagas_disponiveis = retorno2[0];
+                    retorno2[1].forEach((element) => {
                       unidades_e_vagas_sorteadas.push(element);
                       // verifica se a unidade recebeu alguma vaga
                       if (element[1] != undefined) {
@@ -213,9 +212,9 @@ router.post("/sorteio", requiresAuth(), (request, response) => {
                       `SELECT unidade, vaga_sorteada, vagas_escolhidas FROM unidades 
                   WHERE pne = false AND adimplente = false AND presente = true AND vaga_sorteada IS NULL`
                     )
-                      .then((retorno) => {
-                        vagas_disponiveis = retorno[0];
-                        retorno[1].forEach((element) => {
+                      .then((retorno3) => {
+                        vagas_disponiveis = retorno3[0];
+                        retorno3[1].forEach((element) => {
                           unidades_e_vagas_sorteadas.push(element);
                           // verifica se a unidade recebeu alguma vaga
                           if (element[1] != undefined) {
@@ -229,9 +228,9 @@ router.post("/sorteio", requiresAuth(), (request, response) => {
                           `SELECT unidade, vaga_sorteada, vagas_escolhidas FROM unidades 
                     WHERE pne = false AND presente = false AND vaga_sorteada IS NULL`
                         )
-                          .then((retorno) => {
-                            vagas_disponiveis = retorno[0];
-                            retorno[1].forEach((element) => {
+                          .then((retorno4) => {
+                            vagas_disponiveis = retorno4[0];
+                            retorno4[1].forEach((element) => {
                               unidades_e_vagas_sorteadas.push(element);
                               // verifica se a unidade recebeu alguma vaga
                               if (element[1] != undefined) {
@@ -279,8 +278,8 @@ router.post("/sorteio", requiresAuth(), (request, response) => {
                                   qtd_vagas_sorteadas;
                               }
                               query_gravacao += `UPDATE configuracao SET ultimo_sorteio = '${data_atual}', resultado_sorteio = '${mensagem}' WHERE id = 1; `;
-                              pool.query(query_gravacao, (error, results) => {
-                                if (error) {
+                              pool.query(query_gravacao, (_error, _results) => {
+                                if (_error) {
                                   // console.log(query_gravacao)
                                   console.log(
                                     "Falha no sorteio. Mensagem de erro: " +
@@ -290,40 +289,35 @@ router.post("/sorteio", requiresAuth(), (request, response) => {
                                 } else {
                                   // response.status(200).json({ status: 'success', message: mensagem })
                                   request.session.sorteioMensagem = mensagem;
-                                  // response.redirect("/sorteio");
                                   getSorteio(request, response);
                                 }
                               });
                             }
                           })
-                          .catch((error) => {
-                            console.log(error);
+                          .catch((error4) => {
+                            console.log(error4);
                             response
                               .status(500)
-                              .json({ status: "error", message: error });
-                            return;
+                              .json({ status: "error", message: error4 });
                           });
                       })
-                      .catch((error) => {
-                        console.log(error);
+                      .catch((error3) => {
+                        console.log(error3);
                         response
                           .status(500)
-                          .json({ status: "error", message: error });
-                        return;
+                          .json({ status: "error", message: error3 });
                       });
                   })
-                  .catch((error) => {
-                    console.log(error);
+                  .catch((error2) => {
+                    console.log(error2);
                     response
                       .status(500)
-                      .json({ status: "error", message: error });
-                    return;
+                      .json({ status: "error", message: error2 });
                   });
               })
-              .catch((error) => {
-                console.log(error);
-                response.status(500).json({ status: "error", message: error });
-                return;
+              .catch((error1) => {
+                console.log(error1);
+                response.status(500).json({ status: "error", message: error1 });
               });
           }
         }
@@ -351,7 +345,6 @@ router.post("/sorteio/reiniciar", requiresAuth(), (request, response) => {
           if (results[1].rows[0].resultado_sorteio == "Sorteio não realizado") {
             console.log("Sorteio reiniciado com sucesso!");
             request.session.sorteioMensagem = "Sorteio reiniciado com sucesso!";
-            // response.redirect("/sorteio");
             getSorteio(request, response);
           } else {
             response.status(500).json({
