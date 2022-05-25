@@ -61,14 +61,15 @@ const config = {
 // auth router attaches /login, /logout, and /callback routes to the baseURL
 app.use(auth(config));
 
+const users = [];
+const usuarios_admin = process.env.USUARIOS_ADMIN;
+
 const initializePassport = require("./passport-config");
 initializePassport(
   passport,
   (email) => users.find((user) => user.email === email),
   (id) => users.find((user) => user.id === id)
 );
-const users = [];
-const usuarios_admin = process.env.USUARIOS_ADMIN;
 
 // Redis configuration
 const { v4: uuidv4 } = require("uuid");
