@@ -1,41 +1,51 @@
 const { pool } = require("./config");
 
-module.exports.enviarEmail = function (email, subject, content) {
-  const sgMail = require("@sendgrid/mail");
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-  const msg = {
-    to: email,
-    from: process.env.SENDGRID_FROM,
-    subject: subject,
-    text: content,
-  };
-  sgMail
-    .send(msg)
-    .then(() => {
-      console.log("Email sent to " + email);
-    })
-    .catch((error) => {
-      console.error(error);
-    });
+module.exports.enviarEmail = async function (email, subject, content) {
+  let myPromise = new Promise(function(resolve) {
+    const sgMail = require("@sendgrid/mail");
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    const msg = {
+      to: email,
+      from: process.env.SENDGRID_FROM,
+      subject: subject,
+      text: content,
+    };
+    sgMail
+      .send(msg)
+      .then(() => {
+        let _log = "Email enviado para " + email;
+        console.log(_log);
+        resolve(_log);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  });
+  return( await myPromise );
 }
 
-module.exports.enviarEmailHTML = function (email, subject, content) {
-  const sgMail = require("@sendgrid/mail");
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-  const msg = {
-    to: email,
-    from: process.env.SENDGRID_FROM,
-    subject: subject,
-    html: content,
-  };
-  sgMail
-    .send(msg)
-    .then(() => {
-      console.log("Email sent to " + email);
-    })
-    .catch((error) => {
-      console.error(error);
-    });
+module.exports.enviarEmailHTML = async function (email, subject, content) {
+  let myPromise = new Promise(function(resolve) {
+    const sgMail = require("@sendgrid/mail");
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    const msg = {
+      to: email,
+      from: process.env.SENDGRID_FROM,
+      subject: subject,
+      html: content,
+    };
+    sgMail
+      .send(msg)
+      .then(() => {
+        let _log = "Email enviado para " + email;
+        console.log(_log);
+        resolve(_log);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  });
+  return( await myPromise );
 }
 
 function padTo2Digits(num) {

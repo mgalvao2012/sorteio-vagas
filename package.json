@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "author": "Marcelo Galvão",
   "license": "ISC",
@@ -39,6 +39,8 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "nodemon": "^2.0.15"
+    "jest": "^28.1.0",
+    "nodemon": "^2.0.15",
+    "supertest": "^6.2.3"
   }
 }

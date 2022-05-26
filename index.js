@@ -88,7 +88,7 @@ const redisClient = redis.createClient({
 // Conecta no Redis
 async function redisConnect() {
   await redisClient.connect();
-  console.log("Redis " + redisClient.isOpen); // this is true
+  // console.log("Redis " + redisClient.isOpen); // this is true
   redisClient.on("error", (err) => {
     console.log("Redis error: ", err);
   });
@@ -265,7 +265,7 @@ const PORT = process.env.PORT || 3000;
 if (development_env) {
   // configura o servidor local com um certificado ssl não valido
   const https = require("https");
-  https
+  const server = https
     .createServer(
       {
         key: fs.readFileSync("./key.pem"),
@@ -275,14 +275,18 @@ if (development_env) {
       app
     )
     .listen(PORT, () => {
+      /*
       console.log(
         `Server listening at ${PORT}. Environment development: ${development_env}`
       );
+      */
     });
+  module.exports = server;
 } else {
   app.listen(PORT, () => {
     console.log(
       `Server listening at ${PORT}. Environment development: ${development_env}`
     );
   });
+  module.exports = server;
 }
