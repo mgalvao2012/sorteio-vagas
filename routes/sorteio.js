@@ -3,7 +3,6 @@ const router = express.Router();
 const { requiresAuth } = require("express-openid-connect");
 const { pool } = require("../config");
 const util = require("../util");
-const crypto = require('crypto');
 
 const sorteiaVagas = (objetivo, vagas_disponiveis, query) => {
   return new Promise((resolve, reject) => {
@@ -17,8 +16,7 @@ const sorteiaVagas = (objetivo, vagas_disponiveis, query) => {
       var unidades = results.rows;
       // sorteia aleatoriamente a lista de unidades
       unidades.sort(() => {
-        let random = () => crypto.getRandomValues(new Uint32Array(1))[0]/2**32;
-        return 0.5 - random();
+        return 0.5 - Math.random();
       });
       unidades.forEach((unidades_element) => {
         var vagas_escolhidas = unidades_element.vagas_escolhidas;
@@ -162,8 +160,7 @@ router.post("/sorteio", requiresAuth(), (request, response) => {
           });
           // sorteia lista de vagas disponiveis para não favorecer quem não fez nenhuma escolha
           vagas_disponiveis.sort(() => {
-            let random = () => crypto.getRandomValues(new Uint32Array(1))[0]/2**32;
-            return 0.5 - random();
+            return 0.5 - Math.random();
           });
           //console.log('vagas_disponiveis (0) = '+vagas_disponiveis)
           var qtd_de_vagas_disponiveis = vagas_disponiveis.length;
