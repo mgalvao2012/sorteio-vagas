@@ -1,4 +1,5 @@
 const util = require('./util');
+const crypto = require('crypto');
 
 async function calculate(x) {
     await new Promise((resolve, reject) => {
@@ -17,6 +18,8 @@ async function teste(x) {
         });
         await new Promise((resolve, reject) => {
             x++
+            let random = () => crypto.getRandomValues(new Uint32Array(1))[0]/2**32;
+            console.log('random '+random());
             console.log(x)
             resolve(x)
         });
