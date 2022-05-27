@@ -73,8 +73,6 @@ initializePassport(
 );
 
 // Redis configuration
-const { v4: uuidv4 } = require("uuid");
-// uuidv4(); // ⇨ '1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed'
 const redis = require("redis");
 const redisStore = require("connect-redis")(session);
 const redisClient = redis.createClient({
@@ -100,7 +98,15 @@ redisConnect();
 app.use(
   session({
     genid: (req) => {
-      return uuidv4();
+      console.log('process.env.JEST_WORKER_ID '+process.env.JEST_WORKER_ID);
+      if (process.env.JEST_WORKER_ID != undefined) {
+        // Verifica se o código está sendo testado pelo jest. Se estiver em teste a função uuid será simulada
+        return 'adfd01fb-309b-4e1c-9117-44d003f5d7fc';
+      } else {
+        // retona o uuid quando o código não está sob teste
+        const { uuid } = require('uuidv4');
+        return uuid();
+      }
     },
     store: new redisStore({ client: redisClient }),
     name: "_sessionID",

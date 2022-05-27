@@ -6,13 +6,19 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "jest"
+    "test": "export NODE_TLS_REJECT_UNAUTHORIZED='0' | jest --coverage || exit 0"
+  },
+  "project": "sorteio-vagas",
+  "sonarURL": "https://sonarcloud.io",
+  "auth": {
+    "token": "7bff46d4cc7a22f68b9ba5ba0743b218ad0c880a"
   },
   "author": "Marcelo Galvão",
   "license": "ISC",
   "dependencies": {
     "@sendgrid/mail": "^7.7.0",
     "bcrypt": "^5.0.1",
+    "bluebird": "^3.7.2",
     "compression": "^1.7.4",
     "connect-flash": "^0.1.1",
     "connect-redis": "^6.1.3",
@@ -20,6 +26,7 @@
     "crypto": "^1.0.1",
     "dotenv": "^16.0.0",
     "ejs": ">=3.1.7",
+    "expect-puppeteer": "^6.1.0",
     "express": "^4.17.3",
     "express-openid-connect": "^2.7.1",
     "express-rate-limit": "^6.3.0",
@@ -32,16 +39,19 @@
     "passport-local": "^1.0.0",
     "passport-openidconnect": "^0.1.1",
     "pg": "^8.7.3",
+    "random-number-csprng": "^1.0.2",
     "redis": "^4.0.6",
     "request-promise-native": "^1.0.9",
     "router": "^1.3.7",
     "sendgrid": "^5.2.3",
     "speakeasy": "^2.0.0",
-    "uuid": "^8.3.2"
+    "uuidv4": "^6.2.13"
   },
   "devDependencies": {
     "jest": "^28.1.0",
+    "jest-puppeteer": "^6.1.0",
     "nodemon": "^2.0.15",
+    "puppeteer": "^14.1.1",
     "supertest": "^6.2.3"
   }
 }

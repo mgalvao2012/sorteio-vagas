@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">47.05% </span>
+                <span class="strong">88.23% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>8/17</span>
+                <span class='fraction'>15/17</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">83.33% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/6</span>
+                <span class='fraction'>5/6</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/1</span>
+                <span class='fraction'>1/1</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">47.05% </span>
+                <span class="strong">88.23% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>8/17</span>
+                <span class='fraction'>15/17</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -112,23 +112,23 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -147,24 +147,24 @@ const limiter = rateLimit({
   max: 2, // 2 requests,
 });
 &nbsp;
-router.post("/faleconosco", limiter, <span class="fstat-no" title="function not covered" >(r</span>equest, response) =&gt; {
-  const nome = <span class="cstat-no" title="statement not covered" >request.body.nome;</span>
-  const email = <span class="cstat-no" title="statement not covered" >request.body.email;</span>
-  const assunto = <span class="cstat-no" title="statement not covered" >request.body.assunto;</span>
-  const mensagem = <span class="cstat-no" title="statement not covered" >request.body.mensagem;</span>
-<span class="cstat-no" title="statement not covered" >  if (nome == undefined || email == undefined || assunto == undefined || mensagem == undefined) {</span>
+router.post("/faleconosco", limiter, (request, response) =&gt; {
+  const nome = request.body.nome;
+  const email = request.body.email;
+  const assunto = request.body.assunto;
+  const mensagem = request.body.mensagem;
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (nome == undefined || email == undefined || assunto == undefined || mensagem == undefined) {
 <span class="cstat-no" title="statement not covered" >    console.log("Parâmetro não fornecidos corretamente. Email não enviado!");</span>
 <span class="cstat-no" title="statement not covered" >    response.status(500).json({</span>
       status: "error",
       message: "Parâmetro não fornecidos corretamente. Email não enviado!",
     });
   } else {    
-<span class="cstat-no" title="statement not covered" >    util.enviarEmailHTML(</span>
+    util.enviarEmailHTML(
       process.env.EMAIL_FALECONOSCO,
       "Formulário Fale Conosco - Sorteio Vagas GLI",
       `Nome: ${nome} &lt;br/&gt;Email: ${email} &lt;br/&gt;Assunto: ${assunto} &lt;br/&gt;Mensagem: ${mensagem}`
     );
-<span class="cstat-no" title="statement not covered" >    response</span>
+    response
       .status(200)
       .json({ status: "success", message: "Email enviado com sucesso!" });
   }
@@ -178,7 +178,7 @@ module.exports = router;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Thu May 26 2022 22:59:25 GMT-0300 (Brasilia Standard Time)
+                at Fri May 27 2022 20:31:05 GMT-0300 (Brasilia Standard Time)
             </div>
         <script src="../../prettify.js"></script>
         <script>
