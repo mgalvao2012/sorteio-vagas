@@ -21,8 +21,7 @@ module.exports.enviarEmail = async function (email, subject, content) {
         console.error(error);
       });
   });
-  let _return = await myPromise;
-  return(_return);
+  return( await myPromise );
 }
 
 module.exports.enviarEmailHTML = async function (email, subject, content) {
@@ -46,8 +45,7 @@ module.exports.enviarEmailHTML = async function (email, subject, content) {
         console.error(error);
       });
   });
-  let _return = await myPromise;
-  return(_return);
+  return( await myPromise );
 }
 
 function padTo2Digits(num) {
