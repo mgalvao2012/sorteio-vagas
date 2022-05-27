@@ -289,5 +289,4 @@ if (development_env) {
       `Server listening at ${PORT}. Environment development: ${development_env}`
     );
   });
-  module.exports = server;
 }
