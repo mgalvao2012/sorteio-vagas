@@ -26,6 +26,7 @@ app.use(
       "style-src": ["https:", "'unsafe-inline'"],
       "script-src": ["https:", "'unsafe-inline'"],
       "font-src": ["https:", "'unsafe-inline'"],
+      blockAllMixedContent: []
     },
   }),
   helmet.hsts({
