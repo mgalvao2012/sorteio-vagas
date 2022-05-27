@@ -10,6 +10,7 @@ build/Release
 node_modules/
 jspm_packages/
 target/
+coverage/
 
 # Optional npm cache directory
 .npm
