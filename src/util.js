@@ -1,4 +1,14 @@
-const { pool } = require("./config");
+const { pool, redisClient } = require("./config");
+
+module.exports.getjson = async function (key) {
+  let myPromise = new Promise(function(resolve) {
+    redisClient.get(key, async function (err, reply) {
+      let retorno = await JSON.parse(reply);
+      resolve(retorno);
+    });
+  });
+  return( await myPromise );
+}
 
 module.exports.enviarEmail = async function (email, subject, content) {
   let myPromise = new Promise(function(resolve) {

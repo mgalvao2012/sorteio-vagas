@@ -2,10 +2,10 @@
   "name": "sorteio-vagas",
   "version": "1.0.0",
   "description": "Sorteio de vagas de estacionamento do Condomínio Grandlife Ipiranga",
-  "main": "index.js",
+  "main": "./src/index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
+    "start": "node ./src/index.js",
+    "dev": "nodemon ./src/index.js",
     "test": "export NODE_TLS_REJECT_UNAUTHORIZED='0' | jest --coverage || exit 0"
   },
   "project": "sorteio-vagas",

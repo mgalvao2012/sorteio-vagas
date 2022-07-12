@@ -98,7 +98,7 @@ redisConnect();
 app.use(
   session({
     genid: (req) => {
-      console.log('process.env.JEST_WORKER_ID '+process.env.JEST_WORKER_ID);
+      console.log('process.env.JEST_WORKER_ID ' + process.env.JEST_WORKER_ID);
       if (process.env.JEST_WORKER_ID != undefined) {
         // Verifica se o código está sendo testado pelo jest. Se estiver em teste a função uuid será simulada
         return 'adfd01fb-309b-4e1c-9117-44d003f5d7fc';
@@ -145,7 +145,7 @@ app.use(limiter, (request, response, next) => {
     }
   }
   if (request.oidc.user != null) {
-    console.log('request.oidc.user.user_metadata '+request.oidc.user.user_metadata);
+    //console.log('request.oidc.user.user_metadata '+request.oidc.user.user_metadata);
     request.session.usuario_admin = usuarios_admin.includes(
       request.oidc.user.email
     );
@@ -160,7 +160,7 @@ app.use(limiter, (request, response, next) => {
   ) {
     let user_id = request.oidc.user.sub;
     pool.query(
-      `SELECT * FROM unidades WHERE user_id = '${user_id}';`,
+      `SELECT unidade FROM unidades WHERE user_id = '${user_id}';`,
       (error, results) => {
         if (error) {
           console.log(error.message);
@@ -169,15 +169,15 @@ app.use(limiter, (request, response, next) => {
             request.session.unidade_usuario = results.rows[0].unidade;
             console.log(
               "request.session.unidade_usuario " +
-                request.session.unidade_usuario
+              request.session.unidade_usuario
             );
           }
         }
       }
     );
   }
-  console.log("request.session.usuario_admin " + request.session.usuario_admin);
-  console.log("sessionId: " + request.sessionID);
+  //console.log("request.session.usuario_admin " + request.session.usuario_admin);
+  //console.log("sessionId: " + request.sessionID);
   next();
 });
 
@@ -188,8 +188,8 @@ app.get("/", async (request, response) => {
       let user_id = request.oidc.user.sub;
       pool.query(
         `SELECT codigo FROM vagas WHERE disponivel = true ORDER BY codigo;
-                  SELECT * FROM unidades WHERE user_id = '${user_id}';
-                  SELECT unidade FROM unidades WHERE user_id IS NULL ORDER BY unidade;`,
+         SELECT unidade FROM unidades WHERE user_id = '${user_id}';
+         SELECT unidade FROM unidades WHERE user_id IS NULL ORDER BY unidade;`,
         (error, results) => {
           if (error) {
             console.log(error.message);
@@ -228,8 +228,8 @@ app.get("/", async (request, response) => {
       // envia alguns dados do usuário logado para configurar a pagina principal
       let mensagem;
       if (!request.oidc.user.email_verified == true) {
-        mensagem =
-          "Um email foi enviado para que sua conta seja ativada. Sem essa ativação alguns recursos não estarão disponíveis!";
+        mensagem = "Um email foi enviado para que sua conta seja ativada. " +
+          "Sem essa ativação alguns recursos não estarão disponíveis!";
       }
       response.render("index.ejs", {
         email: request.oidc.user.email,
@@ -251,7 +251,6 @@ app.get("/", async (request, response) => {
     });
   }
 });
-//app.use('/', authRouter);
 
 const unidadesRoutes = require("./routes/unidades");
 const vagasRoutes = require("./routes/vagas");
@@ -275,8 +274,8 @@ if (development_env) {
   const server = https
     .createServer(
       {
-        key: fs.readFileSync("./key.pem"),
-        cert: fs.readFileSync("./cert.pem"),
+        key: fs.readFileSync("./src/key.pem"),
+        cert: fs.readFileSync("./src/cert.pem"),
         passphrase: process.env.SECRET,
       },
       app

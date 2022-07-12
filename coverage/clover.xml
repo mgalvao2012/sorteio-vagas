@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1653694265987" clover="3.2.0">
-  <project timestamp="1653694265988" name="All files">
+<coverage generated="1654104635717" clover="3.2.0">
+  <project timestamp="1654104635718" name="All files">
     <metrics statements="544" coveredstatements="180" conditionals="191" coveredconditionals="19" methods="102" coveredmethods="15" elements="837" coveredelements="214" complexity="0" loc="544" ncloc="544" packages="2" files="10" classes="10"/>
     <package name="sorteio-vagas">
       <metrics statements="163" coveredstatements="111" conditionals="57" coveredconditionals="14" methods="30" coveredmethods="14"/>

@@ -2,62 +2,53 @@ const express = require("express");
 const { check, validationResult } = require("express-validator");
 const router = express.Router();
 const { requiresAuth } = require("express-openid-connect");
-const { pool } = require("../config");
+const { pool, redisClient } = require("../config");
 const util = require("../util");
 
-router.get("/unidades", requiresAuth(), (request, response) => {
-  util.usuarioDefiniuUnidade(request, response).then((retorno) => {
-    if (retorno == "OK") {
-      if (request.session.usuario_admin) {
-        pool.query(
-          "SELECT * FROM configuracao;" +
-            "SELECT unidade, pne, adimplente, user_id FROM unidades ORDER BY unidade;",
-          (error, results) => {
-            if (error) {
-              console.log(error.message);
-            } else {
-              var mensagem;
-              if (
-                results[0].rows[0].resultado_sorteio !=
-                "Sorteio não realizado"
-              ) {
-                let ultimo_sorteio = util.formatDate(
-                  results[0].rows[0].ultimo_sorteio,
-                  1
-                );
-                mensagem = `As condições não podem ser alteradas porque o sorteio foi realizado em ${ultimo_sorteio}. É preciso reiniciar o processo!`;
-              }
-              let lista_unidades = []; // lista criada para facilitar o tratamento de presenca
-              results[1].rows.forEach((row) => {
-                lista_unidades.push(
-                  row.unidade +
-                    "-" +
-                    row.pne.toString() +
-                    "-" +
-                    row.adimplente.toString()
-                );
-              });
-              response.render("unidades.ejs", {
-                email: request.oidc.user.email,
-                name: request.oidc.user.name,
-                lista_unidades: results[1].rows,
-                lista_ajustada_unidades: lista_unidades,
-                resultado_sorteio: results[0].rows[0].resultado_sorteio,
-                mensagem: mensagem,
-                usuario_admin: request.session.usuario_admin,
-              });
-            }
-          }
-        );
-      } else {
-        console.log("Você não está autorizado a acessar este recurso!");
-        response.status(403).json({
-          status: "error",
-          message: "Você não está autorizado a acessar este recurso!",
-        });
-      }
+router.get("/unidades", requiresAuth(), async (request, response) => {   
+  const retorno = await util.usuarioDefiniuUnidade(request, response);
+  if (retorno == "OK") {      
+    if (request.session.usuario_admin) {
+      let lista_unidades = []; // lista criada para facilitar o tratamento de presenca
+      (async () => {
+        try {
+          let configuracao = await pool.query("SELECT * FROM configuracao;");            
+          let mensagem;
+          if (configuracao.rows[0].resultado_sorteio != "Sorteio não realizado") {
+            let ultimo_sorteio = util.formatDate(configuracao.rows[0].ultimo_sorteio, 1);
+            mensagem = `As condições não podem ser alteradas porque o sorteio foi realizado em ${ultimo_sorteio}. É preciso reiniciar o processo!`;
+          } 
+          let unidades = await pool.query("SELECT unidade, pne, adimplente, user_id FROM unidades ORDER BY unidade;");
+          unidades.rows.forEach((row) => {
+            lista_unidades.push(row.unidade + "-" + row.pne.toString() + "-" + row.adimplente.toString());
+          });              
+          response.render("unidades.ejs", {
+            email: request.oidc.user.email,
+            name: request.oidc.user.name,
+            lista_unidades: unidades.rows,
+            lista_ajustada_unidades: lista_unidades,
+            resultado_sorteio: configuracao.rows[0].resultado_sorteio,
+            mensagem: mensagem,
+            usuario_admin: request.session.usuario_admin,
+          });
+          /*
+          let _json = JSON.stringify(unidades.rows);
+          await redisClient.set('_json', _json);
+          let _json2 = await util.getjson('_json');
+          console.log(2,_json2);
+          */
+        } catch (e) {
+          console.error(e.message, e.stack);
+        }
+      })();
+    } else {
+      console.log("Você não está autorizado a acessar este recurso!");
+      response.status(403).json({
+        status: "error",
+        message: "Você não está autorizado a acessar este recurso!",
+      });
     }
-  });
+  }
 });
 
 router.post(
