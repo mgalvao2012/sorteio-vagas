@@ -1,7 +1,7 @@
 {
   "name": "sorteio-vagas",
   "version": "1.0.0",
-  "description": "Sorteio de vagas de estacionamento do Condomínio Grandlife Ipiranga",
+  "description": "Sorteio de vagas de estacionamento do Condomínio Grand Life Ipiranga",
   "main": "./src/index.js",
   "scripts": {
     "start": "node ./src/index.js",
