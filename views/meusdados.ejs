@@ -129,13 +129,24 @@
                 <img src="../images/subsolo2.jpg" width="100%">
               </div>
             <% } else { %>
+              <div class="w3-row">
+                <div class="w3-col m6 l6" style="padding-right:10px;">
+                  <p>
+                    <label class="w3-label">Unidade: T + (torre 1 ou 2) + (número do apartamento)</label>
+                    <input class="w3-input w3-border" type="text" required name="unidade" value="<%= unidade %>" disabled>
+                  </p>                  
+                </div>
+                <div class="w3-col m6 l6">
+                  <p>
+                    <label class="w3-label">Vaga sorteada: S + (subsolo 1 ou 2) + (número da vaga)</label>
+                    <input class="w3-input w3-border" type="text" required name="unidade" value="<%= vaga_sorteada %>" disabled>
+                  </p>
+                </div>
+              </div>
               <p>
-                <label class="w3-label">Unidade: T + (torre 1 ou 2) + (número do apartamento)</label>
-                <input class="w3-input w3-border" type="text" required name="unidade" value="<%= unidade %>" disabled>
-              </p>
-              <p>
-                <label class="w3-label">Vaga sorteada: S + (subsolo 1 ou 2) + (número da vaga)</label>
-                <input class="w3-input w3-border" type="text" required name="unidade" value="<%= vaga_sorteada %>" disabled>
+                <label class="w3-label">Vagas Escolhidas:</label>
+                <textarea class="w3-input w3-border" type="areatext" disabled name="_vagas_escolhidas" 
+                  id="_vagas_escolhidas" rows="1" value=""></textarea>
               </p>
             <% } %>
             <% if(vaga_sorteada == null) { %>
@@ -175,6 +186,10 @@
     function loadFunction() {    
       let vagas_escolhidas = '<%= vagas_escolhidas %>'
       let vaga_sorteada = '<%= vaga_sorteada %>'
+      console.log(vagas_escolhidas);
+      if(vagas_escolhidas != '' & vaga_sorteada != '') {
+        document.getElementById('_vagas_escolhidas').value = vagas_escolhidas.replaceAll(',',', ');
+      }
       if(vagas_escolhidas != '' & vaga_sorteada == '') {
         vagas_escolhidas = vagas_escolhidas.split(',')
         vagas_escolhidas.forEach(vaga => {
