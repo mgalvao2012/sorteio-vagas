@@ -18,7 +18,7 @@
   <div class="w3-container w3-light-grey" style="padding:78px 16px;" id="meusdados">
     <div style="padding: 10px; box-shadow: 0 3px 18px 8px rgb(38 24 24 / 25%);">
       <h3 class="w3-center">Meus dados</h3>
-      <% if(vaga_sorteada == null) { %>
+      <% if(vaga_sorteada == null && !usuario_admin) { %>
         <p class="w3-center w3-medium">Atualize suas informações para participar do sorteio.</p>
       <% } %>
       <div style="margin-top:28px; width: 90%; margin: auto;">
@@ -28,7 +28,7 @@
               <div class="w3-col m6 l6" style="padding-right:10px;">
                 <p>
                   <label class="w3-label">Nome</label>
-                  <input class="w3-input w3-border" type="text" required name="name" value="<%= name %>">
+                  <input class="w3-input w3-border" type="text" disabled name="name" value="<%= name %>">
                 </p>
               </div>
               <div class="w3-col m6 l6">
@@ -38,13 +38,12 @@
                 </p>
               </div>
             </div>
+
             <% if(vaga_sorteada == null) { %>
               <p>
+                <% if(!usuario_admin) { %>
                 <% if(unidade == null) { %>
                   <label class="w3-label">Unidade: </label>
-                  <!--
-                  <input class="w3-input w3-border" type="text" pattern="T[1-2][0-1][0-9][1-4]" required name="unidade">
-                  -->
                   <select name="unidade" id="unidades" class="box">
                     <% lista_unidades.forEach(function(row) { %>
                       <option value="<%- row.unidade %>"><%- row.unidade %></option>
@@ -75,11 +74,18 @@
                     </div>
                   </div>
                 <% } %>
+                <% } %>
               </p>
               <div class="w3-bar" >
-                <input id="S1b" type="button" class="aba-subsolo aba-subsolo-foco" value="Sub-solo 1">
-                <input id="S2b" type="button" class="aba-subsolo" value="Sub-solo 2">
-                <input id="S3b" type="button" class="aba-subsolo" value="Mapa S1">
+                <% if(!usuario_admin) { %>
+                  <input id="S1b" type="button" class="aba-subsolo aba-subsolo-foco" value="Sub-solo 1">
+                  <input id="S2b" type="button" class="aba-subsolo" value="Sub-solo 2">
+                  <input id="S3b" type="button" class="aba-subsolo" value="Mapa S1">
+                <% } else { %>
+                  <input id="S1b" type="button" class="aba-subsolo aba-subsolo-foco" value="Sub-solo 1" style="display:none">
+                  <input id="S2b" type="button" class="aba-subsolo" value="Sub-solo 2" style="display:none">
+                  <input id="S3b" type="button" class="aba-subsolo aba-subsolo-foco" value="Mapa S1">
+                  <% } %>
                 <input id="S4b" type="button" class="aba-subsolo" value="Mapa S2">
                 <script>
                   document.getElementById('S1b').addEventListener('click', function() { abreSubsolo('S1') })                      
@@ -87,10 +93,28 @@
                   document.getElementById('S3b').addEventListener('click', function() { abreSubsolo('S3') })                      
                   document.getElementById('S4b').addEventListener('click', function() { abreSubsolo('S4') })                      
                 </script>
-              </div> 
-              <div id="S1" class="cards subsolo w3-border">                      
-                  <% lista_vagas.forEach(function(row) { %>
-                      <% if (row.codigo.substring(0,2) == 'S1' ) { %>
+              </div>
+              <% if(!usuario_admin) { %>
+                <div id="S1" class="cards subsolo w3-border">                      
+                    <% lista_vagas.forEach(function(row) { %>
+                        <% if (row.codigo.substring(0,2) == 'S1' ) { %>
+                            <div id="<%- row.codigo %>card" class="card">
+                                <div id="<%- row.codigo %>c" class="res-circle">
+                                    <div id="<%- row.codigo %>t" class="circle-txt">
+                                        <%- row.codigo.substring(3) %>
+                                    </div>
+                                </div>
+                            </div>
+                            <script>
+                              document.getElementById('<%- row.codigo %>card').addEventListener('click', 
+                                function() { unidadeClicada('<%- row.codigo %>') })                      
+                            </script>
+                        <% } %>
+                    <% }) %>
+                </div>
+                <div id="S2" class="cards subsolo w3-border" style="display:none">                     
+                  <% lista_vagas.forEach(function(row) {
+                      if (row.codigo.substring(0,2) == 'S2' ) { %>
                           <div id="<%- row.codigo %>card" class="card">
                               <div id="<%- row.codigo %>c" class="res-circle">
                                   <div id="<%- row.codigo %>t" class="circle-txt">
@@ -104,27 +128,17 @@
                           </script>
                       <% } %>
                   <% }) %>
-              </div>
-              <div id="S2" class="cards subsolo w3-border" style="display:none">                     
-                <% lista_vagas.forEach(function(row) {
-                    if (row.codigo.substring(0,2) == 'S2' ) { %>
-                        <div id="<%- row.codigo %>card" class="card">
-                            <div id="<%- row.codigo %>c" class="res-circle">
-                                <div id="<%- row.codigo %>t" class="circle-txt">
-                                    <%- row.codigo.substring(3) %>
-                                </div>
-                            </div>
-                        </div>
-                        <script>
-                          document.getElementById('<%- row.codigo %>card').addEventListener('click', 
-                            function() { unidadeClicada('<%- row.codigo %>') })                      
-                        </script>
-                    <% } %>
-                <% }) %>
-              </div>
-              <div id="S3" class="subsolo" style="display:none"> 
-                <img src="../images/subsolo1.jpg" width="100%">
-              </div>
+                </div>
+              <% } %>               
+              <% if(!usuario_admin) { %>
+                <div id="S3" class="subsolo" style="display:none">
+                  <img src="../images/subsolo1.jpg" width="100%">
+                </div>
+              <% } else { %>
+                <div id="S3" class="subsolo">
+                  <img src="../images/subsolo1.jpg" width="100%">
+                </div>
+              <% } %>                
               <div id="S4" class="subsolo" style="display:none"> 
                 <img src="../images/subsolo2.jpg" width="100%">
               </div>
@@ -149,7 +163,7 @@
                   id="_vagas_escolhidas" rows="1" value=""></textarea>
               </p>
             <% } %>
-            <% if(vaga_sorteada == null) { %>
+            <% if(vaga_sorteada == null && !usuario_admin) { %>
               <p>
                 <input type="text" id="vagas_escolhidas" name="vagas_escolhidas" style="display: none;">                
                 <button class="w3-button w3-black" type="submit">
@@ -186,7 +200,6 @@
     function loadFunction() {    
       let vagas_escolhidas = '<%= vagas_escolhidas %>'
       let vaga_sorteada = '<%= vaga_sorteada %>'
-      console.log(vagas_escolhidas);
       if(vagas_escolhidas != '' & vaga_sorteada != '') {
         document.getElementById('_vagas_escolhidas').value = vagas_escolhidas.replaceAll(',',', ');
       }

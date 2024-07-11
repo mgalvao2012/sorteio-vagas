@@ -192,7 +192,10 @@ app.get("/", async (request, response) => {
 					if (error) {
 						console.log(error.message);
 					} else {
-						if (results[1].rows[0] == undefined) {
+						if (
+							results[1].rows[0] == undefined &&
+							request.session.usuario_admin != true
+						) {
 							response.render("meusdados.ejs", {
 								user_id: user_id,
 								email: request.oidc.user.email,
