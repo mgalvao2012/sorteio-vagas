@@ -132,4 +132,37 @@ router.post(
 	}
 );
 
+router.post(
+	"/meusdados-remover-unidade",
+	[
+		check("unidade")
+			.isLength({ min: 5, max: 5 })
+			.withMessage("O parâmetro unidade não está corretamente preenchido (tamanho)")
+			.matches(/T[1|2][0-2]\d[1-4]/)
+			.withMessage("O parâmetro unidade não está corretamente preenchido (formato)")
+			.trim(),
+	],
+	requiresAuth(),
+	async function (request, response) {
+		const error = validationResult(request).formatWith(({ msg }) => msg);
+		const hasError = !error.isEmpty();
+		if (hasError) {
+			response.status(422).json({ error: error.array() });
+		} else {
+			var unidade = request.body.unidade;
+			console.log("unidade " + unidade + " removeu vagas escolhidas");
+			pool.query(
+				"UPDATE unidades SET user_id = null, vagas_escolhidas = null WHERE unidade = $1 RETURNING *;",
+				[unidade],
+				(_error, _results) => {
+					if (_error) {
+						console.log("erro: " + _error.message);
+					}
+				}
+			);
+		}
+		response.redirect("/meusdados");
+	}
+);
+
 module.exports = router;

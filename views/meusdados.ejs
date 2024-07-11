@@ -23,7 +23,7 @@
       <% } %>
       <div style="margin-top:28px; width: 90%; margin: auto;">
         <div>
-          <form action="/meusdados" method="POST">
+          <form id="form1" action="/meusdados" method="POST">
             <div class="w3-row">
               <div class="w3-col m6 l6" style="padding-right:10px;">
                 <p>
@@ -62,14 +62,14 @@
                       <p>
                         <label class="w3-label">Unidade:</label>
                         <input class="w3-input w3-border" type="text" disabled name="unidade_desabilitada" value="<%= unidade %>">
-                        <input type="text" name="unidade" style="display: none;" value="<%= unidade %>">
+                        <input type="text" id="unidade" name="unidade" style="display: none;" value="<%= unidade %>">
                       </p>
                     </div>
                     <div class="w3-col m6 l6">
                       <p>
                         <label class="w3-label">Vagas Escolhidas:</label>
                         <textarea class="w3-input w3-border" type="areatext" disabled name="sequencia_vagas_escolhidas" 
-                          id="sequencia_vagas_escolhidas" rows="1" value=""></textarea>
+                          id="sequencia_vagas_escolhidas" rows="2" value=""></textarea>
                       </p>
                     </div>
                   </div>
@@ -107,7 +107,7 @@
                             </div>
                             <script>
                               document.getElementById('<%- row.codigo %>card').addEventListener('click', 
-                                function() { unidadeClicada('<%- row.codigo %>') })                      
+                                function() { unidadeClicada('<%- row.codigo %>', true) })                      
                             </script>
                         <% } %>
                     <% }) %>
@@ -124,7 +124,7 @@
                           </div>
                           <script>
                             document.getElementById('<%- row.codigo %>card').addEventListener('click', 
-                              function() { unidadeClicada('<%- row.codigo %>') })                      
+                              function() { unidadeClicada('<%- row.codigo %>', true) })                      
                           </script>
                       <% } %>
                   <% }) %>
@@ -165,10 +165,23 @@
             <% } %>
             <% if(vaga_sorteada == null && !usuario_admin) { %>
               <p>
-                <input type="text" id="vagas_escolhidas" name="vagas_escolhidas" style="display: none;">                
-                <button class="w3-button w3-black" type="submit">
+                <div class="w3-bar">
+                  <input type="text" id="vagas_escolhidas" name="vagas_escolhidas" style="display: none;">                
+                  <button class="w3-button w3-black w3-padding-small" type="submit">
                     <i class="fa fa-paper-plane"></i> ENVIAR
-                </button>
+                  </button>
+                  <% if(unidade != null) { %>
+                    <button id="trocarUnidade" class="w3-button w3-black w3-padding-small" type="button">
+                      <i class="fa fa-paper-plane"></i> TROCAR UNIDADE
+                    </button>
+                    <span style="font-style: italic;">
+                      (Imporante: você deverá selecionar as vagas novamente!)
+                    </span>
+                    <script>
+                      document.getElementById('trocarUnidade').addEventListener('click', function() { trocarUnidade() }) 
+                    </script>
+                  <% } %>              
+                </div>
               </p>
             <% } %>
             </form>
@@ -206,13 +219,13 @@
       if(vagas_escolhidas != '' & vaga_sorteada == '') {
         vagas_escolhidas = vagas_escolhidas.split(',')
         vagas_escolhidas.forEach(vaga => {
-            unidadeClicada(vaga)
+            unidadeClicada(vaga, false)
         }) 
       }
     }
     window.onload = loadFunction();
 
-    function unidadeClicada(valor) {  
+    function unidadeClicada(valor, clicou) {  
       var posicao = lista_vagas_escolhidas.indexOf(valor);
       if (posicao > -1) {
         document.getElementById(valor+'c').style.background = "#F2F2F2";
@@ -228,6 +241,14 @@
       var sequencia_lista_unidades = document.getElementById("sequencia_vagas_escolhidas");
       lista_unidades.value = lista_vagas_escolhidas;
       sequencia_lista_unidades.value = lista_vagas_escolhidas.toString().replace(/,/gi, ', ');
+      if(clicou) {
+        const notify = new Notify();
+        notify.render({
+          head: "atenção!",
+          style: "warning",
+          content: "Confirme as vagas através do botão [<i class='fa fa-paper-plane'></i> ENVIAR]"
+        });
+      }
     }
 
     function abreSubsolo(subsolo) { 
@@ -247,6 +268,11 @@
       } else {
         document.getElementById(subsolo).style.display = "block";  
       }   
+    }
+
+    function trocarUnidade() {
+      document.getElementById("form1").action = "meusdados-remover-unidade";
+      document.getElementById("form1").submit();      
     }
   </script>
   <script src="./js/script.js"></script>    
