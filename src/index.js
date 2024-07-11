@@ -78,6 +78,7 @@ const redisStore = require("connect-redis")(session);
 const redisClient = redis.createClient({
 	url: process.env.REDIS_TLS_URL,
 	legacyMode: true,
+	pingInterval: 10000,
 	socket: {
 		tls: development_env ? false : true,
 		rejectUnauthorized: false,
