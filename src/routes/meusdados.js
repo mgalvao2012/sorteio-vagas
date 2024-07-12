@@ -152,7 +152,7 @@ router.post(
 			var unidade = request.body.unidade;
 			console.log("unidade " + unidade + " removeu vagas escolhidas");
 			pool.query(
-				"UPDATE unidades SET user_id = null, vagas_escolhidas = null WHERE unidade = $1 RETURNING *;",
+				"UPDATE unidades SET user_id = null, email = null, vagas_escolhidas = null WHERE unidade = $1 RETURNING *;",
 				[unidade],
 				(_error, _results) => {
 					if (_error) {
