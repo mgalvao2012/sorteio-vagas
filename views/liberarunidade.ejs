@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Sorteio de vagas de estacionamento do Condomínio Grand Life Ipiranga</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link href="./css/style.css" rel='stylesheet' type='text/css' />
+<link href='./css/notify.min.css' rel='stylesheet' type='text/css' />
+<link href='./css/sticky.css' rel='stylesheet' type='text/css' />
+<link rel="icon" type="image/png" href="./images/sve.png">
+</head>
+<body>
+<%- include('navbar.ejs') %>
+
+  <!-- Form Section -->
+  <div class="w3-container w3-light-grey" style="padding:78px 16px;" id="meusdados">
+    <div style="padding: 10px; box-shadow: 0 3px 18px 8px rgb(38 24 24 / 25%);">
+      <h3 class="w3-center">Liberar unidade</h3>
+      <p class="w3-center w3-medium">Permite a liberação da unidade, normalmente usado quando identificado um cadastro indevido.</p>
+      <div style="margin-top:28px; width: 90%; margin: auto;">
+        <div>
+          <% if (lista_unidades.length > 0) { %>
+            <form id="form1" action="/liberarunidade" method="POST">
+                <p>
+                  <label class="w3-label">Unidade: </label>
+                  <select name="unidade" id="unidades" class="box">
+                    <% lista_unidades.forEach(function(row) { %>
+                      <option value="<%- row.unidade %>"><%- row.unidade %></option>
+                    <% }) %>
+                  </select>
+                </p>
+                <p class="w3-medium">
+                  <span style="font-weight: bold; color: #cc2727;">
+                    Após confirmar o usuário será notificado por email que será necessário selecionar uma nova unidade!
+                  </span></p>              
+                <p>
+                  <div class="w3-bar">
+                    <button class="w3-button w3-black w3-padding-small" type="submit">
+                      <i class="fa fa-paper-plane"></i> ENVIAR
+                    </button>
+                  </div>
+                </p>
+            </form>
+          <% } else { %>
+            <p class="w3-center w3-large">Não há unidades a serem liberadas</p>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Footer -->
+  <footer class="w3-center w3-black w3-padding-24">
+    <a href="#liberarunidade" class="w3-button w3-light-grey"><i class="fa fa-arrow-up w3-margin-right"></i>Vai para o início</a>
+    <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank" class="w3-hover-text-green">w3.css</a></p>
+  </footer>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="./js/notify.js"></script>  
+  <script> 
+    const notify = new Notify();
+    var estilo = '<%= (mensagem != null ? mensagem[0] : "") %>';
+    var titulo = '<%= (mensagem != null ? mensagem[1] : "") %>';
+    var mensagem = '<%= (mensagem != null ? mensagem[2] : "") %>';
+    if (mensagem != '') {
+        notify.render({
+        head: titulo,
+        style: estilo,
+        content: mensagem
+      });
+    }
+  </script>
+  <script src="./js/script.js"></script>    
+</body>
+</html>

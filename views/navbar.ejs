@@ -1,73 +1,104 @@
 <!-- Navbar (sit on top) -->
 <div class="w3-top">
-    <div class="w3-bar w3-white w3-card" id="myNavbar">
-      <a href="/" class="w3-bar-item w3-button w3-wide">SVE</a>
-      <!-- Right-sided navbar links -->
-      <div class="w3-right w3-hide-small">
-        <a href="/#sobre" class="w3-bar-item w3-button"> SOBRE NÓS</a>
-        <a href="/#faleconosco" class="w3-bar-item w3-button"><i class="fa fa-envelope"></i> FALE CONOSCO</a>
-        <% if (email) { %>
-          <div class="dropdown">
-            <button class="dropbtn"><%= name %> 
-              <i class="fa fa-caret-down"></i>
-            </button>
-            <div class="dropdown-content">
-              <a href="/meusdados">Meus dados</a>
-              <a href="/vagas">Vagas</a>
-              <% if (usuario_admin) { %>
-                <a href="/unidades">Unidades</a>
-                <a href="/sorteio">Sorteio</a>
-                <a href="/setup">Setup</a>
-              <% } %>
-              <a href="/logout">Logout</a>
-            </div>
-          </div> 
-        <% } else { %>
-          <a id="opcaoLogin" href="/login" class="w3-bar-item w3-button">Login</a>
-          <script>
-            document.getElementById('opcaoLogin').addEventListener('click', function() { w3_close() })                      
-          </script>
-        <% } %>
-      </div>
-      <!-- Hide right-floated links on small screens and replace them with a menu icon -->
-  
-      <a id="abreMenu" href="#" class="w3-bar-item w3-button w3-right w3-hide-large w3-hide-medium">
-        <i class="fa fa-bars"></i>
-      </a>
-      <script>
-        document.getElementById('abreMenu').addEventListener('click', function() { w3_open() })                      
-      </script>
-    </div>
-  </div>
-  
-  <!-- Sidebar on small screens when clicking the menu icon -->
-  <nav class="w3-sidebar w3-bar-block w3-black w3-card w3-animate-left w3-hide-medium w3-hide-large" style="display:none" id="mySidebar">
-    <a id="opcaoFecharSC" href="#" class="w3-bar-item w3-button w3-large w3-padding-16">Fechar ×</a>
-    <a id="opcaoSobreSC" href="/#sobre" class="w3-bar-item w3-button">SOBRE NÓS</a>
-    <a id="opcaoFaleSC" href="/#faleconosco" class="w3-bar-item w3-button">FALE CONOSCO</a>
-    <script>
-      document.getElementById('opcaoFecharSC').addEventListener('click', function() { w3_close() })                      
-      document.getElementById('opcaoSobreSC').addEventListener('click', function() { w3_close() })                      
-      document.getElementById('opcaoFaleSC').addEventListener('click', function() { w3_close() })                      
-    </script>
-    <% if (email) { %>
-      <div class="w3-dropdown-hover w3-mobile">
-        <button class="w3-button"><%= name.substring(0,24) %><i class="fa fa-caret-down"></i></button>
-        <div class="w3-dropdown-content w3-bar-block w3-dark-grey">
-          <a href="/meusdados" class="w3-bar-item w3-button">Meus dados</a>
-          <a href="/vagas" class="w3-bar-item w3-button">Vagas</a>
-          <% if (usuario_admin) { %>
-            <a href="/unidades" class="w3-bar-item w3-button">Unidades</a>
-            <a href="/sorteio" class="w3-bar-item w3-button">Sorteio</a>
-            <a href="/setup" class="w3-bar-item w3-button">Setup</a>
-          <% } %>          
-          <a href="/logout" class="w3-bar-item w3-button">Logout</a>
-        </div>
-      </div>
-    <% } else { %>
-      <a id="opcaoLoginSC" href="/login" class="w3-bar-item w3-button">Login</a>
-      <script>
-        document.getElementById('opcaoLoginSC').addEventListener('click', function() { w3_close() })                      
-      </script>
-    <% } %>
-  </nav>
+	<div class="w3-bar w3-white w3-card" id="myNavbar">
+		<a href="/" class="w3-bar-item w3-button w3-wide">SVE</a>
+		<!-- Right-sided navbar links -->
+		<div class="w3-right w3-hide-small">
+			<a href="/#sobre" class="w3-bar-item w3-button"> SOBRE NÓS</a>
+			<a href="/#faleconosco" class="w3-bar-item w3-button"
+				><i class="fa fa-envelope"></i> FALE CONOSCO</a
+			>
+			<% if (email) { %>
+			<div class="dropdown">
+				<button class="dropbtn">
+					<%= name %>
+					<i class="fa fa-caret-down"></i>
+				</button>
+				<div class="dropdown-content">
+					<a href="/meusdados">Meus dados</a>
+					<a href="/vagas">Vagas</a>
+					<% if (usuario_admin) { %>
+					<a href="/unidades">Unidades</a>
+					<a href="/sorteio">Sorteio</a>
+					<a href="/liberarunidade">Liberar unidades</a>
+					<% } %>
+					<a href="/logout">Logout</a>
+				</div>
+			</div>
+			<% } else { %>
+			<a id="opcaoLogin" href="/login" class="w3-bar-item w3-button">Login</a>
+			<script>
+				document
+					.getElementById("opcaoLogin")
+					.addEventListener("click", function () {
+						w3_close();
+					});
+			</script>
+			<% } %>
+		</div>
+		<!-- Hide right-floated links on small screens and replace them with a menu icon -->
+
+		<a
+			id="abreMenu"
+			href="#"
+			class="w3-bar-item w3-button w3-right w3-hide-large w3-hide-medium"
+		>
+			<i class="fa fa-bars"></i>
+		</a>
+		<script>
+			document.getElementById("abreMenu").addEventListener("click", function () {
+				w3_open();
+			});
+		</script>
+	</div>
+</div>
+
+<!-- Sidebar on small screens when clicking the menu icon -->
+<nav
+	class="w3-sidebar w3-bar-block w3-black w3-card w3-animate-left w3-hide-medium w3-hide-large"
+	style="display: none"
+	id="mySidebar"
+>
+	<a id="opcaoFecharSC" href="#" class="w3-bar-item w3-button w3-large w3-padding-16"
+		>Fechar ×</a
+	>
+	<a id="opcaoSobreSC" href="/#sobre" class="w3-bar-item w3-button">SOBRE NÓS</a>
+	<a id="opcaoFaleSC" href="/#faleconosco" class="w3-bar-item w3-button"
+		>FALE CONOSCO</a
+	>
+	<script>
+		document.getElementById("opcaoFecharSC").addEventListener("click", function () {
+			w3_close();
+		});
+		document.getElementById("opcaoSobreSC").addEventListener("click", function () {
+			w3_close();
+		});
+		document.getElementById("opcaoFaleSC").addEventListener("click", function () {
+			w3_close();
+		});
+	</script>
+	<% if (email) { %>
+	<div class="w3-dropdown-hover w3-mobile">
+		<button class="w3-button">
+			<%= name.substring(0,24) %><i class="fa fa-caret-down"></i>
+		</button>
+		<div class="w3-dropdown-content w3-bar-block w3-dark-grey">
+			<a href="/meusdados" class="w3-bar-item w3-button">Meus dados</a>
+			<a href="/vagas" class="w3-bar-item w3-button">Vagas</a>
+			<% if (usuario_admin) { %>
+			<a href="/unidades" class="w3-bar-item w3-button">Unidades</a>
+			<a href="/sorteio" class="w3-bar-item w3-button">Sorteio</a>
+			<a href="/liberarunidade" class="w3-bar-item w3-button">Liberar unidade</a>
+			<% } %>
+			<a href="/logout" class="w3-bar-item w3-button">Logout</a>
+		</div>
+	</div>
+	<% } else { %>
+	<a id="opcaoLoginSC" href="/login" class="w3-bar-item w3-button">Login</a>
+	<script>
+		document.getElementById("opcaoLoginSC").addEventListener("click", function () {
+			w3_close();
+		});
+	</script>
+	<% } %>
+</nav>

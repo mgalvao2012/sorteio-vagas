@@ -261,6 +261,7 @@ const sorteioRoutes = require("./routes/sorteio");
 const meusdadosRoutes = require("./routes/meusdados");
 const setupRoutes = require("./routes/setup");
 const faleconoscoRoutes = require("./routes/faleconosco");
+const liberarunidadeRoutes = require("./routes/liberarunidade");
 
 app.use(unidadesRoutes);
 app.use(vagasRoutes);
@@ -268,6 +269,7 @@ app.use(sorteioRoutes);
 app.use(meusdadosRoutes);
 app.use(setupRoutes);
 app.use(faleconoscoRoutes);
+app.use(liberarunidadeRoutes);
 
 // Start server
 const PORT = process.env.PORT || 3000;

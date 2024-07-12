@@ -1,85 +1,129 @@
 <!DOCTYPE html>
 <html>
-<head>
-<title>Sorteio de vagas de estacionamento do Condomínio Grandlife Ipiranga</title>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<link href="./css/style.css" rel='stylesheet' type='text/css' />
-<link href='./css/notify.min.css' rel='stylesheet' type='text/css' />
-<link href='./css/sticky.css' rel='stylesheet' type='text/css' />
-<link rel="icon" type="image/png" href="./images/sve.png">
-</head>
-<body>
-<%- include('navbar.ejs') %>
+	<head>
+		<title>
+			Sorteio de vagas de estacionamento do Condomínio Grand Life Ipiranga
+		</title>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+		/>
+		<link href="./css/style.css" rel="stylesheet" type="text/css" />
+		<link href="./css/notify.min.css" rel="stylesheet" type="text/css" />
+		<link href="./css/sticky.css" rel="stylesheet" type="text/css" />
+		<link rel="icon" type="image/png" href="./images/sve.png" />
+	</head>
+	<body>
+		<%- include('navbar.ejs') %>
 
-  <!-- Form Section -->
-  <div class="w3-container w3-light-grey" style="padding:78px 16px;" id="setup">
-    <div style="padding: 10px; box-shadow: 0 3px 18px 8px rgb(38 24 24 / 25%);">
-      <h3 class="w3-center">Setup</h3>
-      <div style="margin-top:28px; width: 90%; margin: auto;">
-        <p class="w3-center w3-medium">Esta operação irá <span style="font-weight: bold;">APAGAR</span> todos os dados e recriar todas as tabelas.</p>
-        <div>
-          <form action="/setup" method="POST">
-            <p>
-              <label class="w3-label">Clique no botão [GERAR CÓDIGO] para receber um código no seu email. Digite o código enviado para confirmar a operação.</label>
-              <input class="w3-input w3-border" type="text" required name="chave" pattern="[0-9]{6}" maxlength="6" title="O código é composto de por 6 dígitos numéricos!">
-            </p>
-            <p>
-              <button id="btnReiniciar" class="w3-button w3-black" type="submit">
-                  <i class="fa fa-paper-plane"></i> ENVIAR
-              </button>
-              <button id="btnGerarToken" class="w3-button w3-black" type="button">
-                <i class="fa fa-key"></i> GERAR CÓDIGO
-              </button>
-            </p>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- Footer -->
-  <footer class="w3-center w3-black w3-padding-24">
-    <a href="#setup" class="w3-button w3-light-grey"><i class="fa fa-arrow-up w3-margin-right"></i>Vai para o início</a>
-    <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank" class="w3-hover-text-green">w3.css</a></p>
-  </footer>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  <script src="./js/notify.js"></script>  
-  <script> 
-    document.getElementById("btnGerarToken").addEventListener('click', function() { gerarToken() })
+		<!-- Form Section -->
+		<div class="w3-container w3-light-grey" style="padding: 78px 16px" id="setup">
+			<div style="padding: 10px; box-shadow: 0 3px 18px 8px rgb(38 24 24 / 25%)">
+				<h3 class="w3-center">Setup</h3>
+				<div style="margin-top: 28px; width: 90%; margin: auto">
+					<p class="w3-center w3-medium">
+						Esta operação irá
+						<span style="font-weight: bold">APAGAR</span> todos os dados e
+						recriar todas as tabelas.
+					</p>
+					<div>
+						<form action="/setup" method="POST">
+							<p>
+								<label class="w3-label"
+									>Clique no botão [GERAR CÓDIGO] para receber um código
+									no seu email. Digite o código enviado para confirmar a
+									operação.</label
+								>
+								<input
+									class="w3-input w3-border"
+									type="text"
+									required
+									name="chave"
+									pattern="[0-9]{6}"
+									maxlength="6"
+									title="O código é composto de por 6 dígitos numéricos!"
+								/>
+							</p>
+							<p>
+								<button
+									id="btnReiniciar"
+									class="w3-button w3-black"
+									type="submit"
+								>
+									<i class="fa fa-paper-plane"></i> ENVIAR
+								</button>
+								<button
+									id="btnGerarToken"
+									class="w3-button w3-black"
+									type="button"
+								>
+									<i class="fa fa-key"></i> GERAR CÓDIGO
+								</button>
+							</p>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Footer -->
+		<footer class="w3-center w3-black w3-padding-24">
+			<a href="#setup" class="w3-button w3-light-grey"
+				><i class="fa fa-arrow-up w3-margin-right"></i>Vai para o início</a
+			>
+			<p>
+				Powered by
+				<a
+					href="https://www.w3schools.com/w3css/default.asp"
+					title="W3.CSS"
+					target="_blank"
+					class="w3-hover-text-green"
+					>w3.css</a
+				>
+			</p>
+		</footer>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+		<script src="./js/notify.js"></script>
+		<script>
+			document
+				.getElementById("btnGerarToken")
+				.addEventListener("click", function () {
+					gerarToken();
+				});
 
-    const notify = new Notify();
-    var estilo = '<%= (mensagem != null ? mensagem[0] : "") %>';
-    var titulo = '<%= (mensagem != null ? mensagem[1] : "") %>';
-    var mensagem = '<%= (mensagem != null ? mensagem[2] : "") %>';
-    if (mensagem != '') {
-        notify.render({
-        head: titulo,
-        style: estilo,
-        content: mensagem
-      });
-    }
+			const notify = new Notify();
+			var estilo = '<%= (mensagem != null ? mensagem[0] : "") %>';
+			var titulo = '<%= (mensagem != null ? mensagem[1] : "") %>';
+			var mensagem = '<%= (mensagem != null ? mensagem[2] : "") %>';
+			if (mensagem != "") {
+				notify.render({
+					head: titulo,
+					style: estilo,
+					content: mensagem,
+				});
+			}
 
-    function gerarToken() {
-      $(document).ready(function(){
-        $(document).ajaxError(function(e, xhr, opt) {
-          notify.render({
-            head: 'Atenção!',
-            style: 'error',
-            content: xhr.responseJSON.message
-          })
-        });
-        $.get("/setup/gerarToken", function(data,status){
-          notify.render({
-            head: 'Informação',
-            style: 'info',
-            content: data.message + ' Por favor, consulte o seu email!'
-          });
-        })
-      });
-    }
-  </script>   
-  <script src="./js/script.js"></script>
-</body>
+			function gerarToken() {
+				$(document).ready(function () {
+					$(document).ajaxError(function (e, xhr, opt) {
+						notify.render({
+							head: "Atenção!",
+							style: "error",
+							content: xhr.responseJSON.message,
+						});
+					});
+					$.get("/setup/gerarToken", function (data, status) {
+						notify.render({
+							head: "Informação",
+							style: "info",
+							content: data.message + " Por favor, consulte o seu email!",
+						});
+					});
+				});
+			}
+		</script>
+		<script src="./js/script.js"></script>
+	</body>
 </html>

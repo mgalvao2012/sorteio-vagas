@@ -28,6 +28,7 @@ CREATE TABLE unidades (
   adimplente BOOLEAN,
   vaga_sorteada CHAR(5) REFERENCES Vagas (codigo),
   user_id CHAR(80) UNIQUE,
+  email CHAR(255) UNIQUE,
   ultima_gravacao TIMESTAMP default CURRENT_TIMESTAMP,
   vagas_escolhidas JSONB
 );

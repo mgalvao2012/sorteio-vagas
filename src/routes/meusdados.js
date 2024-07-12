@@ -113,8 +113,8 @@ router.post(
       );
       */
 			pool.query(
-				"UPDATE unidades SET user_id = $1, vagas_escolhidas = $2 WHERE unidade = $3 RETURNING *;",
-				[user_id, vagas_escolhidas, unidade],
+				"UPDATE unidades SET user_id = $1, email = $2, vagas_escolhidas = $3 WHERE unidade = $4 RETURNING *;",
+				[user_id, request.oidc.user.email, vagas_escolhidas, unidade],
 				(_error, _results) => {
 					if (_error) {
 						console.log("erro: " + _error.message);
