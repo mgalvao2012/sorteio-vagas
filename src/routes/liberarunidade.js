@@ -64,7 +64,7 @@ router.post(
 			);
 			pool.query(
 				`SELECT email FROM unidades WHERE unidade = '${unidade}';
-				UPDATE unidades SET user_id = null, vagas_escolhidas = null WHERE unidade = '${unidade}' RETURNING *;`,
+				UPDATE unidades SET user_id = null, email = null, vagas_escolhidas = null WHERE unidade = '${unidade}' RETURNING *;`,
 				(_error, _results) => {
 					if (_error) {
 						console.log("erro: " + _error.message);
