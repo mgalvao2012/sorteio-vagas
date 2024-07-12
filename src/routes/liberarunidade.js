@@ -72,7 +72,7 @@ router.post(
 						util.enviarEmailHTML(
 							_results[0].rows[0].email,
 							"Condomínio Grand Life Ipiranga - Sorteio de vagas",
-							`Caro(a) Usuário(a)<br/><br/>Sua unidade foi selecionada incorretamente e, portanto, foi removida do cadastro. 
+							`Caro(a) Usuário(a),<br/><br/>Sua unidade foi selecionada incorretamente e, portanto, foi removida do cadastro. 
 							Sendo assim, solicitamos que o processo seja realizado novamente.<br/><br/>Administração do Condomínio<br/><br/>
 							<strong>Em caso de dúvidas, por favor, não responda este email. Fale diretamente com a Administração do Condomínio.</strong>`
 						);
