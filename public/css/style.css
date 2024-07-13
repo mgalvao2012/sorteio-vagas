@@ -179,7 +179,7 @@ tr:nth-child(even) {
 }
 
 .res-circle {
-  width: 30px;
+  width: 35px;
   border-radius: 30px;
   border: 1px solid #008000;
 
@@ -189,6 +189,7 @@ tr:nth-child(even) {
   /* (C) NECESSARY TO POSITION TEXT BLOCK */
   line-height: 0;
   position: relative;
+  border-radius: 12px;
 }
 
 /* (D) MATCH HEIGHT */
