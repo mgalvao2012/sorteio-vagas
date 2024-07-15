@@ -261,7 +261,7 @@ const sorteioRoutes = require("./routes/sorteio");
 const meusdadosRoutes = require("./routes/meusdados");
 const setupRoutes = require("./routes/setup");
 const faleconoscoRoutes = require("./routes/faleconosco");
-const liberarunidadeRoutes = require("./routes/liberarunidade");
+//const liberarunidadeRoutes = require("./routes/liberarunidade");
 const managementRoutes = require("./routes/management");
 
 app.use(unidadesRoutes);
@@ -270,7 +270,7 @@ app.use(sorteioRoutes);
 app.use(meusdadosRoutes);
 app.use(setupRoutes);
 app.use(faleconoscoRoutes);
-app.use(liberarunidadeRoutes);
+//app.use(liberarunidadeRoutes);
 app.use(managementRoutes);
 
 // Start server

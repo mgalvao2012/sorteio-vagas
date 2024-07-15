@@ -131,7 +131,7 @@ router.post(
 		}
 	}
 );
-
+/*
 router.post(
 	"/meusdados-remover-unidade",
 	[
@@ -164,5 +164,5 @@ router.post(
 		response.redirect("/meusdados");
 	}
 );
-
+*/
 module.exports = router;

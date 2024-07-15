@@ -234,7 +234,7 @@ tr:nth-child(even) {
   display: grid;
   grid-gap: 10px;
   padding-right: 10px;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   background-color: #FFFFFF;
   white-space: nowrap;
 }

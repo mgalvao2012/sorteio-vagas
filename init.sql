@@ -13,7 +13,8 @@ DROP TABLE IF EXISTS vagas;
 CREATE TABLE configuracao (
   id SERIAL PRIMARY KEY,
   ultimo_sorteio TIMESTAMP,
-  resultado_sorteio VARCHAR(255)
+  resultado_sorteio VARCHAR(255),
+  log_sorteio TEXT
 );
 INSERT INTO configuracao (ultimo_sorteio, resultado_sorteio) values (NOW(), 'Sorteio não realizado');
 
@@ -33,6 +34,8 @@ CREATE TABLE unidades (
   email CHAR(255) UNIQUE,
   nome CHAR(255),
   senha CHAR(80),
+  ordem_sorteio SMALLINT,
+  ordem_vaga_escolhida SMALLINT,
   ultima_gravacao TIMESTAMP default CURRENT_TIMESTAMP,
   vagas_escolhidas JSONB
 );
