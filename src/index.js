@@ -262,6 +262,7 @@ const meusdadosRoutes = require("./routes/meusdados");
 const setupRoutes = require("./routes/setup");
 const faleconoscoRoutes = require("./routes/faleconosco");
 const liberarunidadeRoutes = require("./routes/liberarunidade");
+const managementRoutes = require("./routes/management");
 
 app.use(unidadesRoutes);
 app.use(vagasRoutes);
@@ -270,6 +271,7 @@ app.use(meusdadosRoutes);
 app.use(setupRoutes);
 app.use(faleconoscoRoutes);
 app.use(liberarunidadeRoutes);
+app.use(managementRoutes);
 
 // Start server
 const PORT = process.env.PORT || 3000;

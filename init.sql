@@ -3,6 +3,8 @@
 
 -- CREATE DATABASE sorteio_vagas;
 -- \c sorteio_vagas
+-- Habilita a criptografia nativa para armanezar senhas
+-- CREATE EXTENSION pgcrypto;
 
 DROP TABLE IF EXISTS configuracao;
 DROP TABLE IF EXISTS unidades;
@@ -29,6 +31,8 @@ CREATE TABLE unidades (
   vaga_sorteada CHAR(5) REFERENCES Vagas (codigo),
   user_id CHAR(80) UNIQUE,
   email CHAR(255) UNIQUE,
+  nome CHAR(255),
+  senha CHAR(80),
   ultima_gravacao TIMESTAMP default CURRENT_TIMESTAMP,
   vagas_escolhidas JSONB
 );
