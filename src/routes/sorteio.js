@@ -7,77 +7,65 @@ var ordem_sorteio = 0;
 
 const sorteiaVagas = (objetivo, vagas_disponiveis, query) => {
 	return new Promise((resolve, reject) => {
-		var unidades_e_vagas_sorteadas = [];
 		pool.query(query, (error, results) => {
 			if (error) {
-				//response.status(500).json({ status: 'warning', message: error.message })
 				reject(error.message);
 				return;
 			}
-			var unidades = results.rows;
-			// sorteia aleatoriamente a lista de unidades
-			unidades.sort(() => {
-				return 0.5 - Math.random();
-			});
-			unidades.forEach((unidades_element) => {
-				var vagas_escolhidas = unidades_element.vagas_escolhidas;
-				if (vagas_escolhidas != null) {
-					var ordem_vaga_escolhida = 0;
-					vagas_escolhidas.forEach((vagas_element) => {
-						ordem_vaga_escolhida++;
-						if (unidades_element.vaga_sorteada === null) {
-							var indice_lista_vagas_disponiveis =
-								vagas_disponiveis.indexOf(vagas_element.vaga);
-							if (indice_lista_vagas_disponiveis > -1) {
-								unidades_element.ordem_vaga_escolhida =
-									ordem_vaga_escolhida;
-								unidades_element.vaga_sorteada =
-									vagas_disponiveis[indice_lista_vagas_disponiveis];
-								vagas_disponiveis.splice(
-									indice_lista_vagas_disponiveis,
-									1
-								);
-								/*
-								ordem_sorteio++;
-								console.log(
-									`ordem_sorteio: ${ordem_sorteio} unidade: ${unidades_element.unidade} vaga sorteada: ${unidades_element.vaga_sorteada} ordem_vaga_escolhida: ${ordem_vaga_escolhida}`
-								);
-                */
-							}
+
+			let unidades = results.rows;
+			let unidades_e_vagas_sorteadas = [];
+			let ordem_sorteio = 0;
+
+			// Shuffle the list of units randomly
+			unidades.sort(() => 0.5 - Math.random());
+
+			unidades.forEach((unidade) => {
+				let vagas_escolhidas = unidade.vagas_escolhidas;
+				let vaga_sorteada = null;
+				let ordem_vaga_escolhida = 0;
+
+				if (vagas_escolhidas) {
+					for (let i = 0; i < vagas_escolhidas.length; i++) {
+						ordem_vaga_escolhida = i + 1;
+						let vaga_index = vagas_disponiveis.indexOf(
+							vagas_escolhidas[i].vaga
+						);
+
+						if (vaga_index > -1) {
+							vaga_sorteada = vagas_disponiveis[vaga_index];
+							vagas_disponiveis.splice(vaga_index, 1);
+							break;
 						}
-					});
-					// se ao final todas as vagas escolhidas foram sorteadas, o apartamento recebe a primeira vaga disponivel
-					if (unidades_element.vaga_sorteada === null) {
-						unidades_element.ordem_vaga_escolhida = 0;
-						unidades_element.vaga_sorteada = vagas_disponiveis[0];
-						vagas_disponiveis.splice(0, 1);
-						//console.log('vagas_disponiveis (3) = '+vagas_disponiveis)
 					}
-				} else {
-					// se o apartamento sorteado não escolheu nenhuma vaga ele deverá pegar a primeira disponível
-					unidades_element.ordem_vaga_escolhida = 0;
-					unidades_element.vaga_sorteada = vagas_disponiveis[0];
-					vagas_disponiveis.splice(0, 1);
-					//console.log('vagas_disponiveis (4) = '+vagas_disponiveis)
 				}
-			});
-			console.log(objetivo);
-			unidades.forEach((unidade_element) => {
+
+				if (!vaga_sorteada) {
+					ordem_vaga_escolhida = 0;
+					vaga_sorteada = vagas_disponiveis.shift();
+				}
+
+				unidade.ordem_vaga_escolhida = ordem_vaga_escolhida;
+				unidade.vaga_sorteada = vaga_sorteada;
+
 				ordem_sorteio++;
 				unidades_e_vagas_sorteadas.push([
-					unidade_element.unidade,
-					unidade_element.vaga_sorteada,
-					unidade_element.ordem_vaga_escolhida,
+					unidade.unidade,
+					vaga_sorteada,
+					ordem_vaga_escolhida,
 					ordem_sorteio,
 				]);
+			});
+
+			console.log(objetivo);
+
+			unidades_e_vagas_sorteadas.forEach(([unidade, vaga, ordem_vaga, ordem]) => {
 				console.log(
-					`ordem_sorteio: ${ordem_sorteio} unidade: ${unidade_element.unidade} vaga sorteada: ${unidade_element.vaga_sorteada} ordem_vaga_escolhida: ${unidade_element.ordem_vaga_escolhida}`
+					`ordem_sorteio: ${ordem} unidade: ${unidade} vaga sorteada: ${vaga} ordem_vaga_escolhida: ${ordem_vaga}`
 				);
 			});
-			let retorno = [];
-			retorno.push(vagas_disponiveis);
-			retorno.push(unidades_e_vagas_sorteadas);
-			resolve(retorno);
+
+			resolve([vagas_disponiveis, unidades_e_vagas_sorteadas]);
 		});
 	});
 };
