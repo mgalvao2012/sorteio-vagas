@@ -188,7 +188,8 @@ app.get("/", async (request, response) => {
 			pool.query(
 				`SELECT codigo FROM vagas WHERE disponivel = true ORDER BY codigo;
          SELECT unidade FROM unidades WHERE user_id = '${user_id}';
-         SELECT unidade FROM unidades WHERE user_id IS NULL ORDER BY unidade;`,
+         SELECT unidade FROM unidades WHERE user_id IS NULL ORDER BY unidade;
+			SELECT * FROM configuracao;`,
 				(error, results) => {
 					if (error) {
 						console.log(error.message);
@@ -212,6 +213,7 @@ app.get("/", async (request, response) => {
 								lista_unidades: results[2].rows,
 								vaga_sorteada: null,
 								usuario_admin: request.session.usuario_admin,
+								resultado_sorteio: results[3].rows[0].resultado_sorteio,
 							});
 						} else {
 							response.render("index.ejs", {
@@ -221,6 +223,7 @@ app.get("/", async (request, response) => {
 								name: request.oidc.user.name,
 								mensagem: null,
 								usuario_admin: request.session.usuario_admin,
+								resultado_sorteio: results[3].rows[0].resultado_sorteio,
 							});
 						}
 					}
@@ -241,6 +244,7 @@ app.get("/", async (request, response) => {
 				name: request.oidc.user.name,
 				mensagem: mensagem != null ? ["warning", "Atenção", mensagem] : null,
 				usuario_admin: request.session.usuario_admin,
+				resultado_sorteio: null,
 			});
 		}
 	} else {
@@ -251,6 +255,7 @@ app.get("/", async (request, response) => {
 			name: null,
 			mensagem: null,
 			usuario_admin: request.session.usuario_admin,
+			resultado_sorteio: null,
 		});
 	}
 });
