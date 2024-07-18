@@ -30,7 +30,7 @@ router.get("/management", requiresAuth(), async (request, response) => {
 					let unidades = await pool.query(
 						`SELECT unidade, nome, email, senha 
                 FROM unidades 
-                WHERE nome is not null and email is not null and senha is not null and user_id is null;`
+                WHERE nome is not null and email is not null and senha is not null and user_id is null LIMIT 10;`
 					);
 					unidades.rows.forEach((row) => {
 						let data = JSON.stringify({
