@@ -183,8 +183,7 @@ router.post("/sorteio", requiresAuth(), (request, response) => {
 						sorteiaVagas(
 							"sorteio de unidades COM portadores de necessidade especiais",
 							vagas_disponiveis,
-							`SELECT unidade, vaga_sorteada, vagas_escolhidas FROM unidades 
-                WHERE pne = true AND vaga_sorteada IS NULL`
+							`SELECT unidade, vaga_sorteada, vagas_escolhidas FROM unidades WHERE pne = true AND vaga_sorteada IS NULL`
 						)
 							.then((retorno1) => {
 								vagas_disponiveis = retorno1[0];
@@ -205,7 +204,7 @@ router.post("/sorteio", requiresAuth(), (request, response) => {
 								//console.log('terminou sorteio de unidades COM portadores de necessidade especiais')
 
 								sorteiaVagas(
-									"sorteio de unidades SEM portadores de necessidade especiais, PRESENTES e  ADIMPLENTES",
+									"sorteio de unidades SEM portadores de necessidade especiais, PRESENTES e ADIMPLENTES",
 									vagas_disponiveis,
 									`SELECT unidade, vaga_sorteada, vagas_escolhidas FROM unidades 
                 WHERE pne = false AND adimplente = true AND presente = true AND vaga_sorteada IS NULL`
@@ -213,7 +212,7 @@ router.post("/sorteio", requiresAuth(), (request, response) => {
 									.then((retorno2) => {
 										vagas_disponiveis = retorno2[0];
 										query_gravacao_log_sorteio +=
-											"<strong>sorteio de unidades SEM portadores de necessidade especiais, PRESENTES e  ADIMPLENTES</strong><br/>";
+											"<strong>sorteio de unidades SEM portadores de necessidade especiais, PRESENTES e ADIMPLENTES</strong><br/>";
 										retorno2[1].forEach((element) => {
 											unidades_e_vagas_sorteadas.push(element);
 											// verifica se a unidade recebeu alguma vaga
@@ -227,15 +226,14 @@ router.post("/sorteio", requiresAuth(), (request, response) => {
 										});
 
 										sorteiaVagas(
-											"sorteio de unidades SEM portadores de necessidade especiais, PRESENTES e INADIMPLENTES",
+											"sorteio de unidades SEM portadores de necessidade especiais, AUSENTES e ADIMPLENTES",
 											vagas_disponiveis,
-											`SELECT unidade, vaga_sorteada, vagas_escolhidas FROM unidades 
-                  WHERE pne = false AND adimplente = false AND presente = true AND vaga_sorteada IS NULL`
+											`SELECT unidade, vaga_sorteada, vagas_escolhidas FROM unidades WHERE pne = false AND presente = false AND vaga_sorteada IS NULL`
 										)
 											.then((retorno3) => {
 												vagas_disponiveis = retorno3[0];
 												query_gravacao_log_sorteio +=
-													"<strong>sorteio de unidades SEM portadores de necessidade especiais, PRESENTES e INADIMPLENTES</strong><br/>";
+													"<strong>sorteio de unidades SEM portadores de necessidade especiais, AUSENTES e ADIMPLENTES</strong><br/>";
 												retorno3[1].forEach((element) => {
 													unidades_e_vagas_sorteadas.push(
 														element
@@ -251,15 +249,14 @@ router.post("/sorteio", requiresAuth(), (request, response) => {
 												});
 
 												sorteiaVagas(
-													"sorteio de unidades SEM portadores de necessidade especiais e AUSENTES",
+													"sorteio de unidades SEM portadores de necessidade especiais e INADIMPLENTES",
 													vagas_disponiveis,
-													`SELECT unidade, vaga_sorteada, vagas_escolhidas FROM unidades 
-                    WHERE pne = false AND presente = false AND vaga_sorteada IS NULL`
+													`SELECT unidade, vaga_sorteada, vagas_escolhidas FROM unidades WHERE pne = false AND adimplente = false AND vaga_sorteada IS NULL`
 												)
 													.then((retorno4) => {
 														vagas_disponiveis = retorno4[0];
 														query_gravacao_log_sorteio +=
-															"<strong>sorteio de unidades SEM portadores de necessidade especiais e AUSENTES</strong><br/>";
+															"<strong>sorteio de unidades SEM portadores de necessidade especiais e INADIMPLENTES</strong><br/>";
 														retorno4[1].forEach((element) => {
 															unidades_e_vagas_sorteadas.push(
 																element
