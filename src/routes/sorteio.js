@@ -89,7 +89,7 @@ const getSorteio = (request, response) => {
 							response.render("sorteio.ejs", {
 								email: request.oidc.user.email,
 								name: request.oidc.user.name,
-								ultimo_sorteio: null,
+								configuracao: null,
 								resultado_sorteio: null,
 								lista_vagas_sorteadas: null,
 								lista_presenca: null,
@@ -97,10 +97,18 @@ const getSorteio = (request, response) => {
 								usuario_admin: request.session.usuario_admin,
 							});
 						} else {
-							let ultimo_sorteio = util.formatDate(
-								results[0].rows[0].ultimo_sorteio,
-								1
-							);
+							if (results[0].rows[0].ultimo_sorteio != null) {
+								var ultimo_sorteio = util.formatDate(
+									results[0].rows[0].ultimo_sorteio,
+									1
+								);
+							}
+							if (results[0].rows[0].bloqueio_sorteio != null) {
+								var bloqueio_sorteio = util.formatDate(
+									results[0].rows[0].bloqueio_sorteio,
+									1
+								);
+							}
 							let lista_presenca = []; // lista criada para facilitar o tratamento de presenca
 							results[1].rows.forEach((row) => {
 								lista_presenca.push(
@@ -123,7 +131,8 @@ const getSorteio = (request, response) => {
 								email: request.oidc.user.email,
 								name: request.oidc.user.name,
 								ultimo_sorteio: ultimo_sorteio,
-								resultado_sorteio: results[0].rows[0].resultado_sorteio,
+								bloqueio_sorteio: bloqueio_sorteio,
+								configuracao: results[0].rows[0],
 								lista_vagas_sorteadas: results[1].rows,
 								lista_presenca: lista_presenca,
 								mensagem: [estilo, titulo, mensagem],
@@ -392,9 +401,12 @@ router.post("/sorteio", requiresAuth(), (request, response) => {
 
 router.post("/sorteio/reiniciar", requiresAuth(), (request, response) => {
 	if (request.session.usuario_admin) {
+		let data_atual = util.formatDate(new Date(), 2);
 		pool.query(
 			`UPDATE unidades SET vaga_sorteada = null;
-       UPDATE configuracao SET resultado_sorteio = 'Sorteio não realizado' RETURNING *;`,
+       	 UPDATE configuracao SET resultado_sorteio = 'Sorteio não realizado', log_sorteio = null, 
+			 	 ultimo_sorteio = null, bloqueio_sorteio = null, 
+				 resultado_bloqueio = 'Sorteio não bloqueado' RETURNING *;`,
 			(error, results) => {
 				if (error) {
 					console.log(error.message);
@@ -410,6 +422,42 @@ router.post("/sorteio/reiniciar", requiresAuth(), (request, response) => {
 							status: "error",
 							message:
 								"Falha no processo de reinicio. Procure o administrador.",
+						});
+					}
+				}
+			}
+		);
+	} else {
+		console.log("Você não está autorizado a acessar este recurso!");
+		response.status(403).json({
+			status: "error",
+			message: "Você não está autorizado a acessar este recurso!",
+		});
+	}
+});
+
+router.post("/sorteio/bloquear", requiresAuth(), (request, response) => {
+	if (request.session.usuario_admin) {
+		let data_atual = util.formatDate(new Date(), 2);
+		pool.query(
+			`UPDATE configuracao SET resultado_sorteio = 'Sorteio não realizado', log_sorteio = null,
+			   ultimo_sorteio = null, resultado_bloqueio = 'Sorteio bloqueado', 
+				bloqueio_sorteio = '${data_atual}' RETURNING *;`,
+			(error, results) => {
+				if (error) {
+					console.log(error.message);
+					response.status(500).json({ status: "error", message: error });
+				} else {
+					if (results.rows[0].resultado_bloqueio == "Sorteio bloqueado") {
+						console.log("Sorteio bloqueado com sucesso!");
+						request.session.sorteioMensagem =
+							"Sorteio bloqueado com sucesso!";
+						getSorteio(request, response);
+					} else {
+						response.status(500).json({
+							status: "error",
+							message:
+								"Falha no processo de bloqueio. Procure o administrador.",
 						});
 					}
 				}

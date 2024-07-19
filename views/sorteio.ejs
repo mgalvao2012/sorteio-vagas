@@ -18,22 +18,36 @@
 <div class="w3-container w3-light-grey" style="padding:78px 16px;" id="sorteio">
     <div style="padding: 10px; box-shadow: 0 3px 18px 8px rgb(38 24 24 / 25%);">
       <h3 class="w3-center">Sorteio das vagas</h3>
-      <% if(resultado_sorteio == 'Sorteio não realizado') { %>
+      <% if(configuracao.resultado_sorteio == 'Sorteio não realizado') { %>
         <p class="w3-center w3-medium">Antes de executar o sorteio confirme se todos fizeram suas escolhas.<br/>
         Clicando <span class="fa fa-hand-pointer-o icon-hand-pointer"></span> na unidade é possível atualizar a presença ou ausência no sorteio.</p>
       <% } %>        
       <div style="margin-top:28px; width: 90%; margin: auto;">
         <div>
-          <% if(resultado_sorteio == 'Sorteio não realizado') { %>
-            <form action="/sorteio" method="POST">
-          <% } else { %>    
-            <form action="/sorteio/reiniciar" method="POST">
-          <% } %>    
-              <% if(resultado_sorteio != 'Sorteio não realizado') { %>
-                <p><label class="w3-label">Último sorteio</label>
-                <input class="w3-input w3-border" type="text" name="ultimo_sorteio" value="<%= ultimo_sorteio %>" disabled></p>
+          <form id="form1" action="/sorteio/bloquear" method="POST">
+          <% if(configuracao.resultado_bloqueio == 'Sorteio bloqueado' && configuracao.resultado_sorteio == 'Sorteio não realizado') { %>
+            <p>
+              <label class="w3-label">Bloqueio do sorteio</label>
+              <input class="w3-input w3-border" type="text" name="bloqueio_sorteio" value="<%= bloqueio_sorteio %>" disabled>
+            </p>
+          <% } %>
+              <% if(configuracao.resultado_sorteio != 'Sorteio não realizado') { %>
+                <div class="w3-row">
+                  <div class="w3-col m6 l6" style="padding-right:10px;">
+                    <p>
+                      <label class="w3-label">Execução do sorteio</label>
+                      <input class="w3-input w3-border" type="text" name="ultimo_sorteio" value="<%= ultimo_sorteio %>" disabled></p>
+                    </p>
+                  </div>
+                  <div class="w3-col m6 l6" style="padding-right:10px;">
+                    <p>
+                      <label class="w3-label">Bloqueio do sorteio</label>
+                      <input class="w3-input w3-border" type="text" name="bloqueio_sorteio" value="<%= bloqueio_sorteio %>" disabled>
+                    </p>
+                  </div>
+                </div>
                 <p><label class="w3-label">Resultado</label>
-                <input class="w3-input w3-border" type="text" name="resultado" value="<%= resultado_sorteio %>" disabled></p>
+                <input class="w3-input w3-border" type="text" name="resultado" value="<%= configuracao.resultado_sorteio %>" disabled></p>
                 <div>
                   <div class="w3-bar" >
                     <input id="S1b" type="button" class="aba-subsolo aba-subsolo-foco" value="Torre 1">
@@ -166,20 +180,34 @@
                 </label> 
               <% } %>
               <p>
-                <% if(resultado_sorteio == 'Sorteio não realizado') { %>
+                <% if(configuracao.resultado_bloqueio == 'Sorteio não bloqueado' && configuracao.resultado_sorteio == 'Sorteio não realizado') { %>
                   <button class="w3-button w3-black" type="submit">
+                      <i class="fa fa-paper-plane"></i> BLOQUEAR PARA SORTEAR
+                  </button>
+                <% } %>
+                <% if(configuracao.resultado_bloqueio == 'Sorteio bloqueado' && configuracao.resultado_sorteio == 'Sorteio não realizado') { %>
+                  <button id="btnSortear" class="w3-button w3-black" type="submit">
                       <i class="fa fa-paper-plane"></i> SORTEAR
                   </button> 
-                <% } else { %>               
-                  <button id="btnReiniciar" class="w3-button w3-black" type="submit">
+                  <script>
+                    document.getElementById("btnSortear").addEventListener('click', 
+                      function() { 
+                          document.getElementById("form1").action = "/sorteio";
+                          document.getElementById("form1").submit();      
+                      });                    
+                  </script>
+                <% } %>
+                <% if(configuracao.resultado_sorteio.startsWith('Sorteio realizado')) { %>             
+                  <button id="btnReiniciar" class="w3-button w3-black" type="button">
                     <i class="fa fa-paper-plane"></i> REINICIAR SORTEIO
                   </button>
-                  <!-- 
                   <script>
                     document.getElementById("btnReiniciar").addEventListener('click', 
-                      function() { window.open("/sorteio/reiniciar","_self") })                    
+                      function() { 
+                        document.getElementById("form1").action = "/sorteio/reiniciar";
+                        document.getElementById("form1").submit();      
+                    });                    
                   </script>
-                  -->
               <% } %>
               </p>
             </form>
@@ -199,7 +227,7 @@
     var lista_vagas_sorteadas = '<%= lista_vagas_sorteadas %>'
     var lista_presenca = '<%= lista_presenca %>'.split(',')
     var lista_presenca_vagas = []
-    var resultado_sorteio = '<%= resultado_sorteio %>'
+    var configuracao = '<%= configuracao %>'
 
     const notify = new Notify();
     var estilo = '<%= (mensagem != null ? mensagem[0] : "") %>';
@@ -215,7 +243,7 @@
 
     // atualiza as unidades com o status de presença gravado no banco de dados
     function loadFunction() { 
-      if(resultado_sorteio == 'Sorteio não realizado') {
+      if(configuracao.resultado_sorteio == 'Sorteio não realizado') {
         for(var i=0; i<lista_presenca.length; i++) {
           let unidade = lista_presenca[i].split('-')[0]
           if (lista_presenca[i].split('-')[1] == 'true') {

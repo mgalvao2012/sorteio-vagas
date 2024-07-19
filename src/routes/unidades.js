@@ -14,14 +14,12 @@ router.get("/unidades", requiresAuth(), async (request, response) => {
 				try {
 					let configuracao = await pool.query("SELECT * FROM configuracao;");
 					let mensagem;
-					if (
-						configuracao.rows[0].resultado_sorteio != "Sorteio não realizado"
-					) {
-						let ultimo_sorteio = util.formatDate(
-							configuracao.rows[0].ultimo_sorteio,
-							1
-						);
+					if (configuracao.rows[0].resultado_sorteio.startsWith("Sorteio realizado")) {
+						let ultimo_sorteio = util.formatDate(configuracao.rows[0].ultimo_sorteio,1);
 						mensagem = `As condições não podem ser alteradas porque o sorteio foi realizado em ${ultimo_sorteio}. É preciso reiniciar o processo!`;
+					} else if (configuracao.rows[0].resultado_bloqueio == "Sorteio bloqueado") {
+						let bloqueio_sorteio = util.formatDate(configuracao.rows[0].bloqueio_sorteio,1);
+						mensagem = `As condições não podem ser alteradas porque o sorteio foi bloqueado em ${bloqueio_sorteio}!`;
 					}
 					let unidades = await pool.query(
 						"SELECT unidade, pne, adimplente, user_id FROM unidades ORDER BY unidade;"

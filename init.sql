@@ -13,10 +13,12 @@ DROP TABLE IF EXISTS vagas;
 CREATE TABLE configuracao (
   id SERIAL PRIMARY KEY,
   ultimo_sorteio TIMESTAMP,
+  bloqueio_sorteio TIMESTAMP,
   resultado_sorteio VARCHAR(255),
+  resultado_bloqueio VARCHAR(255)
   log_sorteio TEXT
 );
-INSERT INTO configuracao (ultimo_sorteio, resultado_sorteio) values (NOW(), 'Sorteio não realizado');
+INSERT INTO configuracao (ultimo_sorteio, resultado_sorteio) values (NOW(), 'Sorteio não realizado', 'Sorteio não bloqueado');
 
 CREATE TABLE vagas (
   codigo CHAR(5) PRIMARY KEY,

@@ -13,8 +13,9 @@ const getMeusdados = (request, response) => {
 		let user_id = request.oidc.user.sub;
 		pool.query(
 			`SELECT codigo FROM vagas WHERE disponivel = true ORDER BY codigo;
-       SELECT * FROM unidades WHERE user_id = '${user_id}';
-       SELECT unidade FROM unidades WHERE user_id IS NULL ORDER BY unidade;`,
+       	 SELECT * FROM unidades WHERE user_id = '${user_id}';
+       	 SELECT unidade FROM unidades WHERE user_id IS NULL ORDER BY unidade;
+			 SELECT * FROM configuracao;`,
 			(error, results) => {
 				if (error) {
 					console.log(error.message);
@@ -55,6 +56,7 @@ const getMeusdados = (request, response) => {
 							lista_unidades: results[2].rows,
 							vaga_sorteada: results[1].rows[0].vaga_sorteada,
 							usuario_admin: request.session.usuario_admin,
+							configuracao: results[3].rows[0],
 						});
 					}
 					resolve("ok");

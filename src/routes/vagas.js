@@ -27,20 +27,16 @@ router.get("/vagas", requiresAuth(), async (request, response) => {
 								usuario_admin: request.session.usuario_admin,
 							});
 						} else {
-							let ultimo_sorteio = util.formatDate(
-								results[0].rows[0].ultimo_sorteio,
-								1
-							);
-							var mensagem;
-							if (
-								results[0].rows[0].resultado_sorteio !=
-								"Sorteio não realizado"
-							) {
-								ultimo_sorteio = util.formatDate(
-									results[0].rows[0].ultimo_sorteio,
-									1
-								);
-								mensagem = `As condições não podem ser alteradas porque o sorteio foi realizado em ${ultimo_sorteio}. É preciso reiniciar o processo!`;
+							var mensagem = '';
+							var ultimo_sorteio = '';
+							if (request.session.usuario_admin != '') {
+								if (results[0].rows[0].resultado_sorteio.startsWith("Sorteio realizado")) {
+									ultimo_sorteio = util.formatDate(results[0].rows[0].ultimo_sorteio,1);
+									mensagem = `As condições não podem ser alteradas porque o sorteio foi realizado em ${ultimo_sorteio}. É preciso reiniciar o processo!`;
+								} else if (results[0].rows[0].resultado_bloqueio == "Sorteio bloqueado") {
+									let bloqueio_sorteio = util.formatDate(results[0].rows[0].bloqueio_sorteio,1);
+									mensagem = `As condições não podem ser alteradas porque o sorteio foi bloqueado em ${bloqueio_sorteio}!`;
+								}
 							}
 							let lista_vagas = []; // lista criada para facilitar o tratamento da vaga
 							results[1].rows.forEach((row) => {

@@ -42,21 +42,6 @@
             <% if(vaga_sorteada == null) { %>
               <p>
                 <% if(!usuario_admin) { %>
-                <% if(unidade == null) { %>
-                  <label class="w3-label">Unidade: </label>
-                  <select name="unidade" id="unidades" class="box">
-                    <% lista_unidades.forEach(function(row) { %>
-                      <option value="<%- row.unidade %>"><%- row.unidade %></option>
-                    <% }) %>
-                  </select>
-                  &nbsp;&nbsp;
-                  <span style="font-weight: bold; color: #cc2727;">
-                    Atenção: uma vez escolhida essa informação não pode ser alterada!
-                  </span>
-                <% } else { %>
-                  <!--
-                  <label class="w3-label">Unidade: exemplo <span>T1041</span>, T + (torre 1 ou 2) + (número do apartamento)</label>
-                  -->
                   <div class="w3-row">
                     <div class="w3-col m6 l6" style="padding-right:10px;">
                       <p>
@@ -70,15 +55,17 @@
                         <label class="w3-label">Vagas Selecionadas:</label>
                         <textarea class="w3-input w3-border" type="areatext" name="sequencia_vagas_escolhidas" 
                           id="sequencia_vagas_escolhidas" style="display: none;" value=""></textarea>
-                        <p class="w3-input w3-border" id="pvagas_escolhidas" style="background: white; margin-top: -15px;></p>
+                        <textarea class="w3-input w3-border" type="areatext" disabled name="_vagas_escolhidas" 
+                          id="_vagas_escolhidas" style="display: none;" value=""></textarea>
+                        <p class="w3-input w3-border" id="pvagas_escolhidas" style="background: white; margin-top: -15px;"></p>
                       </p>
                     </div>
                   </div>
                 <% } %>
-                <% } %>
               </p>
               <div class="w3-bar" >
-                <% if(!usuario_admin) { %>
+                <% if(!usuario_admin && configuracao.resultado_bloqueio == 'Sorteio não bloqueado' && 
+                  configuracao.resultado_sorteio == 'Sorteio não realizado') { %>
                   <input id="S1b" type="button" class="aba-subsolo aba-subsolo-foco" value="Sub-solo 1">
                   <input id="S2b" type="button" class="aba-subsolo" value="Sub-solo 2">
                   <input id="S3b" type="button" class="aba-subsolo" value="Mapa S1">
@@ -94,8 +81,9 @@
                   document.getElementById('S3b').addEventListener('click', function() { abreSubsolo('S3') })                      
                   document.getElementById('S4b').addEventListener('click', function() { abreSubsolo('S4') })                      
                 </script>
-              </div>
-              <% if(!usuario_admin) { %>
+              </div>              
+              <% if(!usuario_admin && configuracao.resultado_bloqueio == 'Sorteio não bloqueado' && 
+                configuracao.resultado_sorteio == 'Sorteio não realizado') { %>
                 <div id="S1" class="cards subsolo w3-border">                      
                     <% lista_vagas.forEach(function(row) { %>
                         <% if (row.codigo.substring(0,2) == 'S1' ) { %>
@@ -131,7 +119,8 @@
                   <% }) %>
                 </div>
               <% } %>               
-              <% if(!usuario_admin) { %>
+              <% if(!usuario_admin && configuracao.resultado_bloqueio == 'Sorteio não bloqueado' && 
+                configuracao.resultado_sorteio == 'Sorteio não realizado' ) { %>
                 <div id="S3" class="subsolo" style="display:none">
                   <img src="../images/subsolo1.jpg" width="100%">
                 </div>
@@ -165,7 +154,9 @@
                   <p class="w3-input w3-border" id="pvagas_escolhidas" style="background: white; margin-top: -15px;"></p>
               </p>
             <% } %>
-            <% if(vaga_sorteada == null && !usuario_admin) { %>
+            <% if(vaga_sorteada == null && !usuario_admin && 
+              configuracao.resultado_bloqueio == 'Sorteio não bloqueado' && 
+              configuracao.resultado_sorteio == 'Sorteio não realizado') { %>
               <p>
                 <div class="w3-bar">
                   <input type="text" id="vagas_escolhidas" name="vagas_escolhidas" style="display: none;">                
@@ -178,20 +169,6 @@
                   <script>
                     document.getElementById('removerVagas').addEventListener('click', function() { removerVagas() }) 
                   </script>               
-                  <% if(unidade != null) { %>
-<!--
-                    <button id="trocarUnidade" class="w3-button w3-black w3-padding-small" type="button">
-                      <i class="fa fa-paper-plane"></i> TROCAR UNIDADE
-                    </button>
-                    <span style="font-style: italic;">
-                      (Imporante: você deverá selecionar as vagas novamente!)
-                    </span>
-                    <script>
-                      document.getElementById('trocarUnidade').addEventListener('click', function() { trocarUnidade() }) 
-                    </script>
--->                    
-                  <% } %>              
-                </div>
               </p>
             <% } %>
             </form>
@@ -223,15 +200,16 @@
     function loadFunction() {    
       let vagas_escolhidas = '<%= vagas_escolhidas %>'
       let vaga_sorteada = '<%= vaga_sorteada %>'
-      if(vagas_escolhidas != '' & vaga_sorteada != '') {
+      //alert(configuracao);
+      if(vagas_escolhidas != '') {
         document.getElementById('_vagas_escolhidas').value = vagas_escolhidas.replaceAll(',',', ');
         document.getElementById('pvagas_escolhidas').innerHTML = document.getElementById('_vagas_escolhidas').value;
-      }
-      if(vagas_escolhidas != '' & vaga_sorteada == '') {
-        vagas_escolhidas = vagas_escolhidas.split(',')
-        vagas_escolhidas.forEach(vaga => {
-            unidadeClicada(vaga, false)
-        })
+        if(vaga_sorteada == '') {
+          vagas_escolhidas = vagas_escolhidas.split(',');
+          vagas_escolhidas.forEach(vaga => {
+              unidadeClicada(vaga, false)
+          });
+        }  
       }
     }
     window.onload = loadFunction();
