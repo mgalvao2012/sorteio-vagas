@@ -67,9 +67,10 @@
                     </div>
                     <div class="w3-col m6 l6">
                       <p>
-                        <label class="w3-label">Vagas Escolhidas:</label>
-                        <textarea class="w3-input w3-border" type="areatext" disabled name="sequencia_vagas_escolhidas" 
-                          id="sequencia_vagas_escolhidas" rows="2" value=""></textarea>
+                        <label class="w3-label">Vagas Selecionadas:</label>
+                        <textarea class="w3-input w3-border" type="areatext" name="sequencia_vagas_escolhidas" 
+                          id="sequencia_vagas_escolhidas" style="display: none;" value=""></textarea>
+                        <p class="w3-input w3-border" id="pvagas_escolhidas" style="background: white; margin-top: -15px;></p>
                       </p>
                     </div>
                   </div>
@@ -158,9 +159,10 @@
                 </div>
               </div>
               <p>
-                <label class="w3-label">Vagas Escolhidas:</label>
+                <label class="w3-label">Vagas Selecionadas:</label>
                 <textarea class="w3-input w3-border" type="areatext" disabled name="_vagas_escolhidas" 
-                  id="_vagas_escolhidas" rows="1" value=""></textarea>
+                  id="_vagas_escolhidas" style="display: none"  rows="1" value=""></textarea>
+                  <p class="w3-input w3-border" id="pvagas_escolhidas" style="background: white; margin-top: -15px;"></p>
               </p>
             <% } %>
             <% if(vaga_sorteada == null && !usuario_admin) { %>
@@ -170,6 +172,12 @@
                   <button class="w3-button w3-black w3-padding-small" type="submit">
                     <i class="fa fa-paper-plane"></i> ENVIAR
                   </button>
+                  <button id="removerVagas" class="w3-button w3-black w3-padding-small" type="button">
+                    <i class="fa fa-trash"></i> REMOVER VAGAS
+                  </button>
+                  <script>
+                    document.getElementById('removerVagas').addEventListener('click', function() { removerVagas() }) 
+                  </script>               
                   <% if(unidade != null) { %>
 <!--
                     <button id="trocarUnidade" class="w3-button w3-black w3-padding-small" type="button">
@@ -217,12 +225,13 @@
       let vaga_sorteada = '<%= vaga_sorteada %>'
       if(vagas_escolhidas != '' & vaga_sorteada != '') {
         document.getElementById('_vagas_escolhidas').value = vagas_escolhidas.replaceAll(',',', ');
+        document.getElementById('pvagas_escolhidas').innerHTML = document.getElementById('_vagas_escolhidas').value;
       }
       if(vagas_escolhidas != '' & vaga_sorteada == '') {
         vagas_escolhidas = vagas_escolhidas.split(',')
         vagas_escolhidas.forEach(vaga => {
             unidadeClicada(vaga, false)
-        }) 
+        })
       }
     }
     window.onload = loadFunction();
@@ -240,9 +249,10 @@
         //lista_vagas_escolhidas.sort();
       }
       var lista_unidades = document.getElementById("vagas_escolhidas");
-      var sequencia_lista_unidades = document.getElementById("sequencia_vagas_escolhidas");
+      var sequencia_lista_unidades = document.getElementById("sequencia_vagas_escolhidas");      
       lista_unidades.value = lista_vagas_escolhidas;
       sequencia_lista_unidades.value = lista_vagas_escolhidas.toString().replace(/,/gi, ', ');
+      document.getElementById('pvagas_escolhidas').innerHTML = sequencia_lista_unidades.value;
       if(clicou) {
         const notify = new Notify();
         notify.render({
@@ -272,8 +282,8 @@
       }   
     }
 
-    function trocarUnidade() {
-      document.getElementById("form1").action = "meusdados-remover-unidade";
+    function removerVagas() {
+      document.getElementById("form1").vagas_escolhidas.value = "";
       document.getElementById("form1").submit();      
     }
   </script>
