@@ -25,59 +25,47 @@
       <div style="margin-top:28px; width: 90%; margin: auto;">
         <div>
           <form id="form1" action="/sorteio/bloquear" method="POST">
-          <% if(configuracao.resultado_bloqueio == 'Sorteio bloqueado' && configuracao.resultado_sorteio == 'Sorteio não realizado') { %>
-            <p>
-              <label class="w3-label">Bloqueio do sorteio</label>
-              <input class="w3-input w3-border" type="text" name="bloqueio_sorteio" value="<%= bloqueio_sorteio %>" disabled>
-            </p>
-          <% } %>
-              <% if(configuracao.resultado_sorteio != 'Sorteio não realizado') { %>
-                <div class="w3-row">
-                  <div class="w3-col m6 l6" style="padding-right:10px;">
-                    <p>
-                      <label class="w3-label">Execução do sorteio</label>
-                      <input class="w3-input w3-border" type="text" name="ultimo_sorteio" value="<%= ultimo_sorteio %>" disabled></p>
-                    </p>
-                  </div>
-                  <div class="w3-col m6 l6" style="padding-right:10px;">
-                    <p>
-                      <label class="w3-label">Bloqueio do sorteio</label>
-                      <input class="w3-input w3-border" type="text" name="bloqueio_sorteio" value="<%= bloqueio_sorteio %>" disabled>
-                    </p>
-                  </div>
+            <% if(configuracao.resultado_bloqueio == 'Sorteio bloqueado' && configuracao.resultado_sorteio == 'Sorteio não realizado') { %>
+              <p>
+                <label class="w3-label">Bloqueio do sorteio</label>
+                <input class="w3-input w3-border" type="text" name="bloqueio_sorteio" value="<%= bloqueio_sorteio %>" disabled>
+              </p>
+            <% } %>
+            <% if(configuracao.resultado_sorteio != 'Sorteio não realizado') { %>
+              <div class="w3-row">
+                <div class="w3-col m6 l6" style="padding-right:10px;">
+                  <p>
+                    <label class="w3-label">Execução do sorteio</label>
+                    <input class="w3-input w3-border" type="text" name="ultimo_sorteio" value="<%= ultimo_sorteio %>" disabled></p>
+                  </p>
                 </div>
-                <p><label class="w3-label">Resultado</label>
-                <input class="w3-input w3-border" type="text" name="resultado" value="<%= configuracao.resultado_sorteio %>" disabled></p>
-                <div>
-                  <div class="w3-bar" >
-                    <input id="S1b" type="button" class="aba-subsolo aba-subsolo-foco" value="Torre 1">
-                    <input id="S2b" type="button" class="aba-subsolo" value="Torre 2">
-                    <input id="S3b" type="button" class="aba-subsolo" value="Mapa S1">
-                    <input id="S4b" type="button" class="aba-subsolo" value="Mapa S2">
-                    <input id="S5b" type="button" class="aba-subsolo" value="Log Sorteio">
-                    <script>
-                      document.getElementById('S1b').addEventListener('click', function() { abreSubsolo('S1') })                      
-                      document.getElementById('S2b').addEventListener('click', function() { abreSubsolo('S2') })                      
-                      document.getElementById('S3b').addEventListener('click', function() { abreSubsolo('S3') })                      
-                      document.getElementById('S4b').addEventListener('click', function() { abreSubsolo('S4') })                      
-                      document.getElementById('S5b').addEventListener('click', function() { abreSubsolo('S5') })                      
-                    </script>
-                  </div> 
-                  <div id="S1" class="cards-sorteio subsolo w3-border">  
-                      <% lista_vagas_sorteadas.forEach(function(row) { %>                          
-                          <% if (row.unidade.substring(0,2) == 'T1' ) { %>
-                            <div class="card-sorteio">
-                              <span style="font-weight: bold;">
-                                <%- row.unidade.substring(2) %>
-                              </span>-
-                              <%- row.vaga_sorteada %> - <%- row.ordem_sorteio %> - <%- row.ordem_vaga_escolhida %>
-                            </div>
-                          <% } %>
-                      <% }) %>
-                  </div>
-                  <div id="S2" class="cards-sorteio subsolo w3-border" style="display:none">                     
-                    <% lista_vagas_sorteadas.forEach(function(row) {
-                        if (row.unidade.substring(0,2) == 'T2' ) { %>
+                <div class="w3-col m6 l6" style="padding-right:10px;">
+                  <p>
+                    <label class="w3-label">Bloqueio do sorteio</label>
+                    <input class="w3-input w3-border" type="text" name="bloqueio_sorteio" value="<%= bloqueio_sorteio %>" disabled>
+                  </p>
+                </div>
+              </div>
+              <p><label class="w3-label">Resultado</label>
+              <input class="w3-input w3-border" type="text" name="resultado" value="<%= configuracao.resultado_sorteio %>" disabled></p>
+              <div>
+                <div class="w3-bar" >
+                  <input id="S1b" type="button" class="aba-subsolo aba-subsolo-foco" value="Torre 1">
+                  <input id="S2b" type="button" class="aba-subsolo" value="Torre 2">
+                  <input id="S3b" type="button" class="aba-subsolo" value="Mapa S1">
+                  <input id="S4b" type="button" class="aba-subsolo" value="Mapa S2">
+                  <input id="S5b" type="button" class="aba-subsolo" value="Log Sorteio">
+                  <script>
+                    document.getElementById('S1b').addEventListener('click', function() { abreSubsolo('S1') })                      
+                    document.getElementById('S2b').addEventListener('click', function() { abreSubsolo('S2') })                      
+                    document.getElementById('S3b').addEventListener('click', function() { abreSubsolo('S3') })                      
+                    document.getElementById('S4b').addEventListener('click', function() { abreSubsolo('S4') })                      
+                    document.getElementById('S5b').addEventListener('click', function() { abreSubsolo('S5') })                      
+                  </script>
+                </div> 
+                <div id="S1" class="cards-sorteio subsolo w3-border">  
+                    <% lista_vagas_sorteadas.forEach(function(row) { %>                          
+                        <% if (row.unidade.substring(0,2) == 'T1' ) { %>
                           <div class="card-sorteio">
                             <span style="font-weight: bold;">
                               <%- row.unidade.substring(2) %>
@@ -86,62 +74,47 @@
                           </div>
                         <% } %>
                     <% }) %>
-                  </div>
-                  <div id="S3" class="subsolo" style="display:none"> 
-                    <img src="/images/subsolo1.jpg" width="100%">
-                  </div>
-                  <div id="S4" class="subsolo" style="display:none"> 
-                    <img src="/images/subsolo2.jpg" width="100%">
-                  </div>
-                  <div id="S5" class="subsolo subsolo w3-border" style="display:none; background-color: #FFFFFF;"> 
-                    <p><%- log_sorteio %></p>
-                  </div>
                 </div>
-                <label class="w3-label">Formato: Unidade - Subsolo - Vaga - Ordem do Sorteio da Unidade - Ordem do Sorteio da Vaga Escolhida </label>                
-                
-              <% } else { %>
-                <div>
-                  <div class="w3-bar" >
-                    <input id="S1b" type="button" class="aba-subsolo aba-subsolo-foco" value="Torre 1">
-                    <input id="S2b" type="button" class="aba-subsolo" value="Torre 2">
-                    <input id="S3b" type="button" class="aba-subsolo" value="Mapa S1">
-                    <input id="S4b" type="button" class="aba-subsolo" value="Mapa S2">
-                    <script>
-                      document.getElementById('S1b').addEventListener('click', function() { abreSubsolo('S1') })                      
-                      document.getElementById('S2b').addEventListener('click', function() { abreSubsolo('S2') })                      
-                      document.getElementById('S3b').addEventListener('click', function() { abreSubsolo('S3') })                      
-                      document.getElementById('S4b').addEventListener('click', function() { abreSubsolo('S4') })                      
-                    </script>
-                  </div> 
-                  <div id="S1" class="cards-sorteio-vagas subsolo w3-border">  
-                      <% lista_vagas_sorteadas.forEach(function(row) { %>                          
-                          <% if (row.unidade.substring(0,2) == 'T1' ) { %>
-                            <div class="card-sorteio-vagas" id="<%- row.unidade %>u">
-                              <span style="font-weight: bold;">
-                                <%- row.unidade.substring(2) %> - <span id="<%- row.unidade %>-icon"></span> -
-                                <% if (row.user_id != null) { %>
-                                  <span class="fa fa-user icon-color-ok"></span>
-                                <% } else { %>
-                                  <span class="fa fa-user icon-color-no-ok"></span>
-                                <% } %>
-                              </span>- 
-                              <% if(row.vagas_escolhidas != null) { 
-                                    let vagas = []
-                                    row.vagas_escolhidas.forEach(function(item) {
-                                      vagas.push(item.vaga)
-                                    })
-                              %>                              
-                                  <%- '('+vagas.toString().replace(/,/gi, ', ')+')' %>                                
-                              <% } else { %>
-                                Sem escolhas
-                              <% } %>                            
-                            </div>
-                          <% } %>
-                      <% }) %>
-                  </div>
-                  <div id="S2" class="cards-sorteio-vagas subsolo w3-border" style="display:none">                     
-                    <% lista_vagas_sorteadas.forEach(function(row) {
-                        if (row.unidade.substring(0,2) == 'T2' ) { %>
+                <div id="S2" class="cards-sorteio subsolo w3-border" style="display:none">                     
+                  <% lista_vagas_sorteadas.forEach(function(row) {
+                      if (row.unidade.substring(0,2) == 'T2' ) { %>
+                        <div class="card-sorteio">
+                          <span style="font-weight: bold;">
+                            <%- row.unidade.substring(2) %>
+                          </span>-
+                          <%- row.vaga_sorteada %> - <%- row.ordem_sorteio %> - <%- row.ordem_vaga_escolhida %>
+                        </div>
+                      <% } %>
+                  <% }) %>
+                </div>
+                <div id="S3" class="subsolo" style="display:none"> 
+                  <img src="/images/subsolo1.jpg" width="100%">
+                </div>
+                <div id="S4" class="subsolo" style="display:none"> 
+                  <img src="/images/subsolo2.jpg" width="100%">
+                </div>
+                <div id="S5" class="subsolo subsolo w3-border" style="display:none; background-color: #FFFFFF;"> 
+                  <p><%- log_sorteio %></p>
+                </div>
+              </div>
+              <label class="w3-label">Formato: Unidade - Subsolo - Vaga - Ordem do Sorteio da Unidade - Ordem do Sorteio da Vaga Escolhida </label>              
+            <% } else { %>
+              <div>
+                <div class="w3-bar" >
+                  <input id="S1b" type="button" class="aba-subsolo aba-subsolo-foco" value="Torre 1">
+                  <input id="S2b" type="button" class="aba-subsolo" value="Torre 2">
+                  <input id="S3b" type="button" class="aba-subsolo" value="Mapa S1">
+                  <input id="S4b" type="button" class="aba-subsolo" value="Mapa S2">
+                  <script>
+                    document.getElementById('S1b').addEventListener('click', function() { abreSubsolo('S1') })                      
+                    document.getElementById('S2b').addEventListener('click', function() { abreSubsolo('S2') })                      
+                    document.getElementById('S3b').addEventListener('click', function() { abreSubsolo('S3') })                      
+                    document.getElementById('S4b').addEventListener('click', function() { abreSubsolo('S4') })                      
+                  </script>
+                </div> 
+                <div id="S1" class="cards-sorteio-vagas subsolo w3-border">  
+                    <% lista_vagas_sorteadas.forEach(function(row) { %>                          
+                        <% if (row.unidade.substring(0,2) == 'T1' ) { %>
                           <div class="card-sorteio-vagas" id="<%- row.unidade %>u">
                             <span style="font-weight: bold;">
                               <%- row.unidade.substring(2) %> - <span id="<%- row.unidade %>-icon"></span> -
@@ -155,31 +128,57 @@
                                   let vagas = []
                                   row.vagas_escolhidas.forEach(function(item) {
                                     vagas.push(item.vaga)
-                                  })              
+                                  })
                             %>                              
-                                <%- '('+vagas.toString().replace(/,/gi, ', ')+')' %>
+                                <%- '('+vagas.toString().replace(/,/gi, ', ')+')' %>                                
                             <% } else { %>
                               Sem escolhas
-                            <% }%>
+                            <% } %>                            
                           </div>
                         <% } %>
                     <% }) %>
-                  </div>
-                  <div id="S3" class="subsolo" style="display:none"> 
-                    <img src="/images/subsolo1.jpg" width="100%">
-                  </div>
-                  <div id="S4" class="subsolo" style="display:none"> 
-                    <img src="/images/subsolo2.jpg" width="100%">
-                  </div>
                 </div>
-                <label class="w3-label">
-                  Formato: Unidade (<i class="fa fa-check icon-color-ok"></i> Presente / 
-                  <i class="fa fa-remove icon-color-no-ok"></i> Ausente) - Usuário Registrado 
-                  (<i class="fa fa-user icon-color-ok"></i> Sim / <i class="fa fa-user icon-color-no-ok"></i> Não) 
-                  - Vagas escolhidas
-                </label> 
-              <% } %>
-              <p>
+                <div id="S2" class="cards-sorteio-vagas subsolo w3-border" style="display:none">                     
+                  <% lista_vagas_sorteadas.forEach(function(row) {
+                      if (row.unidade.substring(0,2) == 'T2' ) { %>
+                        <div class="card-sorteio-vagas" id="<%- row.unidade %>u">
+                          <span style="font-weight: bold;">
+                            <%- row.unidade.substring(2) %> - <span id="<%- row.unidade %>-icon"></span> -
+                            <% if (row.user_id != null) { %>
+                              <span class="fa fa-user icon-color-ok"></span>
+                            <% } else { %>
+                              <span class="fa fa-user icon-color-no-ok"></span>
+                            <% } %>
+                          </span>- 
+                          <% if(row.vagas_escolhidas != null) { 
+                                let vagas = []
+                                row.vagas_escolhidas.forEach(function(item) {
+                                  vagas.push(item.vaga)
+                                })              
+                          %>                              
+                              <%- '('+vagas.toString().replace(/,/gi, ', ')+')' %>
+                          <% } else { %>
+                            Sem escolhas
+                          <% }%>
+                        </div>
+                      <% } %>
+                  <% }) %>
+                </div>
+                <div id="S3" class="subsolo" style="display:none"> 
+                  <img src="/images/subsolo1.jpg" width="100%">
+                </div>
+                <div id="S4" class="subsolo" style="display:none"> 
+                  <img src="/images/subsolo2.jpg" width="100%">
+                </div>
+              </div>
+              <label class="w3-label">
+                Formato: Unidade (<i class="fa fa-check icon-color-ok"></i> Presente / 
+                <i class="fa fa-remove icon-color-no-ok"></i> Ausente) - Usuário Registrado 
+                (<i class="fa fa-user icon-color-ok"></i> Sim / <i class="fa fa-user icon-color-no-ok"></i> Não) 
+                - Vagas escolhidas
+              </label> 
+            <% } %>
+            <p>
                 <% if(configuracao.resultado_bloqueio == 'Sorteio não bloqueado' && configuracao.resultado_sorteio == 'Sorteio não realizado') { %>
                   <button class="w3-button w3-black" type="submit">
                       <i class="fa fa-paper-plane"></i> BLOQUEAR PARA SORTEAR

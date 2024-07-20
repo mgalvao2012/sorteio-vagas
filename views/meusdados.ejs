@@ -143,10 +143,24 @@
                 <div class="w3-col m6 l6">
                   <p>
                     <label class="w3-label">Vaga sorteada: S + (subsolo 1 ou 2) + (número da vaga)</label>
-                    <input class="w3-input w3-border" type="text" required name="unidade" value="<%= vaga_sorteada %>" disabled>
+                    <input class="w3-input w3-border" type="text" required name="unidade" value="<%= vaga_sorteada %>" style="font-weight: bold;" disabled>
                   </p>
                 </div>
               </div>
+              <div class="w3-row">
+                <div class="w3-col m6 l6" style="padding-right:10px;">
+                  <p>
+                    <label class="w3-label">Execução do sorteio</label>
+                    <input class="w3-input w3-border" type="text" name="ultimo_sorteio" value="<%= ultimo_sorteio %>" disabled></p>
+                  </p>
+                </div>
+                <div class="w3-col m6 l6" style="padding-right:10px;">
+                  <p>
+                    <label class="w3-label">Bloqueio do sorteio</label>
+                    <input class="w3-input w3-border" type="text" name="bloqueio_sorteio" value="<%= bloqueio_sorteio %>" disabled>
+                  </p>
+                </div>
+              </div>              
               <p>
                 <label class="w3-label">Vagas Selecionadas:</label>
                 <textarea class="w3-input w3-border" type="areatext" disabled name="_vagas_escolhidas" 

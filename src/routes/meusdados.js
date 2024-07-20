@@ -3,6 +3,8 @@ const { check, validationResult } = require("express-validator");
 const router = express.Router();
 const { requiresAuth } = require("express-openid-connect");
 const { pool } = require("../config");
+const util = require("../util");
+const e = require("connect-flash");
 
 const getMeusdados = (request, response) => {
 	return new Promise((resolve, reject) => {
@@ -36,6 +38,16 @@ const getMeusdados = (request, response) => {
 							usuario_admin: request.session.usuario_admin,
 						});
 					} else {
+						var estilo_mensagem = '';						
+						if (results[3].rows[0].resultado_bloqueio == "Sorteio bloqueado" && 
+							results[3].rows[0].resultado_sorteio == "Sorteio não realizado"
+						) {
+							estilo_mensagem = "warning";
+							mensagem = "O Sorteio foi bloqueado. " +
+								"Não é mais possível alterar as vagas escolhidas!";
+						} else {
+							estilo_mensagem = "success";
+						}
 						// converte de '[{"vaga": "S1G27"},{"vaga": "S1G28"}]' -> ['S1G27, S1G28']
 						let vagas_escolhidas_array = results[1].rows[0].vagas_escolhidas;
 						let vagas_escolhidas = [];
@@ -45,18 +57,26 @@ const getMeusdados = (request, response) => {
 								vagas_escolhidas.push(item.vaga);
 							});
 						}
+						if (results[3].rows[0].ultimo_sorteio != null) {
+							var ultimo_sorteio = util.formatDate(results[3].rows[0].ultimo_sorteio,1);
+						}
+						if (results[3].rows[0].bloqueio_sorteio != null) {
+							var bloqueio_sorteio = util.formatDate(results[3].rows[0].bloqueio_sorteio,1);
+						}
 						response.render("meusdados.ejs", {
 							user_id: user_id,
 							email: request.oidc.user.email,
 							name: request.oidc.user.name,
 							unidade: results[1].rows[0].unidade,
 							vagas_escolhidas: vagas_escolhidas,
-							mensagem: ["success", "Informação!", mensagem],
+							mensagem: [estilo_mensagem, "Informação!", mensagem],
 							lista_vagas: results[0].rows,
 							lista_unidades: results[2].rows,
 							vaga_sorteada: results[1].rows[0].vaga_sorteada,
 							usuario_admin: request.session.usuario_admin,
 							configuracao: results[3].rows[0],
+							ultimo_sorteio: ultimo_sorteio,
+							bloqueio_sorteio: bloqueio_sorteio,
 						});
 					}
 					resolve("ok");
@@ -89,47 +109,47 @@ router.post(
 		} else {
 			var user_id = request.oidc.user.sub;
 			var unidade = request.body.unidade;
-			console.log("unidade " + unidade);
-			console.log(
-				"request.session.unidade_usuario " + request.session.unidade_usuario
-			);
-			console.log(
-				`Vagas escolhidas pela unidade ${unidade} [${request.body.vagas_escolhidas}]`
-			);
-			var vagas_escolhidas_array = [];
-			var vagas_escolhidas = null;
-			if (request.body.vagas_escolhidas.length > 0) {
-				let vagas_escolhidas_preenchida =
-					request.body.vagas_escolhidas.split(",");
-				if (vagas_escolhidas_preenchida.length > 0) {
-					vagas_escolhidas_preenchida.forEach((vaga) => {
-						vagas_escolhidas_array.push({ vaga: vaga });
-					});
-					vagas_escolhidas = JSON.stringify(vagas_escolhidas_array);
-				}
-			}
-			/*
-      console.log(
-        `query UPDATE unidades SET user_id = '${user_id}', vagas_escolhidas = ${vagas_escolhidas} `+
-        `WHERE unidade = '${unidade}' RETURNING *;`
-      );
-      */
-			pool.query(
-				"UPDATE unidades SET user_id = $1, email = $2, vagas_escolhidas = $3 WHERE unidade = $4 RETURNING *;",
-				[user_id, request.oidc.user.email, vagas_escolhidas, unidade],
-				(_error, _results) => {
-					if (_error) {
-						console.log("erro: " + _error.message);
-						request.session.meusdadosMensagem =
-							"Erro na atualização dos dados!";
+			(async () => {
+				try {
+					let configuracao = await pool.query("SELECT * FROM configuracao;");
+					if (configuracao.rows[0].resultado_bloqueio == "Sorteio bloqueado") {
+						response.redirect("/meusdados");
 					} else {
-						request.session.meusdadosMensagem =
-							"Dados atualizados com sucesso!";
+						console.log("unidade " + unidade);
+						console.log("request.session.unidade_usuario " + request.session.unidade_usuario);
+						console.log(
+							`Vagas escolhidas pela unidade ${unidade} [${request.body.vagas_escolhidas}]`
+						);
+						var vagas_escolhidas_array = [];
+						var vagas_escolhidas = null;
+						if (request.body.vagas_escolhidas.length > 0) {
+							let vagas_escolhidas_preenchida = request.body.vagas_escolhidas.split(",");
+							if (vagas_escolhidas_preenchida.length > 0) {
+								vagas_escolhidas_preenchida.forEach((vaga) => {
+									vagas_escolhidas_array.push({ vaga: vaga });
+								});
+								vagas_escolhidas = JSON.stringify(vagas_escolhidas_array);
+							}
+						}
+						pool.query(
+							"UPDATE unidades SET user_id = $1, email = $2, vagas_escolhidas = $3 WHERE unidade = $4 RETURNING *;",
+							[user_id, request.oidc.user.email, vagas_escolhidas, unidade],
+							(_error, _results) => {
+								if (_error) {
+									console.log("erro: " + _error.message);
+									request.session.meusdadosMensagem = "Erro na atualização dos dados!";
+								} else {
+									request.session.meusdadosMensagem = "Dados atualizados com sucesso!";
+								}
+								request.session.unidade_usuario = unidade;
+								getMeusdados(request, response);
+							}
+						);			
 					}
-					request.session.unidade_usuario = unidade;
-					getMeusdados(request, response);
+				} catch (e) {
+					console.error(e.message, e.stack);
 				}
-			);
+			})();
 		}
 	}
 );
