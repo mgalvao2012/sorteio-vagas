@@ -161,16 +161,41 @@
   <div id="myModal" class="modal">
     <!-- Modal content -->
     <div class="modal-content">
-      <span class="close">&times;</span>
-      <p id="myModalMensagem"></p>
-      <p>
-        <button id="btnConfirmar" class="w3-button w3-black" type="button">
-            <i class="fa fa-paper-plane"></i> CONFIRMAR
-        </button>
-        <button id="btnCancelar" class="w3-button w3-black" type="button">
-          <i class="fa fa-times-circle"></i> CANCELAR
-        </button>
-      </p>
+      <span id="fecharModal" class="close">&times;</span>
+      <p>Por favor, informar os dados do morador da unidade:</p>
+      <form id="form1">
+        <div class="w3-row">
+          <div class="w3-col m6 l6" style="padding-right:10px;">
+            <p>
+              <label class="w3-label">Nome</label>
+              <input id="nome" class="w3-input w3-border" type="text" name="name" min="10">
+            </p>
+          </div>
+          <div class="w3-col m6 l6">
+            <p>
+              <label class="w3-label">Email</label>
+              <input id="email" class="w3-input w3-border" type="text" name="email" min="10">
+            </p>
+          </div>
+        </div>
+        <p>
+          <input id="form1_unidade" type="hidden" name="unidade">
+          <input id="form1_user_id" type="hidden" name="user_id">
+          <button id="btnConfirmar" class="w3-button w3-black" type="button">
+              <i class="fa fa-paper-plane"></i> CONFIRMAR
+          </button>
+          <button id="btnCancelar" class="w3-button w3-black" type="button">
+            <i class="fa fa-times-circle"></i> CANCELAR
+          </button>
+          <script>            
+            document.getElementById('btnConfirmar').addEventListener('click',
+              function() { 
+                let unidade = document.getElementById('form1_unidade').value;
+                let user_id = document.getElementById('form1_user_id').value;
+                atualizarUnidade(unidade, user_id) });
+          </script>
+        </p>
+      </form>
     </div>
   </div>
 
@@ -239,18 +264,42 @@
     function unidadeClicada(valor) {  
       let user_id = document.getElementById(valor+'-userid').value;
       if (user_id != '') {
-        document.getElementById('myModal').style.display='block';
-        document.getElementById('btnConfirmar').addEventListener('click',
-          function() { liberarUnidade(valor) });
-        document.getElementById('btnCancelar').addEventListener('click',
-          function() { document.getElementById('myModal').style.display='none' });
-        document.getElementById('myModalMensagem').innerHTML = 
-          'Você tem certeza que deseja cancelar o registro da unidade '+valor+' ? '+
-          'Os grupos de vagas escolhidos serão perdidos!';
+        $(document).ready(function(){
+          $(document).ajaxError(function(e, xhr, opt) {
+            notify.render({
+              head: 'Atenção!',
+              style: 'error',
+              content: xhr.responseJSON.message
+            })
+          });
+          $.get("/unidades/morador?user_id="+user_id,
+            function(data,status){
+              if( data.status == 'success') {
+                document.getElementById('nome').value = data.nome;
+                document.getElementById('email').value = data.email;
+                document.getElementById('form1_unidade').value = valor;
+                document.getElementById('form1_user_id').value = user_id;
+                document.getElementById('myModal').style.display='block';
+                //document.getElementById('btnConfirmar').addEventListener('click',
+                //  function() { atualizarUnidade(valor, user_id) });
+                document.getElementById('btnCancelar').addEventListener('click',
+                  function() { document.getElementById('myModal').style.display='none' });
+                document.getElementById('fecharModal').addEventListener('click',
+                  function() { document.getElementById('myModal').style.display='none' });
+              } else {
+                notify.render({
+                  head: 'Atenção',
+                  style: 'error',
+                  content: 'Unidade '+valor+'. Erro: '+data.message
+                });
+              }
+            }
+          );
+        });
       }
     }
 
-    function liberarUnidade(valor) {
+    function atualizarUnidade(valor, user_id) {
       document.getElementById('myModal').style.display='none';
       $(document).ready(function(){
         $(document).ajaxError(function(e, xhr, opt) {
@@ -260,19 +309,18 @@
             content: xhr.responseJSON.message
           })
         });
-        $.post("/unidades/liberarUnidade",
+        $.post("/unidades/morador",
           {
-            "unidade": valor
+            "user_id": user_id,
+            "nome": document.getElementById('nome').value,
+            "email": document.getElementById('email').value,
           },
           function(data,status){
-            let element = document.getElementById(valor+'-icon');
-            element.classList.remove('icon-color-ok');
-            element.classList.add('icon-color-no-ok');
             if( data.status == 'success') {
               notify.render({
                 head: 'Informação',
                 style: 'success',
-                content: 'Unidade '+valor+' foi liberada com sucesso!'
+                content: 'Unidade '+valor+' atualizada com sucesso! ' 
               });
             } else {
               notify.render({
@@ -283,7 +331,7 @@
             }
           }
         );
-      });  
+      });    
     }
 
     function unidadeClicadaPNE(valor) {  

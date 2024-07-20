@@ -4,6 +4,7 @@ const router = express.Router();
 const { requiresAuth } = require("express-openid-connect");
 const { pool } = require("../config");
 const util = require("../util");
+const e = require("connect-flash");
 
 router.get("/unidades", requiresAuth(), async (request, response) => {
 	const retorno = await util.usuarioDefiniuUnidade(request, response);
@@ -62,6 +63,143 @@ router.get("/unidades", requiresAuth(), async (request, response) => {
 	}
 });
 
+router.get("/unidades/morador", requiresAuth(), async (request, response) => {
+	const retorno = await util.usuarioDefiniuUnidade(request, response);
+	if (retorno == "OK") {
+		if (request.session.usuario_admin) {
+			if(request.session.auth0_access_token == null) {
+				console.log("Token para autenticação não foi gerado. Fale com o administrador!");
+				response.status(403).json({
+					status: "error",
+					message: "Token para autenticação não foi gerado. Fale com o administrador!",
+				});
+				} else {
+				(async () => {
+					try {
+						if (request.query.user_id != null) {
+							let unidade = await pool.query(`SELECT nome, email FROM unidades WHERE user_id = '${request.query.user_id}';`);
+							if (unidade.rowCount == 1) {
+								response.json({
+									nome: unidade.rows[0].nome.trim(), 
+									email: unidade.rows[0].email.trim(),								
+									status: "success",
+									message: "unidade encontrada", 
+								});
+							} else {
+								response.status(204).json({ 
+									status: "success",
+									message: "unidade não encontrada", 
+								});
+							}
+						} else {
+							console.log("Parâmetro não informado");
+							response.status(400).json({
+								status: "error",
+								message: "Parâmetro não informado!",
+							});						
+						}
+					} catch (e) {
+						console.error(e.message, e.stack);
+					}
+				})();
+			}
+		} else {
+			console.log("Você não está autorizado a acessar este recurso!");
+			response.status(403).json({
+				status: "error",
+				message: "Você não está autorizado a acessar este recurso!",
+			});
+		}
+	}
+});
+
+router.post(
+	"/unidades/morador",
+	[
+		check("user_id")
+			.isLength({ min: 31 })
+			.withMessage("O parâmetro user_id não está corretamente preenchido (tamanho)")
+			.trim(),
+		check("nome")
+			.isLength({ min: 10, max: 255 })
+			.withMessage("O nome precisa ter pelo menos 10 carateres e no máximo 255")
+			.trim(),
+		check("email")
+			.matches(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/)
+			.withMessage("Formato de email inválido")
+			.trim(),
+	],
+	requiresAuth(),
+	(request, response) => {
+		const error = validationResult(request).formatWith(({ msg }) => msg);
+		const hasError = !error.isEmpty();
+		console.log(error);
+		if (hasError) {
+			response.status(422).json({ error: error.array() });
+		} else {
+			if (request.session.usuario_admin) {
+				const user_id = request.body.user_id;
+				const nome = request.body.nome;
+				const email = request.body.email;
+				let query_update = `UPDATE unidades SET nome = '${nome}', email = '${email}' WHERE user_id = '${user_id}' RETURNING *;`;
+				console.log(query_update);
+				pool.query(query_update,
+					(_error, _results) => {
+						if (_error) {
+							response
+								.status(500)
+								.json({ status: "error", message: _error });
+						} else {
+							// atualiza usuario no Auth0
+							var data = JSON.stringify({
+								email: email,
+								name: nome,
+								connection: "Username-Password-Authentication",
+							});
+							let config = {
+								method: "PATCH",
+								maxBodyLength: Infinity,
+								url: `${process.env.issuerBaseURL}/api/v2/users/${user_id}`,
+								headers: {
+									"Content-Type": "application/json",
+									Accept: "application/json",
+									Authorization: `Bearer ${request.session.auth0_access_token}`,
+								},
+								data: data,
+							};
+							var axios = require("axios").default;
+							axios
+								.request(config)
+								.then((_response) => {
+									let d = new Date();
+									let dt = d.toLocaleString();
+									console.log(`${dt} - Usuário ${_response.data.user_id} atualizado!`);
+									response.status(200).json({
+										status: "success",
+										message: "registro atualizado com sucesso!",
+									});
+								})
+								.catch((error) => {
+									console.log(error);
+									response
+										.status(500)
+										.json({ status: "error", message: error });
+								});
+
+						}
+					}
+				);
+			} else {
+				console.log("Você não está autorizado a acessar este recurso!");
+				response.status(403).json({
+					status: "error",
+					message: "Você não está autorizado a acessar este recurso!",
+				});
+			}
+		}
+	}
+);
+
 router.post(
 	"/unidades/atualizarPresenca",
 	[
@@ -73,13 +211,9 @@ router.post(
 			.trim(),
 		check("presente")
 			.isLength({ min: 4, max: 5 })
-			.withMessage(
-				"O parâmetro presente não está corretamente preenchido (tamanho)"
-			)
+			.withMessage("O parâmetro presente não está corretamente preenchido (tamanho)")
 			.matches(/true|false/)
-			.withMessage(
-				"O parâmetro presente não está corretamente preenchido (true ou false)"
-			)
+			.withMessage("O parâmetro presente não está corretamente preenchido (true ou false)")
 			.trim(),
 	],
 	requiresAuth(),
@@ -135,9 +269,7 @@ router.post(
 			.isLength({ min: 4, max: 5 })
 			.withMessage("O parâmetro pne não está corretamente preenchido (tamanho)")
 			.matches(/true|false/)
-			.withMessage(
-				"O parâmetro pne não está corretamente preenchido (true ou false)"
-			)
+			.withMessage("O parâmetro pne não está corretamente preenchido (true ou false)")
 			.trim(),
 	],
 	requiresAuth(),
@@ -193,9 +325,7 @@ router.post(
 			.isLength({ min: 4, max: 5 })
 			.withMessage("O parâmetro pne não está corretamente preenchido (tamanho)")
 			.matches(/true|false/)
-			.withMessage(
-				"O parâmetro pne não está corretamente preenchido (true ou false)"
-			)
+			.withMessage("O parâmetro pne não está corretamente preenchido (true ou false)")
 			.trim(),
 	],
 	requiresAuth(),
@@ -214,55 +344,6 @@ router.post(
 				pool.query(
 					"UPDATE unidades SET adimplente = $1 WHERE unidade = $2;",
 					[adimplente, unidade],
-					(_error, _results) => {
-						if (_error) {
-							response
-								.status(500)
-								.json({ status: "error", message: _error });
-						} else {
-							response.status(200).json({
-								status: "success",
-								message: "registro atualizado com sucesso!",
-							});
-						}
-					}
-				);
-			} else {
-				console.log("Você não está autorizado a acessar este recurso!");
-				response.status(403).json({
-					status: "error",
-					message: "Você não está autorizado a acessar este recurso!",
-				});
-			}
-		}
-	}
-);
-
-router.post(
-	"/unidades/liberarUnidade",
-	[
-		check("unidade")
-			.isLength({ min: 5, max: 5 })
-			.withMessage("O parâmetro unidade não está corretamente preenchido (tamanho)")
-			.matches(/T[1|2][0-2]\d[1-4]/)
-			.withMessage("O parâmetro unidade não está corretamente preenchido (formato)")
-			.trim(),
-	],
-	requiresAuth(),
-	(request, response) => {
-		const error = validationResult(request).formatWith(({ msg }) => msg);
-		const hasError = !error.isEmpty();
-		if (hasError) {
-			response.status(422).json({ error: error.array() });
-		} else {
-			if (request.session.usuario_admin) {
-				const unidade = request.body.unidade;
-				console.log(
-					`UPDATE unidades SET user_id = NULL, vagas_escolhidas = NULL WHERE unidade = '${unidade}';`
-				);
-				pool.query(
-					"UPDATE unidades SET user_id = NULL, vagas_escolhidas = NULL WHERE unidade = $1;",
-					[unidade],
 					(_error, _results) => {
 						if (_error) {
 							response

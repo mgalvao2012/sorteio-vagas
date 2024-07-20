@@ -133,29 +133,55 @@ const limiter = rateLimit({
 	max: 20, // 20 requests,
 });
 
+var autenticaAuth0 = new Promise(function(resolve, reject) {
+	(async () => {
+		try {
+			var axios = require("axios").default;
+			var options = {
+				method: "POST",
+				url: `${process.env.issuerBaseURL}/oauth/token`,
+				headers: { "content-type": "application/x-www-form-urlencoded" },
+				data: new URLSearchParams({
+					client_id: process.env["AUTH0_CLIENT_ID"],
+					client_secret: process.env["AUTH0_CLIENT_SECRET"],
+					audience: `${process.env.issuerBaseURL}/api/v2/`,
+					grant_type: "client_credentials",
+				}),
+			}
+			let auth0 = await axios.request(options);
+			if (auth0.status == 200 && auth0.data.access_token != undefined) {
+				resolve(auth0.data.access_token);
+			}
+		} catch (e) {
+			console.error(e.message, e.stack);
+		}
+	})();
+});
+
 app.use(limiter, (request, response, next) => {
 	const url_permitidas = process.env.URL_PERMITIDAS;
-	if (!url_permitidas.includes(request.url)) {
-		if (
-			!request.header("apiKey") ||
-			request.header("apiKey") !== process.env.API_KEY
-		) {
+	if (!url_permitidas.includes(request.url.split("?")[0])) {
+		if (!request.header("apiKey") || request.header("apiKey") !== process.env.API_KEY) {
 			return response
 				.status(401)
 				.json({ status: "error", message: "Acesso não autorizado." });
 		}
 	}
 	if (request.oidc.user != null) {
-		//console.log('request.oidc.user.user_metadata '+request.oidc.user.user_metadata);
 		request.session.usuario_admin = usuarios_admin.includes(request.oidc.user.email);
+		// Verifica se o token com Auth0 foi gerado
+		if (request.session.usuario_admin && request.session.auth0_access_token == null) {
+				autenticaAuth0.then( function(token) {
+					request.session.auth0_access_token = token;
+				})		
+		}
 	} else {
 		request.session.usuario_admin = null;
 		request.session.unidade_usuario = null;
 	}
 	if (
 		request.oidc.isAuthenticated() &&
-		(request.session.unidade_usuario == null ||
-			request.session.unidade_usuario == undefined)
+		(request.session.unidade_usuario == null || request.session.unidade_usuario == undefined)
 	) {
 		let user_id = request.oidc.user.sub;
 		pool.query(
@@ -167,8 +193,7 @@ app.use(limiter, (request, response, next) => {
 					if (results.rows[0] != null) {
 						request.session.unidade_usuario = results.rows[0].unidade;
 						console.log(
-							"request.session.unidade_usuario " +
-								request.session.unidade_usuario
+							"request.session.unidade_usuario " + request.session.unidade_usuario
 						);
 					}
 				}
@@ -302,8 +327,6 @@ if (development_env) {
 	module.exports = server;
 } else {
 	app.listen(PORT, () => {
-		console.log(
-			`Server listening at ${PORT}. Environment development: ${development_env}`
-		);
+		console.log(`Server listening at ${PORT}. Environment development: ${development_env}`);
 	});
 }
