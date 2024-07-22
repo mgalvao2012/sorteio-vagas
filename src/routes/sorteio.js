@@ -406,6 +406,7 @@ router.post("/sorteio/reiniciar", requiresAuth(), (request, response) => {
 router.post("/sorteio/bloquear", requiresAuth(), (request, response) => {
 	if (request.session.usuario_admin) {
 		let data_atual = util.formatDate(new Date(), 2);
+		console.log('bloqueio '+data_atual);
 		pool.query(
 			`UPDATE configuracao SET resultado_sorteio = 'Sorteio não realizado', log_sorteio = null,
 			   ultimo_sorteio = null, resultado_bloqueio = 'Sorteio bloqueado', 

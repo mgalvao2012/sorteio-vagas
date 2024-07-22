@@ -1,4 +1,6 @@
 const { pool, redisClient } = require("./config");
+const moment = require("moment");
+const tz = require("moment-timezone");
 
 module.exports.getjson = async function (key) {
 	let myPromise = new Promise(function (resolve) {
@@ -63,36 +65,18 @@ function padTo2Digits(num) {
 }
 
 module.exports.formatDate = function (date, format) {
+	var datahora = moment.tz(date, 'America/Sao_Paulo').format();
 	if (format == 1) {
-		return (
-			[
-				padTo2Digits(date.getDate()),
-				padTo2Digits(date.getMonth() + 1),
-				date.getFullYear(),
-			].join("/") +
-			" " +
-			[
-				padTo2Digits(date.getHours()),
-				padTo2Digits(date.getMinutes()),
-				padTo2Digits(date.getSeconds()),
-			].join(":")
-		);
+		return (datahora.substring(8,10)+'/'+datahora.substring(5,7)+'/'+
+			datahora.substring(0,4)+' '+datahora.substring(11,19));
 	} else {
-		return (
-			[
-				date.getFullYear(),
-				padTo2Digits(date.getMonth() + 1),
-				padTo2Digits(date.getDate()),
-			].join("-") +
-			" " +
-			[
-				padTo2Digits(date.getHours()),
-				padTo2Digits(date.getMinutes()),
-				padTo2Digits(date.getSeconds()),
-			].join(":")
-		);
+		return (datahora.substring(0,10)+' '+datahora.substring(11,19));
 	}
 };
+
+function convertTZ(date, tzString) {
+	return new Date((typeof date === "string" ? new Date(date) : date).toLocaleString("pt-BR", {timeZone: tzString}));   
+}
 
 module.exports.usuarioDefiniuUnidade = async function (request, response) {
 	return new Promise((resolve, _reject) => {
