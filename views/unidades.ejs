@@ -200,11 +200,12 @@
     </div>
   </div>
   <script> 
-    var lista_unidades = '<%= lista_unidades %>'
-    var lista_ajustada_unidades = '<%= lista_ajustada_unidades %>'.split(',')
-    var resultado_sorteio = '<%= resultado_sorteio %>'
-    var lista_pne = []
-    var lista_adimplente= []
+    var lista_unidades = '<%= lista_unidades %>';
+    var lista_ajustada_unidades = '<%= lista_ajustada_unidades %>'.split(',');
+    var resultado_sorteio = '<%= resultado_sorteio %>';
+    var resultado_bloqueio = '<%= resultado_bloqueio %>';
+    var lista_pne = [];
+    var lista_adimplente= [];
 
     const notify = new Notify();
     var estilo = '<%= (mensagem != null ? mensagem[0] : "") %>';
@@ -231,12 +232,15 @@
             lista_adimplente.push(unidade)
           }
           // adiciona o evento onclick aos icones
-          document.getElementById(unidade+'-pne-icon').addEventListener('click', 
-            function() { unidadeClicadaPNE(unidade) })
-          document.getElementById(unidade+'-adimplente-icon').addEventListener('click', 
-            function() { unidadeClicadaAdimplente(unidade) })
-          document.getElementById(unidade+'-icon').addEventListener('click', 
-            function() { unidadeClicada(unidade) })
+          console.log()
+          if(resultado_bloqueio == 'Sorteio não bloqueado') {
+            document.getElementById(unidade+'-pne-icon').addEventListener('click', 
+              function() { unidadeClicadaPNE(unidade) })
+            document.getElementById(unidade+'-adimplente-icon').addEventListener('click', 
+              function() { unidadeClicadaAdimplente(unidade) })
+            document.getElementById(unidade+'-icon').addEventListener('click', 
+              function() { unidadeClicada(unidade) })
+          }
         }  
       }
     }

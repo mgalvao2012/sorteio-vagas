@@ -26,13 +26,7 @@ router.get("/unidades", requiresAuth(), async (request, response) => {
 						"SELECT unidade, pne, adimplente, user_id FROM unidades ORDER BY unidade;"
 					);
 					unidades.rows.forEach((row) => {
-						lista_unidades.push(
-							row.unidade +
-								"-" +
-								row.pne.toString() +
-								"-" +
-								row.adimplente.toString()
-						);
+						lista_unidades.push(row.unidade + "-" + row.pne.toString() + "-" + row.adimplente.toString());
 					});
 					response.render("unidades.ejs", {
 						email: request.oidc.user.email,
@@ -40,15 +34,10 @@ router.get("/unidades", requiresAuth(), async (request, response) => {
 						lista_unidades: unidades.rows,
 						lista_ajustada_unidades: lista_unidades,
 						resultado_sorteio: configuracao.rows[0].resultado_sorteio,
+						resultado_bloqueio: configuracao.rows[0].resultado_bloqueio,
 						mensagem: ["warning", "Atenção!", mensagem],
 						usuario_admin: request.session.usuario_admin,
 					});
-					/*
-          let _json = JSON.stringify(unidades.rows);
-          await redisClient.set('_json', _json);
-          let _json2 = await util.getjson('_json');
-          console.log(2,_json2);
-          */
 				} catch (e) {
 					console.error(e.message, e.stack);
 				}
