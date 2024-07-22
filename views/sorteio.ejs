@@ -18,20 +18,20 @@
 <div class="w3-container w3-light-grey" style="padding:78px 16px;" id="sorteio">
     <div style="padding: 10px; box-shadow: 0 3px 18px 8px rgb(38 24 24 / 25%);">
       <h3 class="w3-center">Sorteio das vagas</h3>
-      <% if(configuracao.resultado_sorteio == 'Sorteio não realizado') { %>
+      <% if(resultado_sorteio == 'Sorteio não realizado') { %>
         <p class="w3-center w3-medium">Antes de executar o sorteio confirme se todos fizeram suas escolhas.<br/>
         Clicando <span class="fa fa-hand-pointer-o icon-hand-pointer"></span> na unidade é possível atualizar a presença ou ausência no sorteio.</p>
       <% } %>        
       <div style="margin-top:28px; width: 90%; margin: auto;">
         <div>
           <form id="form1" action="/sorteio/bloquear" method="POST">
-            <% if(configuracao.resultado_bloqueio == 'Sorteio bloqueado' && configuracao.resultado_sorteio == 'Sorteio não realizado') { %>
+            <% if(resultado_bloqueio == 'Sorteio bloqueado' && resultado_sorteio == 'Sorteio não realizado') { %>
               <p>
                 <label class="w3-label">Bloqueio do sorteio</label>
                 <input class="w3-input w3-border" type="text" name="bloqueio_sorteio" value="<%= bloqueio_sorteio %>" disabled>
               </p>
             <% } %>
-            <% if(configuracao.resultado_sorteio != 'Sorteio não realizado') { %>
+            <% if(resultado_sorteio != 'Sorteio não realizado') { %>
               <div class="w3-row">
                 <div class="w3-col m6 l6" style="padding-right:10px;">
                   <p>
@@ -47,7 +47,7 @@
                 </div>
               </div>
               <p><label class="w3-label">Resultado</label>
-              <input class="w3-input w3-border" type="text" name="resultado" value="<%= configuracao.resultado_sorteio %>" disabled></p>
+              <input class="w3-input w3-border" type="text" name="resultado" value="<%= resultado_sorteio %>" disabled></p>
               <div>
                 <div class="w3-bar" >
                   <input id="S1b" type="button" class="aba-subsolo aba-subsolo-foco" value="Torre 1">
@@ -179,12 +179,12 @@
               </label> 
             <% } %>
             <p>
-                <% if(configuracao.resultado_bloqueio == 'Sorteio não bloqueado' && configuracao.resultado_sorteio == 'Sorteio não realizado') { %>
+                <% if(resultado_bloqueio == 'Sorteio não bloqueado' && resultado_sorteio == 'Sorteio não realizado') { %>
                   <button class="w3-button w3-black" type="submit">
                       <i class="fa fa-paper-plane"></i> BLOQUEAR PARA SORTEAR
                   </button>
                 <% } %>
-                <% if(configuracao.resultado_bloqueio == 'Sorteio bloqueado' && configuracao.resultado_sorteio == 'Sorteio não realizado') { %>
+                <% if(resultado_bloqueio == 'Sorteio bloqueado' && resultado_sorteio == 'Sorteio não realizado') { %>
                   <button id="btnSortear" class="w3-button w3-black" type="submit">
                       <i class="fa fa-paper-plane"></i> SORTEAR
                   </button> 
@@ -196,7 +196,7 @@
                       });                    
                   </script>
                 <% } %>
-                <% if(configuracao.resultado_sorteio.startsWith('Sorteio realizado')) { %>             
+                <% if(resultado_sorteio.startsWith('Sorteio realizado')) { %>             
                   <button id="btnReiniciar" class="w3-button w3-black" type="button">
                     <i class="fa fa-paper-plane"></i> REINICIAR SORTEIO
                   </button>
@@ -226,7 +226,8 @@
     var lista_vagas_sorteadas = '<%= lista_vagas_sorteadas %>'
     var lista_presenca = '<%= lista_presenca %>'.split(',')
     var lista_presenca_vagas = []
-    var configuracao = '<%= configuracao %>'
+    var resultado_bloqueio = '<%= resultado_bloqueio %>';
+    var resultado_sorteio = '<%= resultado_sorteio %>';
 
     const notify = new Notify();
     var estilo = '<%= (mensagem != null ? mensagem[0] : "") %>';
@@ -242,7 +243,7 @@
 
     // atualiza as unidades com o status de presença gravado no banco de dados
     function loadFunction() { 
-      if(configuracao.resultado_sorteio == 'Sorteio não realizado') {
+      if(resultado_sorteio == 'Sorteio não realizado') {
         for(var i=0; i<lista_presenca.length; i++) {
           let unidade = lista_presenca[i].split('-')[0]
           if (lista_presenca[i].split('-')[1] == 'true') {
@@ -257,49 +258,16 @@
     }
     window.onload = loadFunction();
 
-    function unidadeClicada(valor) {  
-      var posicao = lista_presenca_vagas.indexOf(valor);
-      if (posicao > -1) {
-        $(document).ready(function(){
-          $(document).ajaxError(function(e, xhr, opt) {
-            notify.render({
-              head: 'Atenção!',
-              style: 'error',
-              content: xhr.responseJSON.message
-            })
-          });
-          $.post("/unidades/atualizarPresenca",
-            {
-              "unidade": valor,
-              "presente": "false"
-            },
-            function(data,status){
-              document.getElementById(valor+'-icon').innerHTML = '<i class="fa fa-remove icon-color-no-ok"></i>';
-              lista_presenca_vagas.splice(posicao,1);
-              if( data.status == 'success') {
-                notify.render({
-                  head: 'Informação',
-                  style: 'warning',
-                  content: 'Unidade '+valor+' não está presente!'
-                });
-              } else {
-                notify.render({
-                  head: 'Atenção',
-                  style: 'error',
-                  content: 'Unidade '+valor+'. Erro: '+data.message
-                });
-              }
-            }
-          );
-        });    
+    function unidadeClicada(valor) {
+      if(resultado_bloqueio == 'Sorteio bloqueado') {
+        notify.render({
+          head: 'Atenção!',
+          style: 'warning',
+          content: 'As condições não podem ser alteradas porque o sorteio foi bloqueado'
+        });
       } else {
-        let i = -1
-        for(i=0; i<lista_vagas_sorteadas.length; i++) {
-          if (lista_vagas_sorteadas[i].unidade == valor) {
-            break
-          }
-        }
-        if (i > -1) {
+        var posicao = lista_presenca_vagas.indexOf(valor);
+        if (posicao > -1) {
           $(document).ready(function(){
             $(document).ajaxError(function(e, xhr, opt) {
               notify.render({
@@ -311,16 +279,16 @@
             $.post("/unidades/atualizarPresenca",
               {
                 "unidade": valor,
-                "presente": "true"
+                "presente": "false"
               },
               function(data,status){
-                document.getElementById(valor+'-icon').innerHTML = '<i class="fa fa-check icon-color-ok"></i>';
-                lista_presenca_vagas.push(valor);
+                document.getElementById(valor+'-icon').innerHTML = '<i class="fa fa-remove icon-color-no-ok"></i>';
+                lista_presenca_vagas.splice(posicao,1);
                 if( data.status == 'success') {
                   notify.render({
                     head: 'Informação',
-                    style: 'success',
-                    content: 'Unidade '+valor+' está presente!'
+                    style: 'warning',
+                    content: 'Unidade '+valor+' não está presente!'
                   });
                 } else {
                   notify.render({
@@ -331,7 +299,48 @@
                 }
               }
             );
-          });
+          });    
+        } else {
+          let i = -1
+          for(i=0; i<lista_vagas_sorteadas.length; i++) {
+            if (lista_vagas_sorteadas[i].unidade == valor) {
+              break
+            }
+          }
+          if (i > -1) {
+            $(document).ready(function(){
+              $(document).ajaxError(function(e, xhr, opt) {
+                notify.render({
+                  head: 'Atenção!',
+                  style: 'error',
+                  content: xhr.responseJSON.message
+                })
+              });
+              $.post("/unidades/atualizarPresenca",
+                {
+                  "unidade": valor,
+                  "presente": "true"
+                },
+                function(data,status){
+                  document.getElementById(valor+'-icon').innerHTML = '<i class="fa fa-check icon-color-ok"></i>';
+                  lista_presenca_vagas.push(valor);
+                  if( data.status == 'success') {
+                    notify.render({
+                      head: 'Informação',
+                      style: 'success',
+                      content: 'Unidade '+valor+' está presente!'
+                    });
+                  } else {
+                    notify.render({
+                      head: 'Atenção',
+                      style: 'error',
+                      content: 'Unidade '+valor+'. Erro: '+data.message
+                    });
+                  }
+                }
+              );
+            });
+          }
         }
       }
     }

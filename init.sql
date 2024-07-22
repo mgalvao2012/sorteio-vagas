@@ -18,7 +18,7 @@ CREATE TABLE configuracao (
   resultado_bloqueio VARCHAR(255)
   log_sorteio TEXT
 );
-INSERT INTO configuracao (ultimo_sorteio, resultado_sorteio) values (NOW(), 'Sorteio não realizado', 'Sorteio não bloqueado');
+INSERT INTO configuracao (resultado_sorteio, resultado_bloqueio) values ('Sorteio não realizado', 'Sorteio não bloqueado');
 
 CREATE TABLE vagas (
   codigo CHAR(5) PRIMARY KEY,
