@@ -64,8 +64,12 @@ function padTo2Digits(num) {
 	return num.toString().padStart(2, "0");
 }
 
-module.exports.formatDate = function (date, format) {
-	var datahora = moment.tz(date, 'America/Sao_Paulo').format();
+module.exports.formatDate = function (date, format, convertTZ) {
+	if (convertTZ) {
+		var datahora = moment.tz(date, 'America/Sao_Paulo').format();
+	} else {
+		var datahora = moment(date).format();
+	}
 	if (format == 1) {
 		return (datahora.substring(8,10)+'/'+datahora.substring(5,7)+'/'+
 			datahora.substring(0,4)+' '+datahora.substring(11,19));
@@ -73,10 +77,6 @@ module.exports.formatDate = function (date, format) {
 		return (datahora.substring(0,10)+' '+datahora.substring(11,19));
 	}
 };
-
-function convertTZ(date, tzString) {
-	return new Date((typeof date === "string" ? new Date(date) : date).toLocaleString("pt-BR", {timeZone: tzString}));   
-}
 
 module.exports.usuarioDefiniuUnidade = async function (request, response) {
 	return new Promise((resolve, _reject) => {

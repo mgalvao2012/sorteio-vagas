@@ -3,7 +3,6 @@ const router = express.Router();
 const { requiresAuth } = require("express-openid-connect");
 const { pool } = require("../config");
 const util = require("../util");
-var ordem_sorteio = 0;
 
 const sorteiaVagas = (objetivo, vagas_disponiveis, query) => {
 	return new Promise((resolve, reject) => {
@@ -96,10 +95,10 @@ const getSorteio = (request, response) => {
 							});
 						} else {
 							if (results[0].rows[0].ultimo_sorteio != null) {
-								var ultimo_sorteio = util.formatDate(results[0].rows[0].ultimo_sorteio,1);
+								var ultimo_sorteio = util.formatDate(results[0].rows[0].ultimo_sorteio, 1, false);
 							}
 							if (results[0].rows[0].bloqueio_sorteio != null) {
-								var bloqueio_sorteio = util.formatDate(results[0].rows[0].bloqueio_sorteio,1);
+								var bloqueio_sorteio = util.formatDate(results[0].rows[0].bloqueio_sorteio, 1, false);
 							}
 							let lista_presenca = []; // lista criada para facilitar o tratamento de presenca
 							results[1].rows.forEach((row) => {
@@ -274,7 +273,7 @@ router.post("/sorteio", requiresAuth(), (request, response) => {
 																element[1] != null ? 1 : 0;
 														}
 													);
-													let data_atual = util.formatDate(new Date(), 2);
+													let data_atual = util.formatDate(new Date(), 2, true);
 													if (
 														qtd_vagas_sorteadas == 0 &&
 														qtd_unidades_sorteadas == 0
@@ -370,7 +369,7 @@ router.post("/sorteio", requiresAuth(), (request, response) => {
 
 router.post("/sorteio/reiniciar", requiresAuth(), (request, response) => {
 	if (request.session.usuario_admin) {
-		let data_atual = util.formatDate(new Date(), 2);
+		let data_atual = util.formatDate(new Date(), 2, true);
 		pool.query(
 			`UPDATE unidades SET vaga_sorteada = null;
        	 UPDATE configuracao SET resultado_sorteio = 'Sorteio não realizado', log_sorteio = null, 
@@ -405,7 +404,7 @@ router.post("/sorteio/reiniciar", requiresAuth(), (request, response) => {
 
 router.post("/sorteio/bloquear", requiresAuth(), (request, response) => {
 	if (request.session.usuario_admin) {
-		let data_atual = util.formatDate(new Date(), 2);
+		let data_atual = util.formatDate(new Date(), 2, true);
 		console.log('bloqueio '+data_atual);
 		pool.query(
 			`UPDATE configuracao SET resultado_sorteio = 'Sorteio não realizado', log_sorteio = null,

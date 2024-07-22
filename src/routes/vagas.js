@@ -31,10 +31,10 @@ router.get("/vagas", requiresAuth(), async (request, response) => {
 							var ultimo_sorteio = '';
 							if (request.session.usuario_admin != '') {
 								if (results[0].rows[0].resultado_sorteio.startsWith("Sorteio realizado")) {
-									ultimo_sorteio = util.formatDate(results[0].rows[0].ultimo_sorteio,1);
+									ultimo_sorteio = util.formatDate(results[0].rows[0].ultimo_sorteio, 1, false);
 									mensagem = `As condições não podem ser alteradas porque o sorteio foi realizado em ${ultimo_sorteio}. É preciso reiniciar o processo!`;
 								} else if (results[0].rows[0].resultado_bloqueio == "Sorteio bloqueado") {
-									let bloqueio_sorteio = util.formatDate(results[0].rows[0].bloqueio_sorteio,1);
+									let bloqueio_sorteio = util.formatDate(results[0].rows[0].bloqueio_sorteio, 1, false);
 									mensagem = `As condições não podem ser alteradas porque o sorteio foi bloqueado em ${bloqueio_sorteio}!`;
 								}
 							}

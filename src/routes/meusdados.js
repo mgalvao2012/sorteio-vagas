@@ -58,10 +58,10 @@ const getMeusdados = (request, response) => {
 							});
 						}
 						if (results[3].rows[0].ultimo_sorteio != null) {
-							var ultimo_sorteio = util.formatDate(results[3].rows[0].ultimo_sorteio,1);
+							var ultimo_sorteio = util.formatDate(results[3].rows[0].ultimo_sorteio, 1, false);
 						}
 						if (results[3].rows[0].bloqueio_sorteio != null) {
-							var bloqueio_sorteio = util.formatDate(results[3].rows[0].bloqueio_sorteio,1);
+							var bloqueio_sorteio = util.formatDate(results[3].rows[0].bloqueio_sorteio, 1, false);
 						}
 						response.render("meusdados.ejs", {
 							user_id: user_id,
