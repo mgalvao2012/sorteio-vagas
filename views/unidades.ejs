@@ -192,32 +192,13 @@
               function() { 
                 let unidade = document.getElementById('form1_unidade').value;
                 let user_id = document.getElementById('form1_user_id').value;
-                atualizarUnidade(unidade, user_id) });
+                atualizarUnidade(unidade, user_id); 
+              });
           </script>
         </p>
       </form>
     </div>
   </div>
-
-  <script>
-    // Get the modal
-    var modal = document.getElementById("myModal");
-
-    // Get the <span> element that closes the modal
-    var span = document.getElementsByClassName("close")[0];
-
-    // When the user clicks on <span> (x), close the modal
-    span.onclick = function() {
-      modal.style.display = "none";
-    }
-
-    // When the user clicks anywhere outside of the modal, close it
-    window.onclick = function(event) {
-      if (event.target == modal) {
-        modal.style.display = "none";
-      }
-    }
-  </script>
   <script> 
     var lista_unidades = '<%= lista_unidades %>'
     var lista_ajustada_unidades = '<%= lista_ajustada_unidades %>'.split(',')
@@ -264,74 +245,50 @@
     function unidadeClicada(valor) {  
       let user_id = document.getElementById(valor+'-userid').value;
       if (user_id != '') {
-        $(document).ready(function(){
-          $(document).ajaxError(function(e, xhr, opt) {
-            notify.render({
-              head: 'Atenção!',
-              style: 'error',
-              content: xhr.responseJSON.message
-            })
+        $.get("/unidades/morador?user_id="+user_id,
+          function(data){
+            document.getElementById('nome').value = data.nome;
+            document.getElementById('email').value = data.email;
+            document.getElementById('form1_unidade').value = valor;
+            document.getElementById('form1_user_id').value = user_id;
+            document.getElementById('myModal').style.display='block';
+            document.getElementById('btnCancelar').addEventListener('click',
+              function() { document.getElementById('myModal').style.display='none' });
+            document.getElementById('fecharModal').addEventListener('click',
+              function() { document.getElementById('myModal').style.display='none' });
+        })
+        .fail(function(jqXHR) {
+          notify.render({
+            head: 'Atenção',
+            style: 'error',
+            content: 'Unidade '+valor+'. Erro: '+jqXHR.responseJSON.error[0]
           });
-          $.get("/unidades/morador?user_id="+user_id,
-            function(data,status){
-              if( data.status == 'success') {
-                document.getElementById('nome').value = data.nome;
-                document.getElementById('email').value = data.email;
-                document.getElementById('form1_unidade').value = valor;
-                document.getElementById('form1_user_id').value = user_id;
-                document.getElementById('myModal').style.display='block';
-                //document.getElementById('btnConfirmar').addEventListener('click',
-                //  function() { atualizarUnidade(valor, user_id) });
-                document.getElementById('btnCancelar').addEventListener('click',
-                  function() { document.getElementById('myModal').style.display='none' });
-                document.getElementById('fecharModal').addEventListener('click',
-                  function() { document.getElementById('myModal').style.display='none' });
-              } else {
-                notify.render({
-                  head: 'Atenção',
-                  style: 'error',
-                  content: 'Unidade '+valor+'. Erro: '+data.message
-                });
-              }
-            }
-          );
         });
       }
     }
 
     function atualizarUnidade(valor, user_id) {
-      document.getElementById('myModal').style.display='none';
-      $(document).ready(function(){
-        $(document).ajaxError(function(e, xhr, opt) {
+      document.getElementById('myModal').style.display='none';      
+      $.post("/unidades/morador",
+        {
+          "user_id": user_id,
+          "nome": document.getElementById('nome').value,
+          "email": document.getElementById('email').value,
+        },
+        function(data){
           notify.render({
-            head: 'Atenção!',
+            head: 'Informação',
+            style: 'success',
+            content: 'Unidade '+valor+' atualizada com sucesso! ' 
+          });
+      })
+        .fail(function(jqXHR) {
+          notify.render({
+            head: 'Atenção',
             style: 'error',
-            content: xhr.responseJSON.message
-          })
-        });
-        $.post("/unidades/morador",
-          {
-            "user_id": user_id,
-            "nome": document.getElementById('nome').value,
-            "email": document.getElementById('email').value,
-          },
-          function(data,status){
-            if( data.status == 'success') {
-              notify.render({
-                head: 'Informação',
-                style: 'success',
-                content: 'Unidade '+valor+' atualizada com sucesso! ' 
-              });
-            } else {
-              notify.render({
-                head: 'Atenção',
-                style: 'error',
-                content: 'Unidade '+valor+'. Erro: '+data.message
-              });
-            }
-          }
-        );
-      });    
+            content: 'Unidade '+valor+'. Erro: '+jqXHR.responseJSON.error[0]
+          });
+      });
     }
 
     function unidadeClicadaPNE(valor) {  
@@ -342,7 +299,7 @@
             notify.render({
               head: 'Atenção!',
               style: 'error',
-              content: xhr.responseJSON.message
+              content: xhr.responseJSON.error[0]
             })
           });
           $.post("/unidades/atualizarPNE",
@@ -376,7 +333,7 @@
             notify.render({
               head: 'Atenção!',
               style: 'error',
-              content: xhr.responseJSON.message
+              content: xhr.responseJSON.error[0]
             })
           });
           $.post("/unidades/atualizarPNE",
@@ -415,7 +372,7 @@
             notify.render({
               head: 'Atenção!',
               style: 'error',
-              content: xhr.responseJSON.message
+              content: xhr.responseJSON.error[0]
             })
           });
           $.post("/unidades/atualizarAdimplente",
@@ -449,7 +406,7 @@
             notify.render({
               head: 'Atenção!',
               style: 'error',
-              content: xhr.responseJSON.message
+              content: xhr.responseJSON.error[0]
             })
           });
           $.post("/unidades/atualizarAdimplente",
@@ -500,7 +457,7 @@
     }
 
     // Get the modal
-    var modal = document.getElementById('id01');
+    var modal = document.getElementById('MyModal');
 
     // When the user clicks anywhere outside of the modal, close it
     window.onclick = function(event) {
