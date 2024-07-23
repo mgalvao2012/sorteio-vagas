@@ -32,7 +32,7 @@ O condomínio definiu as seguintes prioridade que devem ser observadas para a ex
 
 Ao final do processo, é recomendado que o resultado do sorteio também seja exportado para o formato PDF, desta forma o síndico pode compartilhar com todos os condôminos o resultado do sorteio.
 
-*Importante:* para acessar todas essas funções acima cada usuário precisa primeiro se cadastrar. Este processo é realizado através do menu "Login" e da opção "Registrar-se". É possível fazer um cadastro com email e senha ou através do autorização de uso do seu usuário do gmail, desta forma, não preciso definir uma nova senha.
+*Importante:* para acessar todas essas funções acima cada usuário precisa se identificar. Este processo é realizado através do menu "Login". O cadastro dos usuários deve ser realizado previamente pelo administrador, através de execução de script sql contendo unidade, nome, email e senha (que deverá ser trocada no primeiro acesso).
 
 ## Instruções para instalação e configuração da aplicação
 
