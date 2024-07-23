@@ -316,8 +316,7 @@ router.post("/sorteio", requiresAuth(), (request, response) => {
 																if (_error) {
 																	// console.log(query_gravacao)
 																	console.log(
-																		"Falha no sorteio. Mensagem de erro: " +
-																			error.message
+																		"Falha no sorteio. Mensagem de erro: " + _error.message 
 																	);
 																	// response.status(500).json({ status: 'warning', message: error.message })
 																} else {
