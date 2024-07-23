@@ -105,6 +105,13 @@ html {
   display: block;
 }
 
+/* remove o cabeçalho das páginas impressas */
+@media print {
+  .w3-top { 
+    position: unset;
+  }
+}
+
 @media screen and (max-width: 600px) {
 
   .topnav a:not(:first-child),
