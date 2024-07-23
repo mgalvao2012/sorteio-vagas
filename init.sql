@@ -6,6 +6,8 @@
 -- Habilita a criptografia nativa para armanezar senhas
 -- CREATE EXTENSION pgcrypto;
 
+SET TIMEZONE TO 'America/Sao_Paulo';
+
 DROP TABLE IF EXISTS configuracao;
 DROP TABLE IF EXISTS unidades;
 DROP TABLE IF EXISTS vagas;
@@ -15,15 +17,19 @@ CREATE TABLE configuracao (
   ultimo_sorteio TIMESTAMP,
   bloqueio_sorteio TIMESTAMP,
   resultado_sorteio VARCHAR(255),
-  resultado_bloqueio VARCHAR(255)
-  log_sorteio TEXT
+  resultado_bloqueio VARCHAR(255),
+  log_sorteio TEXT,
+  criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(), 
+  atualizado_em TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 INSERT INTO configuracao (resultado_sorteio, resultado_bloqueio) values ('Sorteio não realizado', 'Sorteio não bloqueado');
 
 CREATE TABLE vagas (
   codigo CHAR(5) PRIMARY KEY,
   disponivel BOOLEAN,
-  ultima_gravacao TIMESTAMP default CURRENT_TIMESTAMP
+  criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(), 
+  atualizado_em TIMESTAMPTZ NOT NULL DEFAULT NOW()
+
 );
 
 CREATE TABLE unidades (
@@ -38,8 +44,9 @@ CREATE TABLE unidades (
   senha CHAR(80),
   ordem_sorteio SMALLINT,
   ordem_vaga_escolhida SMALLINT,
-  ultima_gravacao TIMESTAMP default CURRENT_TIMESTAMP,
-  vagas_escolhidas JSONB
+  vagas_escolhidas JSONB.
+  criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(), 
+  atualizado_em TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 INSERT INTO vagas (codigo, disponivel) VALUES ('S1G01', true);
@@ -429,3 +436,23 @@ INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_e
 INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T2242', false, true, true, NULL, NULL);
 INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T2243', false, true, true, NULL, NULL);
 INSERT INTO unidades (unidade, pne, presente, adimplente, vaga_sorteada, vagas_escolhidas) VALUES ('T2244', false, true, true, NULL, NULL);
+
+CREATE OR REPLACE FUNCTION trigger_set_timestamp() 
+  RETURNS TRIGGER AS $$ 
+  BEGIN 
+    NEW.atualizado_em = NOW(); 
+    RETURN NEW; 
+  END; 
+  $$ LANGUAGE plpgsql;
+
+CREATE TRIGGER set_timestamp 
+  BEFORE UPDATE ON configuracao FOR EACH row 
+  EXECUTE PROCEDURE trigger_set_timestamp();
+
+CREATE TRIGGER set_timestamp 
+  BEFORE UPDATE ON unidades FOR EACH row 
+  EXECUTE PROCEDURE trigger_set_timestamp();
+
+CREATE TRIGGER set_timestamp 
+  BEFORE UPDATE ON vagas FOR EACH row 
+  EXECUTE PROCEDURE trigger_set_timestamp();
