@@ -92,6 +92,8 @@ const getSorteio = (request, response) => {
 								lista_presenca: null,
 								mensagem: null,
 								usuario_admin: request.session.usuario_admin,
+								versao: process.env.HEROKU_RELEASE_VERSION,
+								build: process.env.HEROKU_BUILD_DESCRIPTION.substring(7),
 							});
 						} else {
 							if (results[0].rows[0].ultimo_sorteio != null) {
@@ -128,6 +130,8 @@ const getSorteio = (request, response) => {
 								mensagem: [estilo, titulo, mensagem],
 								usuario_admin: request.session.usuario_admin,
 								log_sorteio: results[0].rows[0].log_sorteio,
+								versao: process.env.HEROKU_RELEASE_VERSION,
+								build: process.env.HEROKU_BUILD_DESCRIPTION.substring(7),
 							});
 						}
 					}
