@@ -180,26 +180,10 @@
 										value="Mapa S2"
 									/>
 									<script>
-										document
-											.getElementById("S1b")
-											.addEventListener("click", function () {
-												abreSubsolo("S1");
-											});
-										document
-											.getElementById("S2b")
-											.addEventListener("click", function () {
-												abreSubsolo("S2");
-											});
-										document
-											.getElementById("S3b")
-											.addEventListener("click", function () {
-												abreSubsolo("S3");
-											});
-										document
-											.getElementById("S4b")
-											.addEventListener("click", function () {
-												abreSubsolo("S4");
-											});
+										document.getElementById("S1b").addEventListener("click", function () { abreSubsolo("S1"); });
+										document.getElementById("S2b").addEventListener("click", function () { abreSubsolo("S2"); });
+										document.getElementById("S3b").addEventListener("click", function () { abreSubsolo("S3"); });
+										document.getElementById("S4b").addEventListener("click", function () { abreSubsolo("S4"); });
 									</script>
 								</div>
 								<div id="S1" class="cards-vagas subsolo w3-border">
@@ -247,22 +231,10 @@
 			</div>
 		</div>
 
-		<!-- Footer -->
 		<footer class="w3-center w3-black w3-padding-24">
-			<a href="#vagas" class="w3-button w3-light-grey"
-				><i class="fa fa-arrow-up w3-margin-right"></i>Vai para o início</a
-			>
-			<p>
-				Powered by
-				<a
-					href="https://www.w3schools.com/w3css/default.asp"
-					title="W3.CSS"
-					target="_blank"
-					class="w3-hover-text-green"
-					>w3.css</a
-				>
-			</p>
-		</footer>
+			<a href="#vagas" class="w3-button w3-light-grey"><i class="fa fa-arrow-up w3-margin-right"></i>Vai para o início</a>
+			<p>Versão: <%= versao %> - Build: <%= build %></p>
+		 </footer>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 		<script src="./js/notify.js"></script>
 		<script>

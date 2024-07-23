@@ -133,7 +133,7 @@ const limiter = rateLimit({
 	max: 20, // 20 requests,
 });
 
-var autenticaAuth0 = new Promise(function(resolve, reject) {
+var autenticaAuth0 = new Promise(function (resolve, reject) {
 	(async () => {
 		try {
 			var axios = require("axios").default;
@@ -147,7 +147,7 @@ var autenticaAuth0 = new Promise(function(resolve, reject) {
 					audience: `${process.env.issuerBaseURL}/api/v2/`,
 					grant_type: "client_credentials",
 				}),
-			}
+			};
 			let auth0 = await axios.request(options);
 			if (auth0.status == 200 && auth0.data.access_token != undefined) {
 				resolve(auth0.data.access_token);
@@ -171,9 +171,9 @@ app.use(limiter, (request, response, next) => {
 		request.session.usuario_admin = usuarios_admin.includes(request.oidc.user.email);
 		// Verifica se o token com Auth0 foi gerado
 		if (request.session.usuario_admin && request.session.auth0_access_token == null) {
-				autenticaAuth0.then( function(token) {
-					request.session.auth0_access_token = token;
-				})		
+			autenticaAuth0.then(function (token) {
+				request.session.auth0_access_token = token;
+			});
 		}
 	} else {
 		request.session.usuario_admin = null;
@@ -239,6 +239,8 @@ app.get("/", async (request, response) => {
 								vaga_sorteada: null,
 								usuario_admin: request.session.usuario_admin,
 								resultado_sorteio: results[3].rows[0].resultado_sorteio,
+								versao: process.env.HEROKU_RELEASE_VERSION,
+								build: process.env.HEROKU_BUILD_DESCRIPTION.substring(7),
 							});
 						} else {
 							response.render("index.ejs", {
@@ -249,6 +251,8 @@ app.get("/", async (request, response) => {
 								mensagem: null,
 								usuario_admin: request.session.usuario_admin,
 								resultado_sorteio: results[3].rows[0].resultado_sorteio,
+								versao: process.env.HEROKU_RELEASE_VERSION,
+								build: process.env.HEROKU_BUILD_DESCRIPTION.substring(7),
 							});
 						}
 					}
@@ -270,6 +274,8 @@ app.get("/", async (request, response) => {
 				mensagem: mensagem != null ? ["warning", "Atenção", mensagem] : null,
 				usuario_admin: request.session.usuario_admin,
 				resultado_sorteio: null,
+				versao: process.env.HEROKU_RELEASE_VERSION,
+				build: process.env.HEROKU_BUILD_DESCRIPTION.substring(7),
 			});
 		}
 	} else {
@@ -281,6 +287,8 @@ app.get("/", async (request, response) => {
 			mensagem: null,
 			usuario_admin: request.session.usuario_admin,
 			resultado_sorteio: null,
+			versao: process.env.HEROKU_RELEASE_VERSION,
+			build: process.env.HEROKU_BUILD_DESCRIPTION.substring(7),
 		});
 	}
 });

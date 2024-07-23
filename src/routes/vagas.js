@@ -53,6 +53,8 @@ router.get("/vagas", requiresAuth(), async (request, response) => {
 								lista_ajustada_vagas: lista_vagas,
 								mensagem: ["warning", "Atenção!", mensagem],
 								usuario_admin: request.session.usuario_admin,
+								versao: process.env.HEROKU_RELEASE_VERSION,
+								build: process.env.HEROKU_BUILD_DESCRIPTION.substring(7),
 							});
 						}
 					}

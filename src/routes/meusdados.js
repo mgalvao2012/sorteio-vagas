@@ -36,6 +36,8 @@ const getMeusdados = (request, response) => {
 							lista_unidades: results[2].rows,
 							vaga_sorteada: null,
 							usuario_admin: request.session.usuario_admin,
+							versao: process.env.HEROKU_RELEASE_VERSION,
+							build: process.env.HEROKU_BUILD_DESCRIPTION.substring(7)
 						});
 					} else {
 						var estilo_mensagem = '';						
@@ -77,6 +79,8 @@ const getMeusdados = (request, response) => {
 							configuracao: results[3].rows[0],
 							ultimo_sorteio: ultimo_sorteio,
 							bloqueio_sorteio: bloqueio_sorteio,
+							versao: process.env.HEROKU_RELEASE_VERSION,
+							build: process.env.HEROKU_BUILD_DESCRIPTION.substring(7),
 						});
 					}
 					resolve("ok");
