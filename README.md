@@ -1,5 +1,5 @@
 # Projeto SVE
-Sorteio de Vagas de Estacionamento do Condomínio Grandlife Ipiranga
+Sorteio de Vagas de Estacionamento do Condomínio Grand Life Ipiranga
 
 *Objetivo:* simplificar a vida dos condôminos em um processo que normalmente é manual, desgastante e que consome muito tempo durante as reuniões de condomínio.
 
