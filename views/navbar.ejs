@@ -15,9 +15,9 @@
 					<i class="fa fa-caret-down"></i>
 				</button>
 				<div class="dropdown-content">
-					<a href="/meusdados">Meus dados</a>
-					<a href="/vagas">Vagas</a>
+					<a href="/meusdados">Minhas vagas</a>
 					<% if (usuario_admin) { %>
+					<a href="/vagas">Vagas</a>
 					<a href="/unidades">Unidades</a>
 					<a href="/sorteio">Sorteio</a>
 					<% } %>
@@ -82,9 +82,9 @@
 			<%= name.substring(0,24) %><i class="fa fa-caret-down"></i>
 		</button>
 		<div class="w3-dropdown-content w3-bar-block w3-dark-grey">
-			<a href="/meusdados" class="w3-bar-item w3-button">Meus dados</a>
-			<a href="/vagas" class="w3-bar-item w3-button">Vagas</a>
+			<a href="/meusdados" class="w3-bar-item w3-button">Minhas vagas</a>
 			<% if (usuario_admin) { %>
+			<a href="/vagas" class="w3-bar-item w3-button">Vagas</a>
 			<a href="/unidades" class="w3-bar-item w3-button">Unidades</a>
 			<a href="/sorteio" class="w3-bar-item w3-button">Sorteio</a>
 			<% } %>
