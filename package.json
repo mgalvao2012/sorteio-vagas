@@ -26,7 +26,7 @@
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dotenv": "^16.0.0",
-    "ejs": ">=3.1.7",
+    "ejs": ">=3.1.10",
     "expect-puppeteer": "^6.1.0",
     "express": "^4.17.3",
     "express-openid-connect": "^2.7.1",
