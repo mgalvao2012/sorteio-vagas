@@ -259,15 +259,48 @@
     window.onload = loadFunction();
 
     function unidadeClicada(valor) {
-      if(resultado_bloqueio == 'Sorteio bloqueado') {
-        notify.render({
-          head: 'Atenção!',
-          style: 'warning',
-          content: 'As condições não podem ser alteradas porque o sorteio foi bloqueado'
-        });
+      var posicao = lista_presenca_vagas.indexOf(valor);
+      if (posicao > -1) {
+        $(document).ready(function(){
+          $(document).ajaxError(function(e, xhr, opt) {
+            notify.render({
+              head: 'Atenção!',
+              style: 'error',
+              content: xhr.responseJSON.message
+            })
+          });
+          $.post("/unidades/atualizarPresenca",
+            {
+              "unidade": valor,
+              "presente": "false"
+            },
+            function(data,status){
+              document.getElementById(valor+'-icon').innerHTML = '<i class="fa fa-remove icon-color-no-ok"></i>';
+              lista_presenca_vagas.splice(posicao,1);
+              if( data.status == 'success') {
+                notify.render({
+                  head: 'Informação',
+                  style: 'warning',
+                  content: 'Unidade '+valor+' não está presente!'
+                });
+              } else {
+                notify.render({
+                  head: 'Atenção',
+                  style: 'error',
+                  content: 'Unidade '+valor+'. Erro: '+data.message
+                });
+              }
+            }
+          );
+        });    
       } else {
-        var posicao = lista_presenca_vagas.indexOf(valor);
-        if (posicao > -1) {
+        let i = -1
+        for(i=0; i<lista_vagas_sorteadas.length; i++) {
+          if (lista_vagas_sorteadas[i].unidade == valor) {
+            break
+          }
+        }
+        if (i > -1) {
           $(document).ready(function(){
             $(document).ajaxError(function(e, xhr, opt) {
               notify.render({
@@ -279,16 +312,16 @@
             $.post("/unidades/atualizarPresenca",
               {
                 "unidade": valor,
-                "presente": "false"
+                "presente": "true"
               },
               function(data,status){
-                document.getElementById(valor+'-icon').innerHTML = '<i class="fa fa-remove icon-color-no-ok"></i>';
-                lista_presenca_vagas.splice(posicao,1);
+                document.getElementById(valor+'-icon').innerHTML = '<i class="fa fa-check icon-color-ok"></i>';
+                lista_presenca_vagas.push(valor);
                 if( data.status == 'success') {
                   notify.render({
                     head: 'Informação',
-                    style: 'warning',
-                    content: 'Unidade '+valor+' não está presente!'
+                    style: 'success',
+                    content: 'Unidade '+valor+' está presente!'
                   });
                 } else {
                   notify.render({
@@ -299,48 +332,7 @@
                 }
               }
             );
-          });    
-        } else {
-          let i = -1
-          for(i=0; i<lista_vagas_sorteadas.length; i++) {
-            if (lista_vagas_sorteadas[i].unidade == valor) {
-              break
-            }
-          }
-          if (i > -1) {
-            $(document).ready(function(){
-              $(document).ajaxError(function(e, xhr, opt) {
-                notify.render({
-                  head: 'Atenção!',
-                  style: 'error',
-                  content: xhr.responseJSON.message
-                })
-              });
-              $.post("/unidades/atualizarPresenca",
-                {
-                  "unidade": valor,
-                  "presente": "true"
-                },
-                function(data,status){
-                  document.getElementById(valor+'-icon').innerHTML = '<i class="fa fa-check icon-color-ok"></i>';
-                  lista_presenca_vagas.push(valor);
-                  if( data.status == 'success') {
-                    notify.render({
-                      head: 'Informação',
-                      style: 'success',
-                      content: 'Unidade '+valor+' está presente!'
-                    });
-                  } else {
-                    notify.render({
-                      head: 'Atenção',
-                      style: 'error',
-                      content: 'Unidade '+valor+'. Erro: '+data.message
-                    });
-                  }
-                }
-              );
-            });
-          }
+          });
         }
       }
     }
