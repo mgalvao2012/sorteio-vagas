@@ -227,7 +227,7 @@ router.post("/sorteio", requiresAuth(), (request, response) => {
 									sorteiaVagas(
 										"sorteio de unidades SEM portadores de necessidade especiais, AUSENTES e ADIMPLENTES",
 										vagas_disponiveis,
-										`SELECT unidade, vaga_sorteada, vagas_escolhidas FROM unidades WHERE pne = false AND presente = false AND vaga_sorteada IS NULL`
+										`SELECT unidade, vaga_sorteada, vagas_escolhidas FROM unidades WHERE pne = false AND adimplente = true AND presente = false AND vaga_sorteada IS NULL`
 									)
 										.then((retorno3) => {
 											vagas_disponiveis = retorno3[0];
@@ -320,7 +320,7 @@ router.post("/sorteio", requiresAuth(), (request, response) => {
 																if (_error) {
 																	// console.log(query_gravacao)
 																	console.log(
-																		"Falha no sorteio. Mensagem de erro: " + _error.message 
+																		"Falha no sorteio. Mensagem de erro: " + _error.message
 																	);
 																	// response.status(500).json({ status: 'warning', message: error.message })
 																} else {
