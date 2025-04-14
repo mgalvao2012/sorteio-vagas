@@ -16,7 +16,7 @@
   "author": "Marcelo Galvão",
   "license": "ISC",
   "dependencies": {
-    "@sendgrid/mail": "^7.7.0",
+    "@sendgrid/mail": "^8.1.5",
     "auth0": "^4.7.0",
     "bcrypt": "^5.0.1",
     "bluebird": "^3.7.2",
